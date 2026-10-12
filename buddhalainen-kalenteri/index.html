@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dharmakuun kalenteri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<style>
+/* Layout: yötaivas-hero (valittu päivä + kuu) → kuukausiruudukko ja työkalusarake rinnakkain → juhlapäivät ja selitykset */
+:root {
+  --paper: #f1f0f6;
+  --surface: #fbfafd;
+  --ink: #1c2040;
+  --muted: #5d6184;
+  --line: #d8d7e6;
+  --saffron: #b9640d;
+  --gold: #a07a2a;
+  --jade: #2a7a5b;
+  --madder: #a43c37;
+  --sky: #1a1e3d;
+  --sky-ink: #ece6d3;
+  --sky-muted: #a9a9c9;
+  --moonlit: #f4ead0;
+  --moonshade: #c9c7dc;
+  --good-bg: #dcefe6;
+  --bad-bg: #f5dfdc;
+  --sel: #1c2040;
+  --font-display: "Marcellus", "Cormorant", Georgia, serif;
+  --font-body: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d0f22; --surface: #151834; --ink: #ebe6d6; --muted: #a2a3c3; --line: #2a2e54;
+    --saffron: #e89a3d; --gold: #d8b45f; --jade: #62c096; --madder: #e3807a;
+    --sky: #080918; --sky-ink: #ece6d3; --sky-muted: #9d9dbf; --moonlit: #f6edcf; --moonshade: #262a4f;
+    --good-bg: #173a30; --bad-bg: #3f1f25; --sel: #ebe6d6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d0f22; --surface: #151834; --ink: #ebe6d6; --muted: #a2a3c3; --line: #2a2e54;
+  --saffron: #e89a3d; --gold: #d8b45f; --jade: #62c096; --madder: #e3807a;
+  --sky: #080918; --sky-ink: #ece6d3; --sky-muted: #9d9dbf; --moonlit: #f6edcf; --moonshade: #262a4f;
+  --good-bg: #173a30; --bad-bg: #3f1f25; --sel: #ebe6d6;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: max(16px, 3vw); padding-block: 20px 56px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.15; }
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
+.eyebrow { font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Top bar */
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding-block: 4px 18px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand svg { flex: none; }
+.brand h1 { font-size: 26px; letter-spacing: .02em; }
+.brand p { margin: 0; color: var(--muted); font-size: 14px; }
+.top-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 5px 12px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;
+}
+.chip[aria-pressed="true"] { border-color: var(--saffron); background: color-mix(in srgb, var(--saffron) 14%, var(--surface)); }
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.chip[aria-pressed="true"] .dot { background: var(--saffron); }
+
+/* Hero */
+.hero {
+  background: var(--sky); color: var(--sky-ink); border-radius: 22px; position: relative; overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 28px; padding: 28px clamp(18px, 3vw, 36px);
+}
+.hero canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .8; }
+.hero > * { position: relative; }
+.moonbox { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.moonbox svg { width: min(250px, 62vw); height: auto; filter: drop-shadow(0 0 38px rgba(244, 234, 208, .18)); }
+.hero .eyebrow { color: var(--sky-muted); }
+.hero-date { font-family: var(--font-display); font-size: clamp(30px, 4.4vw, 46px); line-height: 1.05; }
+.hero-sub { color: var(--sky-muted); font-size: 15.5px; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.badge { font-size: 13.5px; padding: 3px 11px; border-radius: 999px; border: 1px solid rgba(236,230,211,.25); display: inline-flex; gap: 6px; align-items: center; }
+.badge.good { background: rgba(98,192,150,.18); border-color: rgba(98,192,150,.55); }
+.badge.bad { background: rgba(227,128,122,.17); border-color: rgba(227,128,122,.55); }
+.badge.gold { background: rgba(216,180,95,.16); border-color: rgba(216,180,95,.55); }
+.hero-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.verdict { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.verdict .word { font-family: var(--font-display); font-size: 26px; }
+.verdict .word.good { color: #8fd8b2; } .verdict .word.bad { color: #f0a49c; } .verdict .word.neutral { color: var(--sky-ink); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px 22px; }
+.fact { border-top: 1px solid rgba(236,230,211,.16); padding-top: 8px; min-width: 0; }
+.fact b { display: block; font-weight: 500; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--sky-muted); }
+.fact span { font-size: 16px; }
+.acts { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px 18px; margin: 0; padding: 0; list-style: none; }
+.acts li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 15px; align-items: start; }
+.acts li small { display: block; color: var(--sky-muted); font-size: 13px; line-height: 1.35; }
+.mark { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; margin-top: 2px; }
+.mark.g { background: #62c096; color: #0b231a; } .mark.b { background: #e3807a; color: #2b0d0b; } .mark.n { border: 1px solid rgba(236,230,211,.35); color: var(--sky-muted); }
+.daycolor { display: inline-block; width: 11px; height: 11px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; border: 1px solid rgba(255,255,255,.4); }
+
+/* Main grid */
+.main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 28px; margin-top: 28px; align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+.cal-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.cal-head h2 { font-size: 30px; }
+.cal-head h2 small { font-family: var(--font-body); font-size: 15px; color: var(--muted); margin-left: 8px; }
+.ctrl { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 6px 12px; font-size: 15px; }
+.btn:hover { border-color: var(--muted); }
+.btn.icon { width: 38px; padding: 6px 0; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; font-size: 15px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+select.btn { padding-right: 8px; }
+
+.modebar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14.5px; color: var(--muted); }
+.modebar select { max-width: 100%; }
+
+.dow, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.dow div { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-align: center; padding-bottom: 4px; }
+.cell {
+  position: relative; min-height: 104px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+  padding: 7px 7px 9px; text-align: left; display: flex; flex-direction: column; gap: 4px; overflow: hidden;
+  transition: transform .12s ease, border-color .12s ease;
+}
+.cell:hover { border-color: var(--muted); }
+.cell.out { opacity: .38; }
+.cell.good { background: var(--good-bg); }
+.cell.bad { background: var(--bad-bg); }
+.cell::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: transparent; }
+.cell.good::after { background: var(--jade); } .cell.bad::after { background: var(--madder); }
+.cell.today .dnum { background: var(--saffron); color: #fff; }
+.cell.sel { border: 2px solid var(--sel); padding: 6px 6px 8px; }
+.cell-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 4px; }
+.dnum { font-variant-numeric: tabular-nums; font-weight: 500; font-size: 16px; min-width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; }
+.cell .tithi { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cell .tags { display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; line-height: 1.2; min-width: 0; }
+.cell .tags span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-up { color: var(--saffron); font-weight: 500; }
+.t-tib { color: var(--gold); }
+.t-fest { color: var(--ink); font-weight: 700; }
+.pips { display: flex; gap: 3px; margin-top: auto; }
+.pip { width: 6px; height: 6px; border-radius: 50%; }
+.pip.up { background: var(--saffron); } .pip.tib { background: var(--gold); } .pip.fest { background: var(--ink); } .pip.vassa { background: var(--muted); opacity: .5; }
+
+/* Year view */
+.year { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+.mini h3 { font-size: 18px; margin-bottom: 6px; }
+.mini .mg { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.mini button { aspect-ratio: 1; max-width: 100%; border: 0; border-radius: 6px; font-size: 11.5px; padding: 0; background: transparent; font-variant-numeric: tabular-nums; position: relative; }
+.mini button.good { background: var(--good-bg); color: var(--ink); }
+.mini button.bad { background: var(--bad-bg); }
+.mini button.up::after { content: ""; position: absolute; top: 2px; right: 2px; width: 5px; height: 5px; border-radius: 50%; background: var(--saffron); }
+.mini button.fest { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.mini button.today { background: var(--saffron); color: #fff; }
+
+/* Side */
+.side { display: flex; flex-direction: column; gap: 20px; }
+.side h2 { font-size: 22px; margin-bottom: 4px; }
+.side p.lead { margin: 0 0 12px; color: var(--muted); font-size: 15px; }
+.actpick { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.actpick .chip { font-size: 13.5px; }
+.found { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.found li button {
+  width: 100%; text-align: left; border: 0; background: transparent; padding: 8px 2px; border-bottom: 1px solid var(--line);
+  display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: start;
+}
+.found li:last-child button { border-bottom: 0; }
+.found .fd { font-family: var(--font-display); font-size: 20px; line-height: 1; }
+.found .fd small { display: block; font-family: var(--font-body); font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 3px; }
+.found .fr { font-size: 14px; color: var(--muted); line-height: 1.35; }
+.found .fr strong { color: var(--ink); font-weight: 500; display: block; font-size: 15px; }
+.legend { display: grid; gap: 8px; font-size: 14.5px; }
+.legend div { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: center; }
+.sw { width: 22px; height: 16px; border-radius: 5px; border: 1px solid var(--line); }
+.export textarea { width: 100%; height: 110px; margin-top: 10px; font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); padding: 8px; resize: vertical; }
+.note { font-size: 13.5px; color: var(--muted); }
+
+/* Festivals & guide */
+.lower { margin-top: 36px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+.lower h2 { font-size: 28px; margin-bottom: 14px; }
+.fest-list { list-style: none; margin: 0; padding: 0; }
+.fest-list li { display: grid; grid-template-columns: 112px 1fr; gap: 14px; padding: 12px 0; border-top: 1px solid var(--line); }
+.fest-list .when { font-variant-numeric: tabular-nums; color: var(--saffron); font-weight: 500; }
+.fest-list .when small { display: block; color: var(--muted); font-weight: 400; font-size: 12.5px; }
+.fest-list h3 { font-size: 19px; }
+.fest-list p { margin: 2px 0 0; font-size: 15px; color: var(--muted); }
+.trad { display: inline-block; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; margin-left: 6px; vertical-align: 2px; }
+.guide { display: grid; gap: 18px; }
+.guide section h3 { font-size: 20px; margin-bottom: 4px; }
+.guide p { margin: 0; font-size: 15.5px; max-width: 65ch; }
+.tithi-table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin-top: 8px; }
+.tithi-table th, .tithi-table td { text-align: left; padding: 6px 8px 6px 0; border-top: 1px solid var(--line); vertical-align: top; }
+.tithi-table th { font-weight: 500; white-space: nowrap; }
+.foot { margin-top: 40px; font-size: 13.5px; color: var(--muted); max-width: 80ch; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 8px 16px; border-radius: 999px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+
+@media (max-width: 980px) {
+  .main, .lower { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 720px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .cell { min-height: 66px; padding: 4px 3px 7px; border-radius: 9px; }
+  .cell.sel { padding: 3px 2px 6px; }
+  .cell .tags, .cell .tithi { display: none; }
+  .cell-top { flex-direction: column; align-items: center; }
+  .cell .pips { justify-content: center; }
+  .dnum { font-size: 14px; min-width: 22px; height: 22px; }
+  .dow, .grid { gap: 3px; }
+  .fest-list li { grid-template-columns: 1fr; gap: 2px; }
+  .panel { padding: 14px 12px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="15" r="8" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
+        <path d="M22 38c-4-4-5-9-3-14 1 0 2 1 3 2 1-1 2-2 3-2 2 5 1 10-3 14z" fill="var(--saffron)"/>
+        <path d="M22 38c-6-1-11-5-12-11 3 0 6 1 8 3M22 38c6-1 11-5 12-11-3 0-6 1-8 3" fill="none" stroke="var(--saffron)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M8 39h28" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>Dharmakuun kalenteri</h1>
+        <p>Buddhalainen kuukalenteri · suotuisat ja epäsuotuisat päivät</p>
+      </div>
+    </div>
+    <div class="top-tools" role="group" aria-label="Perinteet">
+      <button class="chip" id="lay-thv" data-layer="thv"><span class="dot"></span>Theravāda</button>
+      <button class="chip" id="lay-tib" data-layer="tib"><span class="dot"></span>Tiibet</button>
+      <button class="chip" id="lay-zen" data-layer="zen"><span class="dot"></span>Itä-Aasia &amp; zen</button>
+      <button class="chip" id="lay-thai" data-layer="thai"><span class="dot"></span>Thai-kansanperinne</button>
+      <button class="chip" id="theme-btn" aria-label="Vaihda teema">◐ Teema</button>
+    </div>
+  </header>
+
+  <section class="hero" aria-live="polite">
+    <canvas class="stars" id="stars" aria-hidden="true"></canvas>
+    <div class="moonbox">
+      <div class="eyebrow" id="h-eyebrow">Tänään</div>
+      <svg id="h-moon" viewBox="-110 -110 220 220" role="img" aria-label="Kuun vaihe"></svg>
+      <div class="hero-sub num" id="h-illum"></div>
+    </div>
+    <div class="hero-main">
+      <div>
+        <div class="hero-date" id="h-date"></div>
+        <div class="hero-sub" id="h-lunar"></div>
+      </div>
+      <div class="verdict"><span class="word" id="h-verdict"></span><span class="hero-sub" id="h-why"></span></div>
+      <div class="badges" id="h-badges"></div>
+      <div class="facts" id="h-facts"></div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">Mitä tänä päivänä kannattaa tehdä</div>
+        <ul class="acts" id="h-acts"></ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="main">
+    <section class="panel" aria-label="Kalenteri">
+      <div class="cal-head">
+        <h2 id="cal-title"></h2>
+        <div class="ctrl">
+          <div class="seg" role="group" aria-label="Näkymä">
+            <button id="tab-month" aria-pressed="true">Kuukausi</button>
+            <button id="tab-year" aria-pressed="false">Vuosi</button>
+          </div>
+          <button class="btn icon" id="prev" aria-label="Edellinen">‹</button>
+          <button class="btn" id="today-btn">Tänään</button>
+          <button class="btn icon" id="next" aria-label="Seuraava">›</button>
+        </div>
+      </div>
+      <div class="modebar">
+        <label for="mode">Värikoodaa päivät:</label>
+        <select class="btn" id="mode"></select>
+      </div>
+      <div id="month-view">
+        <div class="dow"><div>ma</div><div>ti</div><div>ke</div><div>to</div><div>pe</div><div>la</div><div>su</div></div>
+        <div class="grid" id="grid"></div>
+      </div>
+      <div id="year-view" class="year" hidden></div>
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <h2>Etsi hyvä päivä</h2>
+        <p class="lead">Valitse mitä aiot tehdä. Näet seuraavat suotuisat päivät valitusta päivästä eteenpäin.</p>
+        <div class="actpick" id="actpick"></div>
+        <ul class="found" id="found"></ul>
+      </section>
+      <section class="panel">
+        <h2>Merkit</h2>
+        <div class="legend">
+          <div><span class="sw" style="background:var(--good-bg);border-color:var(--jade)"></span>Suotuisa päivä</div>
+          <div><span class="sw" style="background:var(--bad-bg);border-color:var(--madder)"></span>Epäsuotuisa päivä</div>
+          <div><span class="pip up" style="justify-self:center"></span>Uposatha (täysikuu, uusikuu, puolikuu)</div>
+          <div><span class="pip tib" style="justify-self:center"></span>Tiibetiläinen harjoituspäivä</div>
+          <div><span class="pip fest" style="justify-self:center"></span>Juhlapäivä</div>
+          <div><span class="pip vassa" style="justify-self:center;opacity:1"></span>Sadekausi (vassa)</div>
+        </div>
+      </section>
+      <section class="panel export">
+        <h2>Vie omaan kalenteriin</h2>
+        <p class="lead">Kopioi näytetyn vuoden uposatha-, harjoitus- ja juhlapäivät iCalendar-muodossa. Liitä teksti tiedostoon <code>dharma.ics</code> ja tuo se Google-, Apple- tai Outlook-kalenteriin.</p>
+        <button class="btn" id="ics-btn">Kopioi vuoden päivät (.ics)</button>
+        <textarea id="ics-out" readonly hidden aria-label="Kalenteritiedoston sisältö"></textarea>
+      </section>
+    </aside>
+  </div>
+
+  <div class="lower">
+    <section>
+      <h2 id="fest-title">Juhlapäivät</h2>
+      <ul class="fest-list" id="fest-list"></ul>
+    </section>
+    <section class="guide">
+      <h2>Miten päivät määräytyvät</h2>
+      <section>
+        <h3>Kuun kierto</h3>
+        <p>Buddhalainen vuosi seuraa kuuta. Kuukausi alkaa uudenkuun jälkeen, ja jokainen päivä saa kuupäivän 1–30 sen mukaan, kuinka kaukana kuu on auringosta (yksi kuupäivä = 12° kulmaero). Päivät 1–15 ovat kasvavaa kuuta, 16–30 vähenevää. Kasvava kuu tukee aloittamista ja kasvattamista, vähenevä kuu päättämistä, puhdistamista ja luopumista.</p>
+      </section>
+      <section>
+        <h3>Uposatha-päivät</h3>
+        <p>Theravāda-perinteessä täysikuu, uusikuu ja puolikuut ovat uposatha-päiviä. Silloin maallikot pitävät kahdeksan ohjetta, paastoavat iltapäivästä, meditoivat ja käyvät temppelissä. Iloiset juhlat ja viihde jätetään näille päiville tekemättä.</p>
+      </section>
+      <section>
+        <h3>Viisi kuupäivän laatua</h3>
+        <p>Tiibetiläinen kalachakra-astrologia jakaa kuupäivät viiteen ryhmään, jotka toistuvat kolmen päivän välein.</p>
+        <div style="overflow-x:auto">
+          <table class="tithi-table">
+            <tr><th>Ilo</th><td class="num">1 · 6 · 11 · 16 · 21 · 26</td><td>Juhlat, ystävyys, ilo</td></tr>
+            <tr><th>Hyvä</th><td class="num">2 · 7 · 12 · 17 · 22 · 27</td><td>Rakentaminen, muutto, vakaat aloitukset</td></tr>
+            <tr><th>Voitto</th><td class="num">3 · 8 · 13 · 18 · 23 · 28</td><td>Esteiden voittaminen, neuvottelut, kilpailut</td></tr>
+            <tr><th>Tyhjä</th><td class="num">4 · 9 · 14 · 19 · 24 · 29</td><td>Ei aloituksille. Sopii luopumiseen ja siivoamiseen</td></tr>
+            <tr><th>Täysi</th><td class="num">5 · 10 · 15 · 20 · 25 · 30</td><td>Täyttymys, kaikki hyvät teot</td></tr>
+          </table>
+        </div>
+      </section>
+      <section>
+        <h3>Tiibetiläiset harjoituspäivät</h3>
+        <p>8. päivä on Lääkintä-Buddhan ja Tārān päivä, 10. Guru Rinpochen, 15. Amitābhan (täysikuu), 25. ḍākinīen ja 30. Buddha Śākyamunin (uusikuu). 29. päivänä tehdään suojelijoiden harjoituksia. Perinteen mukaan hyvien tekojen vaikutus moninkertaistuu näinä päivinä.</p>
+      </section>
+      <section>
+        <h3>Thai-kansanperinne</h3>
+        <p>Jokaisella viikonpäivällä on oma värinsä ja Buddha-asentonsa. Keskiviikkona ei perinteisesti leikata hiuksia. Sadekauden kolmena kuukautena (vassa) häitä ja suuria juhlia vältetään.</p>
+      </section>
+    </section>
+  </div>
+
+  <p class="foot">Kuun vaiheet ja kuupäivät lasketaan selaimessa tähtitieteellisellä mallilla omalle aikavyöhykkeellesi. Kuupäivä määräytyy aamun mukaan (klo 6). Temppelien perinteiset kalenterit lasketaan omilla säännöillään, joten päivämäärä voi erota yhdellä päivällä. ≈-merkityt theravāda-juhlat on johdettu täysikuista thaimaalaisen käytännön mukaan; tarkista tärkeät päivät omalta temppeliltä tai yhteisöltä. Suotuisuus on perinteen tulkintaa. Monen opettajan mukaan paras päivä hyvälle teolle on tämä päivä.</p>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+"use strict";
+
+/* ---------- Tähtitiede ---------- */
+const RAD = Math.PI / 180;
+const norm = a => ((a % 360) + 360) % 360;
+const TOf = ms => (ms / 86400000 + 2440587.5 - 2451545) / 36525;
+
+function sunLon(T) {
+  const L0 = 280.46646 + 36000.76983 * T;
+  const M = (357.52911 + 35999.05029 * T) * RAD;
+  const C = (1.914602 - 0.004817 * T) * Math.sin(M) + (0.019993 - 0.000101 * T) * Math.sin(2 * M) + 0.000289 * Math.sin(3 * M);
+  return norm(L0 + C - 0.00569 - 0.00478 * Math.sin((125.04 - 1934.136 * T) * RAD));
+}
+// Meeus, luku 47: kuun pituuden suurimmat jaksolliset termit [D, M, M', F, kerroin 1e-6°]
+const MT = [[0,0,1,0,6288774],[2,0,-1,0,1274027],[2,0,0,0,658314],[0,0,2,0,213618],[0,1,0,0,-185116],[0,0,0,2,-114332],
+  [2,0,-2,0,58793],[2,-1,-1,0,57066],[2,0,1,0,53322],[2,-1,0,0,45758],[0,1,-1,0,-40923],[1,0,0,0,-34720],[0,1,1,0,-30383],
+  [2,0,0,-2,15327],[0,0,1,2,-12528],[0,0,1,-2,10980],[4,0,-1,0,10675],[0,0,3,0,10034],[4,0,-2,0,8548],[2,1,-1,0,-7888],
+  [2,1,0,0,-6766],[1,0,-1,0,-5163],[1,1,0,0,4987],[2,-1,1,0,4036],[2,0,3,0,3994],[4,0,0,0,3861],[4,-1,-1,0,3665],[0,1,-2,0,-2689]];
+function moonLon(T) {
+  const Lp = 218.3164477 + 481267.88123421 * T, D = 297.8501921 + 445267.1114034 * T, M = 357.5291092 + 35999.0502909 * T,
+        Mp = 134.9633964 + 477198.8675055 * T, F = 93.2720950 + 483202.0175233 * T, E = 1 - 0.002516 * T;
+  let s = 0;
+  for (const [d, m, mp, f, c] of MT) {
+    const e = m === 0 ? 1 : (Math.abs(m) === 1 ? E : E * E);
+    s += c * e * Math.sin((d * D + m * M + mp * Mp + f * F) * RAD);
+  }
+  s += 3958 * Math.sin((119.75 + 131.849 * T) * RAD) + 1962 * Math.sin((Lp - F) * RAD) + 318 * Math.sin((53.09 + 479264.29 * T) * RAD);
+  return norm(Lp + s / 1e6);
+}
+const elong = ms => { const T = TOf(ms); return norm(moonLon(T) - sunLon(T)); };
+
+/* ---------- Päivän perustiedot ---------- */
+const baseCache = new Map();
+function base(y, m, d) {
+  const key = y * 10000 + m * 100 + d;
+  if (baseCache.has(key)) return baseCache.get(key);
+  const t0 = new Date(y, m, d).getTime(), t1 = new Date(y, m, d + 1).getTime();
+  const e0 = elong(t0), e1 = elong(t1), de = norm(e1 - e0);
+  const e6 = elong(new Date(y, m, d, 6).getTime()), e12 = elong(new Date(y, m, d, 12).getTime());
+  const events = [];
+  for (const tg of [0, 90, 180, 270]) {
+    const off = norm(tg - e0);
+    if (off < de) {
+      let a = t0, b = t1;
+      for (let i = 0; i < 22; i++) { const mid = (a + b) / 2; if (norm(elong(mid) - e0) < off) a = mid; else b = mid; }
+      events.push({ t: tg, time: new Date((a + b) / 2) });
+    }
+  }
+  let sunEvent = null;
+  if (m === 2 || m === 8) {
+    const s0 = sunLon(TOf(t0)), s1 = sunLon(TOf(t1)), tg = m === 2 ? 0 : 180;
+    if (norm(tg - s0) < norm(s1 - s0)) sunEvent = tg;
+  }
+  const r = { y, m, d, date: new Date(y, m, d), tithi: Math.floor(e6 / 12) + 1, e: e12, events, sunEvent };
+  baseCache.set(key, r);
+  return r;
+}
+
+/* ---------- Juhlapäivät vuodelle ---------- */
+const DAYMS = 86400000;
+const keyOf = dt => dt.getFullYear() * 10000 + dt.getMonth() * 100 + dt.getDate();
+const addDays = (dt, n) => new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + n);
+const yearCache = new Map();
+function yearData(y) {
+  if (yearCache.has(y)) return yearCache.get(y);
+  const fm = [], fest = new Map(), list = [];
+  let springEq = null, autumnEq = null;
+  for (let dt = new Date(y, 0, 1); dt.getFullYear() === y; dt = addDays(dt, 1)) {
+    const b = base(y, dt.getMonth(), dt.getDate());
+    if (b.events.some(e => e.t === 180)) fm.push(dt);
+    if (b.sunEvent === 0) springEq = dt;
+    if (b.sunEvent === 180) autumnEq = dt;
+  }
+  const add = (dt, f, end) => {
+    if (!dt) return;
+    const item = Object.assign({ date: dt, end }, f);
+    list.push(item);
+    const last = end || dt;
+    for (let d = dt; d <= last; d = addDays(d, 1)) {
+      const k = keyOf(d); if (!fest.has(k)) fest.set(k, []); fest.get(k).push(item);
+    }
+  };
+  // Theravāda (thaimaalainen käytäntö, johdettu täysikuista)
+  const mi = fm.findIndex(d => d.getMonth() > 1 || (d.getMonth() === 1 && d.getDate() >= 10));
+  let vassa = null;
+  if (mi >= 0) {
+    add(fm[mi], { layer: "thv", approx: true, name: "Māgha Pūjā", short: "Māgha Pūjā", desc: "Sanghan päivä. Muistetaan 1 250 arahantin kokoontumista ja Ovāda-pātimokkha-opetusta: älä tee pahaa, tee hyvää, puhdista mielesi." });
+    add(fm[mi + 3], { layer: "thv", approx: true, name: "Vesak · Visākha Pūjā", short: "Vesak", desc: "Vuoden tärkein päivä: Buddhan syntymä, valaistuminen ja parinirvāṇa. Temppelikierros kynttilöin, lahjoituksia ja meditaatiota." });
+    add(fm[mi + 5], { layer: "thv", approx: true, name: "Āsāḷha Pūjā", short: "Āsāḷha Pūjā", desc: "Dhamman päivä. Buddhan ensimmäinen opetus, Dhammacakkappavattana-sutta, Isipatanan peurapuistossa." });
+    if (fm[mi + 5] && fm[mi + 8]) {
+      vassa = { start: addDays(fm[mi + 5], 1), end: fm[mi + 8] };
+      add(vassa.start, { layer: "thv", approx: true, name: "Vassan alku", short: "Vassa alkaa", desc: "Kolmen kuukauden sadekauden retriitti alkaa. Munkit pysyvät luostareissa. Hyvä hetki sitoutua omaan harjoitukseen, esimerkiksi päivittäiseen meditaatioon." });
+      add(fm[mi + 8], { layer: "thv", approx: true, name: "Pavāraṇā · vassan päätös", short: "Pavāraṇā", desc: "Sadekausi päättyy. Munkit pyytävät toisiltaan huomautuksia virheistään. Valoja ja lyhtyjä." });
+      add(addDays(fm[mi + 8], 1), { layer: "thv", approx: true, name: "Kaṭhina-kausi", short: "Kaṭhina", desc: "Kuukauden mittainen kausi, jolloin yhteisö lahjoittaa munkeille kaavut ja tarpeet. Hyvä aika antamiselle." }, fm[mi + 9] ? addDays(fm[mi + 9], -1) : addDays(fm[mi + 8], 29));
+    }
+  }
+  // Itä-Aasia ja zen (kiinteät päivät Japanin käytännön mukaan)
+  add(new Date(y, 1, 15), { layer: "zen", name: "Nehan-e · Parinirvāṇa-päivä", short: "Parinirvāṇa", desc: "Buddhan poismenon muistopäivä. Luetaan Nirvāṇa-sūtraa ja mietiskellään katoavaisuutta." });
+  if (springEq) add(addDays(springEq, -3), { layer: "zen", name: "Haru no Higan", short: "Higan", desc: "Kevätpäiväntasauksen viikko. Esivanhempien haudoilla käydään ja harjoitetaan kuutta pāramitā-hyvettä." }, addDays(springEq, 3));
+  add(new Date(y, 3, 8), { layer: "zen", name: "Hanamatsuri · Buddhan syntymäpäivä", short: "Hanamatsuri", desc: "Kukkajuhla. Lapsi-Buddhan patsaalle kaadetaan makeaa teetä." });
+  add(new Date(y, 7, 13), { layer: "zen", name: "Obon", short: "Obon", desc: "Esivanhempien henkien juhla. Lyhdyt, tanssit ja muistaminen." }, new Date(y, 7, 16));
+  if (autumnEq) add(addDays(autumnEq, -3), { layer: "zen", name: "Aki no Higan", short: "Higan", desc: "Syyspäiväntasauksen viikko. Esivanhempien muistaminen ja hyveiden harjoitus." }, addDays(autumnEq, 3));
+  add(new Date(y, 11, 8), { layer: "zen", name: "Rōhatsu · Bodhi-päivä", short: "Bodhi-päivä", desc: "Buddhan valaistumisen päivä. Zen-luostareissa sitä edeltää viikon intensiivinen sesshin." });
+  list.sort((a, b) => a.date - b.date);
+  const r = { fest, list, vassa };
+  yearCache.set(y, r);
+  return r;
+}
+
+/* ---------- Sanastot ---------- */
+const MONTHS = ["tammikuu","helmikuu","maaliskuu","huhtikuu","toukokuu","kesäkuu","heinäkuu","elokuu","syyskuu","lokakuu","marraskuu","joulukuu"];
+const MONTHS_GEN = ["tammikuuta","helmikuuta","maaliskuuta","huhtikuuta","toukokuuta","kesäkuuta","heinäkuuta","elokuuta","syyskuuta","lokakuuta","marraskuuta","joulukuuta"];
+const WD = ["sunnuntai","maanantai","tiistai","keskiviikko","torstai","perjantai","lauantai"];
+const WD_S = ["su","ma","ti","ke","to","pe","la"];
+const THAI = [
+  ["punainen", "#d23a3a", "Bodhipuuta katseleva Buddha"],
+  ["keltainen", "#f0c929", "Pelon poistava Buddha, käsi kohotettuna"],
+  ["vaaleanpunainen", "#f29ac0", "Makaava Buddha"],
+  ["vihreä", "#2fa765", "Almukulhoa kantava Buddha"],
+  ["oranssi", "#f08a24", "Meditoiva Buddha"],
+  ["sininen", "#3a8fd8", "Mietiskelevä Buddha, kädet ristissä"],
+  ["violetti", "#8a4fc2", "Nāgan suojaama Buddha"]
+];
+const CATS = [
+  { id: "ilo", name: "Ilo", tib: "dga' ba", txt: "juhlille ja ystävyydelle" },
+  { id: "hyva", name: "Hyvä", tib: "bzang po", txt: "vakaille aloituksille" },
+  { id: "voitto", name: "Voitto", tib: "rgyal ba", txt: "esteiden voittamiseen" },
+  { id: "tyhja", name: "Tyhjä", tib: "stong pa", txt: "ei aloituksille" },
+  { id: "taysi", name: "Täysi", tib: "rdzogs pa", txt: "täyttymykselle" }
+];
+const TIB_SPECIAL = {
+  8: "Lääkintä-Buddhan ja Tārān päivä",
+  10: "Guru Rinpochen päivä",
+  15: "Amitābhan päivä",
+  25: "Ḍākinī-päivä",
+  29: "Suojelijoiden päivä",
+  30: "Buddha Śākyamunin päivä"
+};
+// Perinteinen tiibetiläinen hiustenleikkuuluettelo kuupäivittäin (versiot vaihtelevat)
+const HAIR = [null,
+  [-1,"lyhentää ikää"],[-1,"tuo sairautta"],[1,"lisää vaurautta"],[1,"kirkastaa olemusta"],[1,"lisää vaurautta"],
+  [-1,"himmentää olemusta"],[-1,"tuo riitoja"],[1,"pidentää ikää"],[0,"hyvää seuraa"],[0,"tuo vaikutusvaltaa"],
+  [1,"terävöittää mieltä"],[-1,"vaaraksi terveydelle"],[1,"vahvistaa harjoitusta"],[1,"lisää omaisuutta"],[1,"lisää ansioita"],
+  [-1,"tuo sairautta"],[-1,"himmentää olemusta"],[-1,"tuo menetyksiä"],[1,"pidentää ikää"],[-1,"tuo puutetta"],
+  [-1,"tuo tartuntoja"],[1,"tuo ravintoa ja tuloja"],[1,"lisää vaurautta"],[-1,"tuo tartuntoja"],[-1,"rasittaa silmiä"],
+  [1,"tuo onnea"],[1,"lisää hyvettä"],[-1,"tuo riitoja"],[-1,"heikentää elinvoimaa"],[-1,"perinteen mukaan erittäin epäsuotuisa"]
+];
+const UP_NAMES = { 180: "Täysikuun uposatha", 0: "Uudenkuun uposatha", 90: "Kasvavan puolikuun uposatha", 270: "Vähenevän puolikuun uposatha" };
+const UP_SHORT = { 180: "Täysikuu", 0: "Uusikuu", 90: "Puolikuu", 270: "Puolikuu" };
+
+function phaseName(e) {
+  if (e < 7 || e >= 353) return "Uusikuu";
+  if (e < 83) return "Kasvava sirppi";
+  if (e < 97) return "Ensimmäinen neljännes";
+  if (e < 173) return "Kasvava kupera kuu";
+  if (e < 187) return "Täysikuu";
+  if (e < 263) return "Vähenevä kupera kuu";
+  if (e < 277) return "Viimeinen neljännes";
+  return "Vähenevä sirppi";
+}
+
+/* ---------- Tila ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("dharmakuu." + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("dharmakuu." + k, JSON.stringify(v)); } catch (e) {} }
+};
+const now = new Date();
+const TODAY = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+const S = {
+  sel: TODAY,
+  vy: TODAY.getFullYear(), vm: TODAY.getMonth(),
+  tab: "month",
+  layers: Object.assign({ thv: true, tib: true, zen: true, thai: true }, store.get("layers", {})),
+  mode: store.get("mode", "yleinen"),
+  act: store.get("act", "aloitus"),
+  theme: store.get("theme", null)
+};
+
+/* ---------- Päivän tulkinta ---------- */
+function info(dt) {
+  const b = base(dt.getFullYear(), dt.getMonth(), dt.getDate());
+  const L = S.layers, yd = yearData(dt.getFullYear());
+  const tithi = b.tithi, waxing = tithi <= 15;
+  const cat = CATS[(tithi - 1) % 5];
+  const ev = b.events[0];
+  const up = L.thv && ev ? ev.t : null;
+  const tib = L.tib && TIB_SPECIAL[tithi] ? TIB_SPECIAL[tithi] : null;
+  const fests = (yd.fest.get(keyOf(dt)) || []).filter(f => L[f.layer]);
+  const vassa = !!(yd.vassa && dt >= yd.vassa.start && dt <= yd.vassa.end);
+  let s = 0; const why = [];
+  if (up === 180 || up === 0) { s += 2; why.push(UP_SHORT[up] + " (uposatha)"); }
+  else if (up != null) { s += 1; why.push("puolikuun uposatha"); }
+  if (tib) { s += tithi === 29 ? 0.5 : 1.5; why.push(tib.toLowerCase()); }
+  if (fests.length) { s += fests.some(f => !f.end) ? 2 : 0.5; why.push(fests.map(f => f.short).join(", ")); }
+  if (L.tib) {
+    if (cat.id === "taysi") { s += 1; if (!tib) why.push("täysi kuupäivä"); }
+    else if (cat.id === "tyhja") { s -= 1.5; why.push("tyhjä kuupäivä"); }
+    else s += 0.5;
+  }
+  const rating = s >= 1.5 ? "good" : s <= -1 ? "bad" : "neutral";
+  return { dt, b, tithi, waxing, cat, up, tib, fests, vassa, rating, why, wd: dt.getDay() };
+}
+
+/* ---------- Toiminnot ---------- */
+const ACTS = [
+  { id: "meditaatio", name: "Meditaatio ja retriitti", f(i) {
+      if (i.up != null || i.tib || i.fests.length) return [1, "harjoituspäivä, ansiot moninkertaistuvat"];
+      return [0, "jokainen päivä sopii harjoitukseen"]; } },
+  { id: "dana", name: "Lahjoittaminen ja hyvät teot", f(i) {
+      if (i.up === 180 || i.up === 0 || i.tib || i.fests.length) return [1, "perinteinen antamisen päivä"];
+      return [0, "antaminen on aina hyvä"]; } },
+  { id: "aloitus", name: "Uuden aloittaminen", f(i) {
+      if (S.layers.tib && i.cat.id === "tyhja") return [-1, "tyhjä kuupäivä"];
+      if (i.tithi >= 26 && i.tithi <= 29) return [-1, "vähenevän kuun loppu"];
+      if (i.waxing && (!S.layers.tib || ["ilo","hyva","taysi"].includes(i.cat.id))) return [1, "kasvava kuu" + (S.layers.tib ? ", " + i.cat.name.toLowerCase() + " päivä" : "")];
+      return [0, i.waxing ? "kasvava kuu" : "vähenevä kuu, parempi viimeistellä"]; } },
+  { id: "haat", name: "Häät ja juhlat", f(i) {
+      if (S.layers.thai && i.vassa) return [-1, "sadekausi, juhlia vältetään"];
+      if (i.up != null) return [-1, "uposatha, viihdettä vältetään"];
+      if (S.layers.tib && i.cat.id === "tyhja") return [-1, "tyhjä kuupäivä"];
+      if (i.waxing && (!S.layers.tib || ["ilo","taysi"].includes(i.cat.id))) return [1, "kasvava kuu" + (S.layers.tib ? ", " + i.cat.name.toLowerCase() + " päivä" : "")];
+      return [0, ""]; } },
+  { id: "muutto", name: "Muutto ja rakentaminen", f(i) {
+      if (S.layers.tib && i.cat.id === "tyhja") return [-1, "tyhjä kuupäivä"];
+      if (i.tithi >= 26 && i.tithi <= 29) return [-1, "vähenevän kuun loppu"];
+      if (S.layers.tib && ["hyva","taysi"].includes(i.cat.id)) return [1, i.cat.name.toLowerCase() + " kuupäivä, vakaa perusta"];
+      if (!S.layers.tib && i.waxing) return [1, "kasvava kuu"];
+      return [0, ""]; } },
+  { id: "matka", name: "Matkalle lähtö", f(i) {
+      if (S.layers.tib && i.cat.id === "tyhja") return [-1, "tyhjä kuupäivä"];
+      if (S.layers.tib && ["voitto","hyva"].includes(i.cat.id)) return [1, i.cat.name.toLowerCase() + " kuupäivä"];
+      return [0, ""]; } },
+  { id: "neuvottelu", name: "Neuvottelut ja kilpailut", f(i) {
+      if (S.layers.tib && i.cat.id === "tyhja") return [-1, "tyhjä kuupäivä"];
+      if (S.layers.tib && i.cat.id === "voitto") return [1, "voiton kuupäivä"];
+      if (!S.layers.tib && i.waxing) return [1, "kasvava kuu"];
+      return [0, ""]; } },
+  { id: "hiukset", name: "Hiustenleikkuu", f(i) {
+      if (S.layers.thai && i.wd === 3) return [-1, "keskiviikkona ei leikata hiuksia"];
+      if (S.layers.tib) { const h = HAIR[i.tithi]; return [h[0], h[1]]; }
+      return [0, ""]; } },
+  { id: "luopuminen", name: "Luopuminen ja siivous", f(i) {
+      if (S.layers.tib && i.cat.id === "tyhja") return [1, "tyhjä kuupäivä sopii poistamiseen"];
+      if (!i.waxing) return [1, "vähenevä kuu tukee päästämistä irti"];
+      return [0, "kasvava kuu, parempi aloittaa kuin lopettaa"]; } },
+  { id: "paasto", name: "Paasto ja kahdeksan ohjetta", f(i) {
+      if (i.up != null) return [1, UP_NAMES[i.up].toLowerCase()];
+      if (i.tib && i.tithi !== 29) return [1, "tiibetiläinen harjoituspäivä"];
+      return [0, ""]; } },
+  { id: "terveys", name: "Terveys ja parantava harjoitus", f(i) {
+      if (S.layers.tib && i.tithi === 8) return [1, "Lääkintä-Buddhan päivä"];
+      if (i.up === 180 || (!S.layers.tib && i.up != null)) return [1, "täysikuu, voimakas harjoituspäivä"];
+      return [0, ""]; } },
+  { id: "vapautus", name: "Eläinten vapauttaminen", f(i) {
+      if (i.up === 180 || i.up === 0 || (i.tib && i.tithi !== 29) || i.fests.length) return [1, "elämän pelastamisen perinteinen päivä"];
+      return [0, ""]; } }
+];
+const actById = id => ACTS.find(a => a.id === id);
+const actVal = (a, i) => a.f(i);
+
+/* ---------- Kuun piirto ---------- */
+function moonPath(e, r) {
+  const a = e * RAD, c = Math.cos(a), rx = Math.abs(c) * r, waxing = e < 180;
+  if (e < 1.5 || e > 358.5) return "";
+  const outerSweep = waxing ? 1 : 0;
+  const termSweep = waxing ? (c > 0 ? 0 : 1) : (c > 0 ? 1 : 0);
+  return `M0 ${-r} A${r} ${r} 0 0 ${outerSweep} 0 ${r} A${rx.toFixed(3)} ${r} 0 0 ${termSweep} 0 ${-r}Z`;
+}
+function moonSVG(e, r, big) {
+  const id = "g" + Math.random().toString(36).slice(2, 7);
+  const lit = moonPath(e, r);
+  if (!big) return `<svg width="${2 * r + 2}" height="${2 * r + 2}" viewBox="${-r - 1} ${-r - 1} ${2 * r + 2} ${2 * r + 2}" aria-hidden="true"><circle r="${r}" fill="var(--moonshade)"/>${lit ? `<path d="${lit}" fill="var(--gold)"/>` : ""}${e < 1.5 || e > 358.5 ? `<circle r="${r - .6}" fill="none" stroke="var(--gold)" stroke-width="1"/>` : ""}</svg>`;
+  return `<defs>
+      <radialGradient id="${id}l" cx="-.25" cy="-.3" r="1.1"><stop offset="0" stop-color="#fffaf0"/><stop offset=".55" stop-color="var(--moonlit)"/><stop offset="1" stop-color="#cdbb8e"/></radialGradient>
+      <radialGradient id="${id}h" r=".5"><stop offset=".72" stop-color="rgba(244,234,208,.22)"/><stop offset="1" stop-color="rgba(244,234,208,0)"/></radialGradient>
+    </defs>
+    <circle r="108" fill="url(#${id}h)"/>
+    <circle r="${r}" fill="#22264a"/>
+    <circle r="${r}" fill="none" stroke="rgba(244,234,208,.18)" stroke-width="1"/>
+    ${lit ? `<path d="${lit}" fill="url(#${id}l)"/>` : ""}
+    <g fill="rgba(120,104,70,.13)">${lit ? `<circle cx="-22" cy="-18" r="13"/><circle cx="18" cy="12" r="9"/><circle cx="-8" cy="30" r="6"/><circle cx="30" cy="-28" r="7"/><circle cx="-36" cy="16" r="5"/>` : ""}</g>`;
+}
+
+/* ---------- Apufunktiot ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const sameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+const fmtDate = dt => `${WD[dt.getDay()]} ${dt.getDate()}. ${MONTHS_GEN[dt.getMonth()]} ${dt.getFullYear()}`;
+const fmtShort = dt => `${dt.getDate()}.${dt.getMonth() + 1}.`;
+const fmtTime = dt => dt.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" });
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+function cellRating(i) {
+  if (S.mode === "yleinen") return i.rating;
+  const v = actVal(actById(S.mode), i)[0];
+  return v > 0 ? "good" : v < 0 ? "bad" : "neutral";
+}
+
+/* ---------- Hero ---------- */
+function renderHero() {
+  const i = info(S.sel), b = i.b, dt = S.sel;
+  $("h-eyebrow").textContent = sameDay(dt, TODAY) ? "Tänään" : "Valittu päivä";
+  $("h-moon").innerHTML = moonSVG(b.e, 92, true);
+  $("h-moon").setAttribute("aria-label", phaseName(b.e));
+  const illum = Math.round((1 - Math.cos(b.e * RAD)) / 2 * 100);
+  $("h-illum").textContent = `${phaseName(b.e)} · ${illum} % valaistu`;
+  $("h-date").textContent = cap(fmtDate(dt));
+  $("h-lunar").textContent = `Kuupäivä ${i.tithi} · ${i.waxing ? "kasvava kuu" : "vähenevä kuu"}`;
+  const vw = { good: "Suotuisa päivä", bad: "Epäsuotuisa päivä", neutral: "Tavallinen päivä" }[i.rating];
+  $("h-verdict").textContent = vw; $("h-verdict").className = "word " + i.rating;
+  $("h-why").textContent = i.why.length ? cap(i.why.join(" · ")) : "Ei erityisiä merkintöjä";
+
+  const badges = [];
+  if (i.up != null) {
+    const ev = b.events.find(e => e.t === i.up);
+    badges.push(`<span class="badge gold">${UP_NAMES[i.up]} · klo ${fmtTime(ev.time)}</span>`);
+  }
+  if (i.tib) badges.push(`<span class="badge gold">${esc(i.tib)}</span>`);
+  i.fests.forEach(f => badges.push(`<span class="badge good">${f.approx ? "≈ " : ""}${esc(f.name)}</span>`));
+  if (i.vassa && (S.layers.thv || S.layers.thai)) badges.push(`<span class="badge">Sadekausi (vassa)</span>`);
+  $("h-badges").innerHTML = badges.join("");
+
+  const facts = [];
+  if (S.layers.tib) facts.push(`<div class="fact"><b>Kuupäivän laatu</b><span>${i.cat.name} <i style="color:var(--sky-muted)">(${i.cat.tib})</i>, ${i.cat.txt}</span></div>`);
+  if (S.layers.thai) { const t = THAI[i.wd]; facts.push(`<div class="fact"><b>Päivän väri</b><span><span class="daycolor" style="background:${t[1]}"></span>${cap(t[0])}</span></div><div class="fact"><b>${cap(WD[i.wd])}n Buddha</b><span>${t[2]}</span></div>`); }
+  const nextFm = findNext(dt, x => x.b.events.some(e => e.t === 180), 32);
+  const nextNm = findNext(dt, x => x.b.events.some(e => e.t === 0), 32);
+  facts.push(`<div class="fact"><b>Seuraava täysikuu / uusikuu</b><span class="num">${nextFm ? fmtShort(nextFm) : "–"} / ${nextNm ? fmtShort(nextNm) : "–"}</span></div>`);
+  $("h-facts").innerHTML = facts.join("");
+
+  const items = ACTS.map(a => ({ a, r: actVal(a, i) }));
+  items.sort((x, y) => y.r[0] - x.r[0]);
+  $("h-acts").innerHTML = items.map(({ a, r }) => {
+    const cls = r[0] > 0 ? "g" : r[0] < 0 ? "b" : "n", sym = r[0] > 0 ? "✓" : r[0] < 0 ? "✕" : "·";
+    return `<li><span class="mark ${cls}" aria-label="${r[0] > 0 ? "suositeltava" : r[0] < 0 ? "vältä" : "neutraali"}">${sym}</span><span>${a.name}${r[1] ? `<small>${esc(cap(r[1]))}</small>` : ""}</span></li>`;
+  }).join("");
+}
+function findNext(from, pred, maxDays) {
+  for (let n = 1; n <= maxDays; n++) { const d = addDays(from, n); if (pred(info(d))) return d; }
+  return null;
+}
+
+/* ---------- Kuukausi ---------- */
+function renderMonth() {
+  const y = S.vy, m = S.vm;
+  $("cal-title").innerHTML = `${cap(MONTHS[m])} <small class="num">${y}</small>`;
+  const first = new Date(y, m, 1), offset = (first.getDay() + 6) % 7;
+  const start = addDays(first, -offset);
+  const weeks = Math.ceil((offset + new Date(y, m + 1, 0).getDate()) / 7);
+  let html = "";
+  for (let n = 0; n < weeks * 7; n++) {
+    const d = addDays(start, n), i = info(d), r = cellRating(i);
+    const cls = ["cell", r !== "neutral" ? r : "", d.getMonth() !== m ? "out" : "", sameDay(d, TODAY) ? "today" : "", sameDay(d, S.sel) ? "sel" : ""].join(" ");
+    const tags = [];
+    if (i.up != null) tags.push(`<span class="t-up">${UP_SHORT[i.up]}</span>`);
+    i.fests.slice(0, 1).forEach(f => tags.push(`<span class="t-fest">${f.approx ? "≈ " : ""}${esc(f.short)}</span>`));
+    if (i.tib) tags.push(`<span class="t-tib">${esc(i.tib.replace(/n päivä$|-päivä$| päivä$/, "").replace("Lääkintä-Buddhan ja Tārā", "Lääkintä-Buddha"))}</span>`);
+    const pips = [];
+    if (i.up != null) pips.push('<span class="pip up"></span>');
+    if (i.tib) pips.push('<span class="pip tib"></span>');
+    if (i.fests.length) pips.push('<span class="pip fest"></span>');
+    if (i.vassa && (S.layers.thv || S.layers.thai)) pips.push('<span class="pip vassa"></span>');
+    const label = `${fmtDate(d)}, kuupäivä ${i.tithi}, ${r === "good" ? "suotuisa" : r === "bad" ? "epäsuotuisa" : "tavallinen"}${i.why.length ? ", " + i.why.join(", ") : ""}`;
+    html += `<button class="${cls}" data-t="${d.getTime()}" aria-label="${esc(label)}" ${sameDay(d, S.sel) ? 'aria-current="date"' : ""}>
+      <div class="cell-top"><span class="dnum">${d.getDate()}</span>${moonSVG(i.b.e, 7)}</div>
+      <span class="tithi">kp ${i.tithi}</span>
+      <div class="tags">${tags.join("")}</div>
+      <div class="pips">${pips.join("")}</div></button>`;
+  }
+  $("grid").innerHTML = html;
+}
+
+/* ---------- Vuosi ---------- */
+function renderYear() {
+  const y = S.vy;
+  $("cal-title").innerHTML = `Vuosi <small class="num">${y}</small>`;
+  let html = "";
+  for (let m = 0; m < 12; m++) {
+    const first = new Date(y, m, 1), offset = (first.getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+    let cells = "";
+    for (let k = 0; k < offset; k++) cells += "<span></span>";
+    for (let d = 1; d <= days; d++) {
+      const dt = new Date(y, m, d), i = info(dt), r = cellRating(i);
+      const cls = [r !== "neutral" ? r : "", i.up === 180 || i.up === 0 ? "up" : "", i.fests.length ? "fest" : "", sameDay(dt, TODAY) ? "today" : ""].join(" ");
+      cells += `<button class="${cls}" data-t="${dt.getTime()}" aria-label="${esc(fmtDate(dt))}">${d}</button>`;
+    }
+    html += `<div class="mini"><h3>${cap(MONTHS[m])}</h3><div class="mg">${cells}</div></div>`;
+  }
+  $("year-view").innerHTML = html;
+}
+
+/* ---------- Etsi päivä ---------- */
+function renderFinder() {
+  $("actpick").innerHTML = ACTS.map(a => `<button class="chip" data-act="${a.id}" aria-pressed="${a.id === S.act}">${a.name}</button>`).join("");
+  const a = actById(S.act), out = [];
+  for (let n = 0; n <= 150 && out.length < 8; n++) {
+    const d = addDays(S.sel, n), i = info(d), r = actVal(a, i);
+    if (r[0] > 0 && (S.act !== "aloitus" && S.act !== "haat" || i.rating !== "bad")) out.push({ d, i, r });
+  }
+  $("found").innerHTML = out.length ? out.map(({ d, i, r }) =>
+    `<li><button data-t="${d.getTime()}"><span class="fd num">${d.getDate()}.${d.getMonth() + 1}.<small>${WD_S[d.getDay()]}${sameDay(d, TODAY) ? " · tänään" : ""}</small></span><span class="fr"><strong>${esc(cap(r[1] || "suotuisa"))}</strong>Kuupäivä ${i.tithi}${i.fests.length ? " · " + esc(i.fests[0].short) : ""}</span></button></li>`).join("")
+    : `<li class="note">Ei sopivia päiviä seuraavan viiden kuukauden aikana valituilla perinteillä. Kokeile ottaa Tiibet-perinne käyttöön.</li>`;
+}
+
+/* ---------- Juhlalista ---------- */
+function renderFests() {
+  const y = S.vy, yd = yearData(y);
+  $("fest-title").textContent = `Juhlapäivät ${y}`;
+  const items = yd.list.filter(f => S.layers[f.layer]);
+  const trad = { thv: "Theravāda", zen: "Itä-Aasia" };
+  $("fest-list").innerHTML = items.length ? items.map(f => {
+    const when = f.end ? `${fmtShort(f.date)}–${fmtShort(f.end)}` : `${fmtShort(f.date)}`;
+    return `<li><div class="when num">${f.approx ? "≈ " : ""}${when}<small>${WD[f.date.getDay()]}</small></div><div><h3>${esc(f.name)}<span class="trad">${trad[f.layer]}</span></h3><p>${esc(f.desc)}</p></div></li>`;
+  }).join("") : `<li class="note">Ota Theravāda- tai Itä-Aasia-perinne käyttöön nähdäksesi juhlapäivät.</li>`;
+}
+
+/* ---------- ICS ---------- */
+function buildICS() {
+  const y = S.vy, pad = n => String(n).padStart(2, "0");
+  const ds = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+  const escI = s => s.replace(/[\\;,]/g, m => "\\" + m).replace(/\n/g, "\\n");
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Dharmakuun kalenteri//FI", "CALSCALE:GREGORIAN", "X-WR-CALNAME:Dharmakuun kalenteri " + y];
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").slice(0, 15) + "Z";
+  let n = 0;
+  const ev = (d, title, desc, end) => {
+    lines.push("BEGIN:VEVENT", `UID:dharmakuu-${ds(d)}-${n++}@local`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${ds(d)}`, `DTEND;VALUE=DATE:${ds(addDays(end || d, 1))}`, `SUMMARY:${escI(title)}`);
+    if (desc) lines.push(`DESCRIPTION:${escI(desc)}`);
+    lines.push("TRANSP:TRANSPARENT", "END:VEVENT");
+  };
+  for (let d = new Date(y, 0, 1); d.getFullYear() === y; d = addDays(d, 1)) {
+    const i = info(d);
+    if (i.up != null) ev(d, (i.up === 180 ? "🌕 " : i.up === 0 ? "🌑 " : "🌓 ") + UP_NAMES[i.up], "Kahdeksan ohjetta, meditaatio, temppelikäynti.");
+    if (i.tib) ev(d, "☸ " + i.tib, "Tiibetiläinen harjoituspäivä, kuupäivä " + i.tithi + ".");
+  }
+  yearData(y).list.filter(f => S.layers[f.layer]).forEach(f => ev(f.date, (f.approx ? "≈ " : "") + f.name, f.desc, f.end));
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+/* ---------- Tähtitaivas ---------- */
+function drawStars() {
+  const c = $("stars"), r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  c.width = r.width * dpr; c.height = r.height * dpr;
+  const g = c.getContext("2d"); g.scale(dpr, dpr);
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let k = 0; k < Math.round(r.width * r.height / 2600); k++) {
+    const x = rnd() * r.width, y = rnd() * r.height, s = rnd();
+    g.fillStyle = `rgba(244,234,208,${0.15 + s * 0.55})`;
+    g.beginPath(); g.arc(x, y, s < 0.92 ? 0.7 : 1.4, 0, Math.PI * 2); g.fill();
+  }
+}
+
+/* ---------- Kokonaisuus ---------- */
+function renderMode() {
+  $("mode").innerHTML = `<option value="yleinen">Yleinen suotuisuus</option>` + ACTS.map(a => `<option value="${a.id}">${a.name}</option>`).join("");
+  $("mode").value = S.mode;
+}
+function renderLayers() {
+  document.querySelectorAll("[data-layer]").forEach(b => b.setAttribute("aria-pressed", String(!!S.layers[b.dataset.layer])));
+}
+function render() {
+  renderLayers();
+  renderHero();
+  $("tab-month").setAttribute("aria-pressed", String(S.tab === "month"));
+  $("tab-year").setAttribute("aria-pressed", String(S.tab === "year"));
+  $("month-view").hidden = S.tab !== "month";
+  $("year-view").hidden = S.tab !== "year";
+  if (S.tab === "month") renderMonth(); else renderYear();
+  renderFinder();
+  renderFests();
+}
+function select(dt, keepView) {
+  S.sel = dt;
+  if (!keepView) { S.vy = dt.getFullYear(); S.vm = dt.getMonth(); }
+  render();
+}
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2200); }
+function applyTheme() { if (S.theme) document.documentElement.setAttribute("data-theme", S.theme); else document.documentElement.removeAttribute("data-theme"); }
+
+/* ---------- Tapahtumat ---------- */
+$("grid").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) select(new Date(+b.dataset.t)); });
+$("year-view").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) { S.tab = "month"; select(new Date(+b.dataset.t)); } });
+$("found").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) { S.tab = "month"; S.mode = S.act; store.set("mode", S.mode); $("mode").value = S.mode; select(new Date(+b.dataset.t)); } });
+$("actpick").addEventListener("click", e => { const b = e.target.closest("[data-act]"); if (!b) return; S.act = b.dataset.act; store.set("act", S.act); renderFinder(); });
+$("mode").addEventListener("change", e => { S.mode = e.target.value; store.set("mode", S.mode); render(); });
+document.querySelectorAll("[data-layer]").forEach(b => b.addEventListener("click", () => {
+  S.layers[b.dataset.layer] = !S.layers[b.dataset.layer]; store.set("layers", S.layers); render();
+}));
+$("prev").addEventListener("click", () => {
+  if (S.tab === "year") S.vy--; else { S.vm--; if (S.vm < 0) { S.vm = 11; S.vy--; } }
+  render();
+});
+$("next").addEventListener("click", () => {
+  if (S.tab === "year") S.vy++; else { S.vm++; if (S.vm > 11) { S.vm = 0; S.vy++; } }
+  render();
+});
+$("today-btn").addEventListener("click", () => select(TODAY));
+$("tab-month").addEventListener("click", () => { S.tab = "month"; render(); });
+$("tab-year").addEventListener("click", () => { S.tab = "year"; render(); });
+$("theme-btn").addEventListener("click", () => {
+  const dark = S.theme ? S.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  S.theme = dark ? "light" : "dark"; store.set("theme", S.theme); applyTheme();
+});
+$("ics-btn").addEventListener("click", () => {
+  const txt = buildICS(), ta = $("ics-out");
+  ta.value = txt; ta.hidden = false;
+  const fallback = () => { ta.focus(); ta.select(); toast("Valitse teksti ja kopioi se"); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => toast(`Kopioitu: vuoden ${S.vy} päivät`), fallback);
+  else fallback();
+});
+document.addEventListener("keydown", e => {
+  if (S.tab !== "month" || /input|select|textarea/i.test(e.target.tagName)) return;
+  const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
+  if (!step || !e.target.closest("#grid")) return;
+  e.preventDefault();
+  select(addDays(S.sel, step));
+  const b = document.querySelector(".cell.sel"); if (b) b.focus();
+});
+window.addEventListener("resize", () => { clearTimeout(drawStars.h); drawStars.h = setTimeout(drawStars, 150); });
+
+applyTheme();
+renderMode();
+render();
+drawStars();
+})();
+</script>
+</body>
+</html>
