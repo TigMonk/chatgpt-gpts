@@ -209,6 +209,7 @@ Enterprise/Plus-käyttäjät voivat valita mallin:
 | **Financial Analyst** | `Financial-Analyst-GPT.md` | Talousennusteet, arvonmääritys, unit economics, ROI-analyysi |
 | **Marketing Strategist** | `Marketing-Strategist-GPT.md` | Go-to-market, growth hacking, brand positioning, AARRR-metriikat |
 | **KAMI – Mentoripakka** | `Kami-Mentori-GPT.md` + `Kami-Mentori-Korttikirjasto.md` (Knowledge) | Pelillinen swipe-mentori: business, elämä, keho, mieli. Mentoreina kamit, zen, eläimet, puut ja persoonat |
+| **KAMI – selainsovellus** | `kami-app/` | Swipe-sovellus (Viisaus- ja Tsemppi-polku), esite ja tekijänoikeusselvitys |
 | **HR Advisor** | `HR-Advisor-GPT.md` | Henkilöstöstrategia, suorituksen johtaminen, työlainsäädäntö, TES, organisaation kehittäminen |
 
 ---

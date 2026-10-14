@@ -1,0 +1,258 @@
+<title>KAMI Esite</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: brochure that alternates calm "washi" bands (Viisaus) with dark "boxing ring" bands (Tsemppi); single 1080px column that splits to two at desktop. */
+:root{
+  --bg:#ECEFEB; --paper:#FAFBF8; --ink:#16201B; --muted:#56635C; --line:#C9D1CB;
+  --ai:#24406E; --shu:#C23F2A; --kin:#A9801F; --moss:#52683A;
+  --ring:#1B1440; --volt:#FFD23F; --pop:#FF3D6E; --ringInk:#FFF8E6;
+  --f-display:"Dela Gothic One","Arial Black",Impact,sans-serif;
+  --f-mincho:"Shippori Mincho","Hiragino Mincho ProN",Georgia,serif;
+  --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1512; --paper:#18201C; --ink:#E6ECE8; --muted:#9BA8A0; --line:#2C3832;
+  --ai:#94B2E8; --shu:#F07A62; --kin:#E2B85A; --moss:#A0BC7C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1512; --paper:#18201C; --ink:#E6ECE8; --muted:#9BA8A0; --line:#2C3832;
+  --ai:#94B2E8; --shu:#F07A62; --kin:#E2B85A; --moss:#A0BC7C; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+.band{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:56px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:28px}
+.ring{background:var(--ring);color:var(--ringInk)}
+.paper{background:var(--paper)}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
+h1{font-family:var(--f-display);font-size:clamp(40px,8vw,84px);line-height:1}
+h2{font-family:var(--f-display);font-size:clamp(28px,4.4vw,44px);line-height:1.1}
+h3{font-size:20px;font-weight:700}
+p{margin:0;max-width:62ch}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--shu)}
+.ring .eyebrow{color:var(--volt)}
+.muted{color:var(--muted)}
+.ring .muted{color:rgba(255,248,230,.72)}
+a{color:inherit}
+.cta{display:inline-flex;gap:10px;align-items:center;background:var(--shu);color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:12px;width:max-content;max-width:100%}
+.cta:focus-visible{outline:3px solid var(--kin);outline-offset:3px}
+
+/* hero */
+.hero{display:grid;gap:36px;align-items:center}
+@media (min-width:820px){.hero{grid-template-columns:1.2fr .8fr}}
+.hero h1 .k{font-family:var(--f-mincho);font-weight:700;color:var(--shu)}
+.hero .lead{font-size:19px}
+.phone{justify-self:center;width:min(300px,100%);aspect-ratio:9/17;max-width:100%;border-radius:38px;background:var(--ink);padding:12px;box-shadow:0 30px 60px -30px rgba(0,0,0,.6);position:relative}
+.screen{height:100%;border-radius:28px;background:var(--bg);overflow:hidden;position:relative;display:grid;place-items:center}
+.mock{position:absolute;inset:18px 16px 70px;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 14px 30px -16px rgba(0,0,0,.5)}
+.mock.back1{transform:rotate(-7deg) translateX(-14px);background:var(--ring);color:var(--ringInk)}
+.mock.front{background:var(--paper);border-top:5px solid var(--ai);transform:rotate(3deg) translateX(10px)}
+.mock .m-src{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--ai)}
+.mock .m-t{font-family:var(--f-mincho);font-weight:700;font-size:20px}
+.mock .m-q{font-family:var(--f-mincho);font-size:15px;line-height:1.35;border-left:3px solid var(--shu);padding-left:8px}
+.mock .m-row{margin-top:auto;font-size:11px;background:color-mix(in srgb,var(--ai) 10%,transparent);border-radius:8px;padding:6px 8px}
+.mock.back1 .m-t{font-family:var(--f-display);color:var(--volt);font-size:16px}
+.mock .stamp{position:absolute;top:14px;right:12px;font-family:var(--f-display);color:var(--moss);border:3px solid;border-radius:8px;padding:0 8px;transform:rotate(12deg);font-size:14px}
+.dock{position:absolute;bottom:16px;left:16px;right:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dock span{background:var(--paper);border-radius:10px;text-align:center;font-size:16px;padding:4px 0}
+
+/* paths */
+.two{display:grid;gap:16px}
+@media (min-width:760px){.two{grid-template-columns:1fr 1fr}}
+.pathcard{border-radius:20px;padding:24px;display:grid;gap:12px;align-content:start}
+.pathcard.wis{background:var(--paper);border-top:6px solid var(--ai);color:var(--ink)}
+.pathcard.wis h3{font-family:var(--f-mincho);font-size:28px;color:var(--ai)}
+.pathcard.fun{background:var(--ring);color:var(--ringInk)}
+.pathcard.fun h3{font-family:var(--f-display);font-weight:400;font-size:28px;color:var(--volt)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;font-size:13px}
+.tags span{border:1px solid currentColor;border-radius:99px;padding:2px 10px;opacity:.85}
+.sample{font-size:15px;border-radius:12px;padding:12px 14px}
+.wis .sample{background:color-mix(in srgb,var(--ai) 9%,transparent);font-family:var(--f-mincho)}
+.fun .sample{background:rgba(255,255,255,.08);font-family:var(--f-display);letter-spacing:.01em}
+
+/* mechanics */
+.mech{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.mech div{border-top:2px solid var(--volt);padding-top:12px;display:grid;gap:4px}
+.mech b{font-family:var(--f-display);font-weight:400;font-size:22px;color:var(--volt)}
+
+/* perspectives */
+.persp{display:grid;gap:18px}
+@media (min-width:900px){.persp{grid-template-columns:repeat(3,1fr)}}
+.pv{background:var(--paper);border-radius:18px;padding:22px;display:grid;gap:10px;align-content:start;border:1px solid var(--line)}
+.pv .who{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.pv:nth-child(1) .who{color:var(--shu)} .pv:nth-child(2) .who{color:var(--ai)} .pv:nth-child(3) .who{color:var(--moss)}
+.pv h3{font-family:var(--f-mincho);font-size:24px}
+.pv ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:15px}
+.pv .price{margin-top:6px;font-size:14px;border-top:1px dashed var(--line);padding-top:10px}
+
+/* roadmap */
+.road{display:grid;gap:12px}
+@media (min-width:760px){.road{grid-template-columns:repeat(3,1fr)}}
+.step{border-left:3px solid var(--line);padding:4px 0 4px 16px;display:grid;gap:6px}
+.step.now{border-color:var(--shu)}
+.step small{font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:11px;color:var(--muted)}
+.step.now small{color:var(--shu)}
+.step ul{margin:0;padding-left:18px;font-size:15px}
+
+/* rights table */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:14px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.ok{color:var(--moss);font-weight:700} .no{color:var(--shu);font-weight:700} .warn{color:var(--kin);font-weight:700}
+footer{font-size:13px}
+</style>
+
+<section class="band">
+  <div class="wrap hero">
+    <div style="display:grid;gap:20px">
+      <span class="eyebrow">Mentoripakka · MVP-esite</span>
+      <h1>Vedä kortti.<br><span class="k">Pam,</span> oivallus.</h1>
+      <p class="lead">KAMI on swipe-mentori businekseen, elämään, kehoon ja mieleen. Joka päivä yksi kortti, ja neuvoja antavat kami, karhu, koivu, Marcus Aurelius tai underdog-nyrkkeilijä. Kortti, kysymys ja teko vievät alle minuutin.</p>
+      <a class="cta" href="https://claude.ai/artifact/BdYJToj3CUh2ZWAXTH96db" target="_blank" rel="noopener">Kokeile sovellusta →</a>
+    </div>
+    <div class="phone" aria-label="Kuva sovelluksesta">
+      <div class="screen">
+        <div class="mock back1"><div class="m-t">UNDERDOG-NYRKKEILIJÄ</div><div style="font-family:var(--f-display);font-size:14px">Erä 15. Kädet painaa. Nouset silti.</div></div>
+        <div class="mock front">
+          <span class="stamp">OSUU</span>
+          <span class="m-src">⛩️ Kami · Päivän kortti</span>
+          <span style="font-size:40px;line-height:1">🦊</span>
+          <span class="m-t">Inari</span>
+          <span class="m-q">Kettu ei kilpaile jyvästä. Se vartioi koko peltoa.</span>
+          <span class="m-row"><b>Kysymys:</b> Mikä on se sato, jota vain sinä voit tarjota?</span>
+        </div>
+        <div class="dock"><span>👈</span><span>⬆️</span><span>⬇️</span><span>👉</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band paper">
+  <div class="wrap">
+    <span class="eyebrow">Kaksi polkua, yksi pakka</span>
+    <h2>Valitse, kuka mentoroi tänään</h2>
+    <div class="two">
+      <article class="pathcard wis">
+        <span class="eyebrow" style="color:var(--ai)">Polku 1</span>
+        <h3>Viisaus</h3>
+        <p>Rauhallinen ja syvä polku. Mentoreina ovat shinton kamit, zen-buddhalaisuuden opetukset, eläimet, puut ja antiikin filosofit. Lisäksi mukana on pyhiä tekstejä omina käännöksinä.</p>
+        <div class="tags"><span>⛩️ Inari, Amaterasu, misogi</span><span>☸️ Daruma, kaksi nuolta, kintsugi</span><span>🐻 karhu, lohi, korppi</span><span>🌲 koivu, bambu, sienirihmasto</span><span>🏛️ Marcus Aurelius, Saarnaaja, Popol Vuh, Freud</span></div>
+        <div class="sample">"Ensimmäinen nuoli sattuu. Toisen ammut itse." · Kaksi nuolta</div>
+        <p class="muted" style="font-size:14px">Sopii aamuun, iltaan ja vaikeisiin päätöksiin.</p>
+      </article>
+      <article class="pathcard fun">
+        <span class="eyebrow">Polku 2</span>
+        <h3>Tsemppi</h3>
+        <p>Hauska ja nopea polku. Popkulttuurin tutut hahmot tsemppaavat: urheiluleffat, tosi-tv, meemit ja suomalaiset arjen sankarit. Kaikki tekstit ovat omia, ja hahmot ovat arkkityyppejä.</p>
+        <div class="tags"><span>🥊 Underdog-nyrkkeilijä</span><span>💅 Reality-diiva</span><span>👨‍🍳 Huutava keittiömestari</span><span>👵 Sisu-mummo</span><span>🎙️ Urheiluselostaja</span></div>
+        <div class="sample">"Kulta, sä et pyydä lupaa. Sä ilmoitat."</div>
+        <p class="muted" style="font-size:14px">Sopii päivän piristykseen, treeniin ja someen jaettavaksi.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band ring">
+  <div class="wrap">
+    <span class="eyebrow">Näin se toimii</span>
+    <h2>Neljä swipeä ja palapeli</h2>
+    <div class="mech">
+      <div><b>👉 Osuu</b><span class="muted">Kortista tulee palapelin pala ja saat +10 XP.</span></div>
+      <div><b>👈 Ohi</b><span class="muted">Seuraava kortti tulee heti. Pakka vaihtaa lähdettä.</span></div>
+      <div><b>⬆️ Syvemmälle</b><span class="muted">Kortti kääntyy, ja takana on tarina, myytti tai vaikeampi kysymys.</span></div>
+      <div><b>⬇️ Teko</b><span class="muted">Saat kahden minuutin tehtävän heti. Kun teet sen, saat +20 XP.</span></div>
+      <div><b>🧩 Palapeli</b><span class="muted">Neljästä palasta syntyy oma periaate ja yksi teko seuraavaksi vuorokaudeksi.</span></div>
+      <div><b>🖼️ Korttikuva</b><span class="muted">Mikä tahansa kortti muuttuu 4:5-kuvaksi Instagramiin tai WhatsAppiin.</span></div>
+    </div>
+    <p class="muted">Päivän kortti, putki päivinä, tasot Siemen → Taimi → Puu → Metsä → Vuori ja joka seitsemäs kortti bossikorttina tuplapistein.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <span class="eyebrow">Kolme näkökulmaa</span>
+    <h2>Kenelle KAMI on?</h2>
+    <p class="muted">Sama korttimoottori taipuu kolmeen tuotteeseen. MVP testaa ensimmäistä. Kaksi muuta ovat seuraavat kokeilut.</p>
+    <div class="persp">
+      <article class="pv">
+        <span class="who">Näkökulma A · Kuluttaja</span>
+        <h3>Taskutsemppari</h3>
+        <p>Yksi kortti aamulla ja yksi illalla. Kevyt ja hauska, ja korttikuvan voi jakaa. Kilpailee Instagramin aamuskrollauksen kanssa, ei terapian.</p>
+        <ul>
+          <li>Ilmoitus: "Päivän kortti odottaa"</li>
+          <li>Putki, tasot ja jaettavat kortit</li>
+          <li>Teemapakat: Juhannus, Pääsykoe, Maraton</li>
+        </ul>
+        <p class="price"><b>Malli:</b> ilmainen perusversio ja premium noin 4–6 €/kk (kaikki pakat, AI-mentori, oma palapeliarkisto).</p>
+      </article>
+      <article class="pv">
+        <span class="who">Näkökulma B · Työpaikka ja HR</span>
+        <h3>Tiimin aamukortti</h3>
+        <p>Teamsiin tai Slackiin tulee joka aamu sama kortti koko tiimille. Perjantaina tiimi kokoaa yhteisen palapelin ja periaatteen. Matala kynnys hyvinvointiin ja keskusteluun.</p>
+        <ul>
+          <li>Business- ja Mieli-pakat painottuvat</li>
+          <li>Tiimipalapeli ja retro-kysymykset</li>
+          <li>Anonyymi fiilismittari swipeistä</li>
+        </ul>
+        <p class="price"><b>Malli:</b> 3–5 €/käyttäjä/kk tai työhyvinvointipaketti. Latentin konsultointi täydentää.</p>
+      </article>
+      <article class="pv">
+        <span class="who">Näkökulma C · Valmentaja ja brändi</span>
+        <h3>Oma pakka</h3>
+        <p>Personal trainer, urheiluseura, kirjailija tai yritys tekee oman korttipakkansa omalla äänellään. Jos sopimus sallii, mukana voi olla myös aitoja lisensoituja sitaatteja.</p>
+        <ul>
+          <li>Pakkaeditori ja oma ulkoasu</li>
+          <li>Asiakkaille jaettava linkki</li>
+          <li>Esimerkiksi seuran oma "Pukuhuonepuhe"-pakka</li>
+        </ul>
+        <p class="price"><b>Malli:</b> pakkalisenssi 49–199 €/kk tai kertaprojekti.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band paper">
+  <div class="wrap">
+    <span class="eyebrow">Sisältö ja oikeudet</span>
+    <h2>Saako Rockya ja Kardashianeja lainata?</h2>
+    <p>Lyhyesti: pyhät tekstit ja antiikin filosofit kyllä, kun käännös on oma. Leffarepliikit ja julkkikset eivät, ellei niihin ole lupaa. Siksi Tsemppi-polku käyttää <b>arkkityyppejä omin sanoin</b>: underdog-nyrkkeilijän tunnistaa ilman nimeä ja repliikkiä.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Lähde</th><th>Alkuteksti</th><th>Käännös tai repliikki</th><th>KAMI käyttää</th></tr></thead>
+        <tbody>
+          <tr><td>Raamattu, Koraani, sutrat, Kojiki</td><td class="ok">Vapaa</td><td class="no">Modernit suomennokset suojattuja (esim. Raamattu 1992)</td><td>Oma käännös + jaeviite</td></tr>
+          <tr><td>Marcus Aurelius, Seneca, Epiktetos, Herakleitos</td><td class="ok">Vapaa</td><td class="no">Modernit käännökset suojattuja</td><td>Oma käännös tai mukaelma</td></tr>
+          <tr><td>Freud (k. 1939)</td><td class="ok">Vapaa EU:ssa</td><td class="warn">Netin "Freud-sitaatit" usein keksittyjä</td><td>Käsitteet, esim. sublimaatio</td></tr>
+          <tr><td>Mayat (Popol Vuh)</td><td class="ok">Vapaa</td><td class="warn">Netin "mayaviisaudet" usein keksittyjä</td><td>Luomiskertomus omin sanoin</td></tr>
+          <tr><td>Elokuvat (esim. Rocky)</td><td class="no">Suojattu</td><td class="no">Lyhytkin omaperäinen repliikki voi olla suojattu (EU, Infopaq). Nimet usein tavaramerkkejä.</td><td>Arkkityyppi: "Underdog-nyrkkeilijä"</td></tr>
+          <tr><td>Julkkikset (esim. Kardashianit)</td><td class="warn">Tekstiä harvoin suojattu</td><td class="no">Nimen ja kuvan kaupallinen käyttö vaatii luvan</td><td>Arkkityyppi: "Reality-diiva"</td></tr>
+          <tr><td>Laulujen sanoitukset</td><td class="no">Suojattu</td><td class="no">Lisenssi tarvitaan</td><td>Ei käytetä</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="font-size:14px">Tekijänoikeuslain 22 §:n sitaattioikeus edellyttää, että lainaus palvelee omaa teosta. Sovellus, jonka koko sisältö on sitaatteja, ei todennäköisesti täytä tätä. Tämä on selvitys, ei oikeudellinen neuvo: tarkistuta linjaus juristilla ennen kaupallista julkaisua.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <span class="eyebrow">Tiekartta</span>
+    <h2>MVP:stä metsäksi</h2>
+    <div class="road">
+      <div class="step now"><small>Nyt · MVP</small><h3>Selainsovellus</h3><ul><li>Kaksi polkua, 52 korttia</li><li>Swipe, palapeli, XP, putki</li><li>Korttikuvat jakoon</li><li>Custom GPT -versio ChatGPT:hen</li></ul></div>
+      <div class="step"><small>Seuraava · v1</small><h3>AI-mentori ja PWA</h3><ul><li>AI kirjoittaa kortin omaan haasteeseesi</li><li>Asennettava PWA ja aamuilmoitus</li><li>Mentorineuvosto: kolme mentoria väittelee</li><li>Lisää pakkoja ja kielet (EN, SV)</li></ul></div>
+      <div class="step"><small>Sitten · v2</small><h3>Tiimit ja omat pakat</h3><ul><li>Teams- ja Slack-integraatio</li><li>Pakkaeditori valmentajille</li><li>Lisensoidut virallispakat</li><li>AI-kuvitetut korttitaiteet</li></ul></div>
+    </div>
+    <p class="muted">MVP:n mittarit: kuinka moni palaa seuraavana päivänä (D1 ja D7), osuu-prosentti per lähde, tehdyt teot per käyttäjä ja jaetut korttikuvat.</p>
+  </div>
+</section>
+
+<section class="band ring">
+  <div class="wrap">
+    <h2>Pam. Oivallus. Pam. Teko.</h2>
+    <a class="cta" href="https://claude.ai/artifact/BdYJToj3CUh2ZWAXTH96db" target="_blank" rel="noopener">Avaa KAMI-sovellus →</a>
+    <footer class="muted">Latentti.fi · KAMI Mentoripakka · Lokakuu 2026</footer>
+  </div>
+</section>

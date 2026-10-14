@@ -1,0 +1,457 @@
+<title>KAMI Mentoripakka</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: one-screen phone app. Header HUD → card stack → four swipe buttons → deck chips. Two paths re-skin the card only. */
+:root{
+  --bg:#E6EAE6; --surface:#FAFBF8; --ink:#16201B; --muted:#56635C; --line:#C6CEC8;
+  --ai:#24406E; --shu:#C23F2A; --kin:#B08628; --moss:#52683A;
+  --ring:#1B1440; --volt:#FFD23F; --pop:#FF3D6E; --ringInk:#FFF8E6;
+  --shadow:0 18px 40px -18px rgba(20,30,40,.45);
+  --f-display:"Dela Gothic One","Arial Black",Impact,sans-serif;
+  --f-mincho:"Shippori Mincho","Hiragino Mincho ProN",Georgia,serif;
+  --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101613; --surface:#1A221E; --ink:#E8EDE9; --muted:#9AA79F; --line:#2E3A34;
+  --ai:#8FAEE6; --shu:#F0765E; --kin:#E2B85A; --moss:#9DB878; --shadow:0 18px 40px -18px rgba(0,0,0,.8); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101613; --surface:#1A221E; --ink:#E8EDE9; --muted:#9AA79F; --line:#2E3A34;
+  --ai:#8FAEE6; --shu:#F0765E; --kin:#E2B85A; --moss:#9DB878; --shadow:0 18px 40px -18px rgba(0,0,0,.8); color-scheme:dark}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--kin);outline-offset:2px}
+.app{height:100%;max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding-block:10px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo{font-family:var(--f-display);font-size:22px;letter-spacing:.04em;background:none;border:0;padding:0;display:flex;align-items:center;gap:8px}
+.logo i{font-family:var(--f-mincho);font-style:normal;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:6px;background:var(--shu);color:#fff;font-size:15px}
+.hud{display:flex;gap:6px;font-size:12px;font-variant-numeric:tabular-nums;flex-wrap:wrap;justify-content:flex-end}
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:3px 9px;white-space:nowrap}
+.pill b{font-weight:700}
+.xpbar{height:4px;border-radius:4px;background:var(--line);overflow:hidden}
+.xpbar span{display:block;height:100%;background:linear-gradient(90deg,var(--moss),var(--kin));width:0;transition:width .5s}
+
+/* home */
+.home{flex:1;display:flex;flex-direction:column;gap:14px;overflow:auto;padding-bottom:8px}
+.home h1{font-family:var(--f-display);font-size:clamp(30px,9vw,40px);line-height:1.05;margin:6px 0 0;text-wrap:balance;font-weight:400}
+.home p.lead{margin:0;color:var(--muted)}
+.paths{display:grid;gap:12px}
+.path{border:0;text-align:left;border-radius:18px;padding:18px;display:grid;gap:6px;box-shadow:var(--shadow);position:relative;overflow:hidden;min-height:150px}
+.path small{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:700;opacity:.8}
+.path strong{font-size:26px;line-height:1.1}
+.path span{font-size:14px;max-width:30ch}
+.path.wis{background:var(--surface);color:var(--ink);border-top:6px solid var(--ai)}
+.path.wis strong{font-family:var(--f-mincho);font-weight:700;color:var(--ai)}
+.path.wis::after{content:"⛩";position:absolute;right:14px;bottom:4px;font-size:64px;opacity:.16}
+.path.fun{background:var(--ring);color:var(--ringInk)}
+.path.fun strong{font-family:var(--f-display);font-weight:400;color:var(--volt)}
+.path.fun::after{content:"🥊";position:absolute;right:14px;bottom:6px;font-size:58px;transform:rotate(-14deg)}
+.howto{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:12px;text-align:center;color:var(--muted)}
+.howto div{border:1px dashed var(--line);border-radius:10px;padding:8px 4px}
+.howto b{display:block;font-size:18px;color:var(--ink)}
+
+/* play */
+.play{flex:1;display:flex;flex-direction:column;gap:10px;min-height:0}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 11px;font-size:13px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stack{flex:1;position:relative;min-height:0;touch-action:none}
+.card{perspective:1400px;position:absolute;inset:0;border-radius:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;user-select:none;-webkit-user-select:none;will-change:transform;transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .32s}
+.card.under{transform:scale(.94) translateY(14px);opacity:.7}
+.card.drag{transition:none}
+.face{position:absolute;inset:0;display:flex;flex-direction:column;padding:18px 20px;gap:10px;overflow:auto;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .45s}
+.face.back{transform:rotateY(180deg)}
+.card.flipped .face.front{transform:rotateY(-180deg)}
+.card.flipped .face.back{transform:rotateY(0)}
+.meta{display:flex;justify-content:space-between;align-items:center;font-size:11px;text-transform:uppercase;letter-spacing:.14em;font-weight:700}
+.badge{border-radius:99px;padding:2px 8px;font-size:10px}
+.emoji{font-size:52px;line-height:1}
+.ttl{font-size:24px;line-height:1.15;margin:0;text-wrap:balance}
+.quote{font-size:21px;line-height:1.35;margin:0;text-wrap:balance}
+.body{margin:0;font-size:14px}
+.rows{display:grid;gap:8px;margin-top:auto}
+.row{border-radius:12px;padding:9px 12px;font-size:14px}
+.row b{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
+.rights{font-size:11px;opacity:.7;margin:0}
+/* wisdom skin */
+.card.wis{background:var(--surface);color:var(--ink)}
+.card.wis .face{background:var(--surface)}
+.card.wis .meta{color:var(--ai)}
+.card.wis .badge{background:var(--ai);color:var(--surface)}
+.card.wis .ttl{font-family:var(--f-mincho);font-weight:700}
+.card.wis .quote{font-family:var(--f-mincho);font-weight:500;border-left:3px solid var(--shu);padding-left:12px}
+.card.wis .row{background:color-mix(in srgb,var(--ai) 9%,transparent)}
+.card.wis .row b{color:var(--ai)}
+.card.wis::before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:var(--ai);z-index:2}
+/* fun skin: deliberately always-dark boxing ring */
+.card.fun{background:var(--ring);color:var(--ringInk)}
+.card.fun .face{background:radial-gradient(120% 70% at 100% 0%,color-mix(in srgb,var(--pop) 40%,transparent),transparent 60%),var(--ring)}
+.card.fun .meta{color:var(--volt)}
+.card.fun .badge{background:var(--pop);color:#fff}
+.card.fun .ttl{font-family:var(--f-display);font-weight:400;color:var(--volt);text-transform:uppercase;font-size:22px}
+.card.fun .quote{font-family:var(--f-display);font-weight:400;font-size:22px;line-height:1.25}
+.card.fun .row{background:rgba(255,255,255,.08)}
+.card.fun .row b{color:var(--volt)}
+.card.boss{outline:3px solid var(--kin);outline-offset:-3px}
+.stamp{position:absolute;z-index:5;font-family:var(--f-display);font-size:28px;padding:4px 14px;border:4px solid;border-radius:10px;opacity:0;pointer-events:none;letter-spacing:.06em}
+.stamp.r{top:28px;left:20px;color:var(--moss);transform:rotate(-14deg)}
+.stamp.l{top:28px;right:20px;color:var(--shu);transform:rotate(14deg)}
+.stamp.u{bottom:40%;left:50%;transform:translateX(-50%);color:var(--ai)}
+.stamp.d{top:40%;left:50%;transform:translateX(-50%);color:var(--kin)}
+.card.fun .stamp.r{color:var(--volt)} .card.fun .stamp.l{color:var(--pop)} .card.fun .stamp.u{color:#9FD8FF}
+.ctrl{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ctrl button{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:8px 0 6px;display:grid;gap:0;font-size:11px;color:var(--muted)}
+.ctrl button span{font-size:22px;line-height:1.2}
+.ctrl button:active{transform:scale(.95)}
+.tools{display:flex;gap:8px;justify-content:space-between;font-size:13px}
+.tools button{background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:2px 0}
+
+/* sheets */
+.veil{position:fixed;inset:0;background:rgba(10,14,12,.55);display:grid;place-items:end center;z-index:20;
+  padding:0 max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--surface);color:var(--ink);width:100%;max-width:440px;border-radius:20px;padding:18px;display:grid;gap:12px;max-height:88vh;overflow:auto;box-shadow:var(--shadow)}
+.sheet h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:22px}
+.sheet p{margin:0}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:700;background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.puzzle{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.piece{position:relative;border-radius:10px;padding:12px 10px;min-height:86px;font-size:13px;display:grid;align-content:space-between;gap:4px;color:#fff}
+.piece:nth-child(1){background:var(--ai)} .piece:nth-child(2){background:var(--moss)} .piece:nth-child(3){background:var(--shu)} .piece:nth-child(4){background:var(--kin);color:#1d1606}
+.piece::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:inherit;right:-12px;top:calc(50% - 9px);z-index:1}
+.piece:nth-child(n+3)::before{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:inherit;top:-12px;left:calc(50% - 9px)}
+.piece:nth-child(2n)::after{display:none}
+.piece b{font-size:15px}
+.field{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit}
+.shareimg{width:100%;border-radius:12px;border:1px solid var(--line)}
+.list{display:grid;gap:8px;font-size:14px}
+.list div{border-bottom:1px solid var(--line);padding-bottom:6px}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 14px);transform:translateX(-50%) translateY(-120%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:99px;font-weight:700;font-size:14px;z-index:30;transition:transform .3s;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.boom{position:fixed;pointer-events:none;z-index:25;font-size:22px;animation:boom .9s ease-out forwards}
+@keyframes boom{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app" id="app">
+  <header class="top">
+    <button class="logo" id="homeBtn" aria-label="Etusivulle"><i>神</i>KAMI</button>
+    <div class="hud" aria-live="polite">
+      <span class="pill">🧩 <b id="hPieces">0</b>/4</span>
+      <span class="pill">⚡ <b id="hXp">0</b></span>
+      <span class="pill">🔥 <b id="hStreak">1</b> pv</span>
+      <span class="pill" id="hLevel">🌰 Siemen</span>
+    </div>
+  </header>
+  <div class="xpbar" aria-hidden="true"><span id="xpFill"></span></div>
+
+  <section class="home" id="home">
+    <h1>Vedä kortti.<br>Pam, oivallus.</h1>
+    <p class="lead">Mentoripakka businekseen, elämään, kehoon ja mieleen. Valitse polku:</p>
+    <div class="paths">
+      <button class="path wis" data-go="wis">
+        <small>Polku 1 · Viisaus</small>
+        <strong>Kamit, zen, eläimet, puut ja klassikot</strong>
+        <span>Rauhallinen mentori. Inari, Daruma, karhu, koivu, Marcus Aurelius, Saarnaaja…</span>
+      </button>
+      <button class="path fun" data-go="fun">
+        <small>Polku 2 · Tsemppi</small>
+        <strong>Leffat, tosi-tv, urheilu ja meemit</strong>
+        <span>Hauska päivätsemppari. Underdog-nyrkkeilijä, reality-diiva, Sisu-mummo…</span>
+      </button>
+    </div>
+    <div class="howto" aria-label="Swipe-ohje">
+      <div><b>👉</b>Osuu<br>palapeliin</div>
+      <div><b>👈</b>Ohi</div>
+      <div><b>⬆️</b>Syvemmälle</div>
+      <div><b>⬇️</b>Teko nyt</div>
+    </div>
+    <p class="lead" style="font-size:12px">Neljä osunutta korttia tekee palapelin, josta tulee oma periaate. Näppäimistöllä toimivat nuolinäppäimet.</p>
+  </section>
+
+  <section class="play" id="play" hidden>
+    <div class="chips" role="group" aria-label="Pakka">
+      <button class="chip" data-f="all" aria-pressed="true">Kaikki</button>
+      <button class="chip" data-f="💼" aria-pressed="false">💼 Business</button>
+      <button class="chip" data-f="🌱" aria-pressed="false">🌱 Elämä</button>
+      <button class="chip" data-f="🔥" aria-pressed="false">🔥 Keho</button>
+      <button class="chip" data-f="🌙" aria-pressed="false">🌙 Mieli</button>
+    </div>
+    <div class="stack" id="stack"></div>
+    <div class="ctrl">
+      <button id="bL" aria-label="Ohi"><span>👈</span>Ohi</button>
+      <button id="bU" aria-label="Syvemmälle"><span>⬆️</span>Syvemmälle</button>
+      <button id="bD" aria-label="Teko nyt"><span>⬇️</span>Teko</button>
+      <button id="bR" aria-label="Osuu"><span>👉</span>Osuu</button>
+    </div>
+    <div class="tools">
+      <button id="shareBtn">🖼️ Tee kortista kuva</button>
+      <button id="colBtn">📚 Kokoelma</button>
+      <button id="switchBtn">🔀 Vaihda polkua</button>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<div id="sheetHost"></div>
+
+<script>
+const R_WIS="Alkuperäinen KAMI-teksti.";
+const R_FUN="Alkuperäinen KAMI-teksti arkkityypin hengessä. Ei elokuva- tai tv-sitaatteja.";
+const SRC={kami:"⛩️ Kami",dharma:"☸️ Dharma",elain:"🐺 Eläin",puu:"🌲 Luonto",klassikko:"🏛️ Klassikko",
+  leffa:"🎬 Leffa-arkkityyppi",tv:"📺 Tosi-tv",urheilu:"🏆 Urheilu",meemi:"📱 Meemi",suomi:"🧶 Suomi-hahmo"};
+const WIS=[
+{s:"kami",e:"🦊",p:"💼",t:"Inari",q:"Kettu ei kilpaile jyvästä. Se vartioi koko peltoa.",b:"Inari on shinton sadon, riisin ja kaupan kami. Sen viestintuojat ovat kettuja.",a:"Kysy yhdeltä asiakkaalta: miltä onnistunut vuosi näyttää teille?",k:"Mikä on se sato, jota vain sinä voit tarjota?",d:"Fushimi Inarin pyhäkössä Kiotossa on tuhansia punaisia torii-portteja. Jokainen on lahjoitus, usein yritykseltä kiitokseksi menestyksestä. Mitä antaisit takaisin, jos tämä onnistuu?",w:"Arvo"},
+{s:"kami",e:"☀️",p:"🌱",t:"Amaterasu",q:"Valo palaa, kun tulet ulos luolasta.",b:"Aurinkojumalatar vetäytyi luolaan, ja maailma pimeni.",a:"Näytä keskeneräinen työ yhdelle ihmiselle tänään.",k:"Mihin luolaan olet vetäytynyt?",d:"Muut kamit eivät saaneet häntä ulos voimalla. Ne pitivät luolan suulla juhlat, ja uteliaisuus voitti. Mikä houkuttelisi sinut ulos ilman pakkoa?",w:"Näkyvyys"},
+{s:"kami",e:"🛤️",p:"💼",t:"Sarutahiko",q:"Risteyksessä ei tarvita karttaa, vaan ensimmäinen askel.",b:"Risteysten ja opastuksen kami, joka näytti taivaasta laskeutuvalle Ninigille tien.",a:"Valitse tie, jota voit kulkea 30 päivää. Arvioi vasta sitten.",k:"Mikä pienin askel paljastaisi oikean tien?",d:"Opas ei kävele puolestasi. Hän näyttää suunnan. Kuka voisi olla sinun oppaasi tässä asiassa? Kysy häneltä tällä viikolla.",w:"Suunta"},
+{s:"kami",e:"💧",p:"🔥",t:"Misogi",q:"Kylmä vesi huuhtoo pois sen, mikä ei ole sinun.",b:"Shinton puhdistautumisriitti vesiputouksen tai kylmän veden alla.",a:"Kylmää vettä kasvoille ja ranteille, sitten kolme syvää hengitystä. Kuuntele kehoasi.",k:"Mitä haluaisit huuhtoa pois tästä päivästä?",d:"Misogissa ei kilpailla kestämisestä. Ajatus on aloittaa puhtaalta pöydältä. Mikä olisi sinun päiväsi nollausnappi?",w:"Nollaus"},
+{s:"kami",e:"🪢",p:"💼",t:"Musubi",q:"Uusi syntyy, kun kaksi asiaa sidotaan yhteen.",b:"Shinton käsite luovasta, yhdistävästä voimasta. Sana tarkoittaa myös solmua.",a:"Kirjoita kaksi ideaa, jotka eivät kuulu yhteen, ja yhdistä ne yhdeksi.",k:"Kenet tai minkä voisit yhdistää?",d:"Pyhäköissä ennustelaput solmitaan puiden oksiin. Mikä solmu pitää sinun elämääsi koossa, ja mikä solmu pitäisi avata?",w:"Yhteys"},
+{s:"kami",e:"💃",p:"🌱",t:"Ame-no-Uzume",q:"Kun voima ei auta, kokeile naurua.",b:"Ilon ja tanssin kami, jonka tanssi houkutteli auringon ulos luolasta.",a:"Tee ongelmastasi naurettava versio ja kerro se jollekulle.",k:"Mitä tapahtuisi, jos tämä saisi olla hauskaa?",w:"Ilo"},
+{s:"dharma",e:"🎎",p:"🔥",t:"Daruma",q:"Kaadu seitsemän kertaa, nouse kahdeksan.",b:"Japanilainen sananlasku. Pyöreäpohjainen daruma-nukke nousee aina pystyyn, ja se on nimetty zenin perustajan Bodhidharman mukaan.",a:"Nimeä yksi tavoite ja piirrä paperille daruma, jolla on vain yksi silmä.",k:"Mikä kaatuminen odottaa vielä nousua?",d:"Japanissa darumaan maalataan toinen silmä vasta, kun tavoite on saavutettu. Puolisokea daruma muistuttaa joka päivä keskeneräisestä lupauksesta.",w:"Sisu"},
+{s:"dharma",e:"🏹",p:"🌙",t:"Kaksi nuolta",q:"Ensimmäinen nuoli sattuu. Toisen ammut itse.",b:"Buddhalainen vertaus: kipu on ensimmäinen nuoli, oma tarinamme kivusta on toinen.",a:"Kirjoita kaksi riviä: mitä tapahtui ja mitä kerroin itselleni siitä.",k:"Kumpi nuoli sattuu enemmän?",d:"Toista nuolta ei poisteta vihaamalla itseään. Riittää, että huomaat sen ja nimeät sen: tässä tulee toinen nuoli.",w:"Selkeys"},
+{s:"dharma",e:"🔥",p:"💼",t:"Fudō Myōō",q:"Liekit ympärillä, katse yhdessä pisteessä.",b:"Liikkumaton suojelija, joka ei horju. Kädessä köysi ja miekka.",a:"Valitse yksi asia ja tee sitä 25 minuuttia ilman ilmoituksia.",k:"Mistä et luovu, vaikka on vaikeaa?",d:"Köysi sitoo harhat, miekka leikkaa ne. Mikä on sinun köytesi, eli rutiini joka pitää sinut paikallasi? Entä miekkasi, eli päätös joka katkaisee?",w:"Fokus"},
+{s:"dharma",e:"🌀",p:"🌙",t:"Shoshin",q:"Aloittelijan mielessä on tilaa.",b:"Zen-käsite: kohtaa asia kuin ensimmäistä kertaa.",a:"Kysy tänään yksi tyhmältä tuntuva kysymys ääneen.",k:"Mitä luulet jo tietäväsi?",d:"Asiantuntijuus on hyvä työkalu mutta huonot silmälasit. Selitä ongelmasi kymmenvuotiaalle. Mikä kohta alkaa kuulostaa oudolta?",w:"Uteliaisuus"},
+{s:"dharma",e:"🍵",p:"🌙",t:"Kintsugi",q:"Halkeama kullataan, ei piiloteta.",b:"Japanilainen korjaustaide: rikkoutunut astia liimataan kultalakalla.",a:"Kerro yhdelle ihmiselle epäonnistumisesta, joka opetti sinulle jotain.",k:"Mikä halkeama sinussa on kultaa?",w:"Arvet"},
+{s:"elain",e:"🐻",p:"🔥",t:"Karhu",q:"Talviuni ei ole laiskuutta. Se on strategia.",b:"Talviunessa karhun sydän hidastuu, ja keväällä se herää täyteen voimaan.",a:"Varaa tälle illalle tunti tietoista lepoa ilman ruutua.",k:"Mikä vuodenaika elämässäsi on nyt?",d:"Ennen talvea karhu syö valtavasti. Lepo vaatii valmistautumista. Mitä sinun pitää kerätä, ennen kuin voit levätä?",w:"Lepo"},
+{s:"elain",e:"🐺",p:"💼",t:"Susi",q:"Lauma ei jahtaa jokaista saalista.",b:"Laumalla on roolit, ja jahti onnistuu yhteistyöllä.",a:"Sano ei yhdelle projektille tai asiakkaalle, joka ei ole sinun.",k:"Mikä on sinun laumasi?",w:"Valinta"},
+{s:"elain",e:"🐟",p:"🔥",t:"Lohi",q:"Vastavirta on tie kotiin.",b:"Lohi ui satoja kilometrejä vastavirtaan ja hyppää koskien yli syntymäjokeensa.",a:"Tee tänään se yksi asia, jota olet vältellyt.",k:"Mikä on sinun syntymäjokesi?",w:"Sitkeys"},
+{s:"elain",e:"🐦‍⬛",p:"💼",t:"Korppi",q:"Mieti kaksi siirtoa eteenpäin.",b:"Korppi on yksi älykkäimmistä linnuista: se käyttää työkaluja ja suunnittelee.",a:"Kirjoita: jos teen tämän, mitä tapahtuu sen jälkeen, ja mitä sen jälkeen?",k:"Mitä tapahtuu kahden siirron päästä?",w:"Ennakointi"},
+{s:"puu",e:"🌳",p:"💼",t:"Koivu",q:"Ensimmäinen kasvaa aukealle.",b:"Koivu on pioneerilaji: se valtaa ensimmäisenä palaneen tai hakatun maan.",a:"Kokeile tänään yhtä uutta kanavaa, työkalua tai tapaa.",k:"Mihin aukeaan voisit kasvaa ensimmäisenä?",d:"Koivu valmistaa maata muille, ja myöhemmin sen suojassa kasvaa kuusi. Kenelle sinä raivaat tietä?",w:"Rohkeus"},
+{s:"puu",e:"🎋",p:"🌱",t:"Bambu",q:"Ensin juuret, sitten metrejä.",b:"Bambu kasvattaa pitkään juurakkoa maan alla ja kasvaa sitten nopeasti. Myrskyssä se taipuu eikä katkea.",a:"Tee 20 minuuttia näkymätöntä perustyötä, jota kukaan ei kehu.",k:"Missä vaiheessa juurten kasvua olet?",w:"Kärsivällisyys"},
+{s:"puu",e:"🍄",p:"💼",t:"Sienirihmasto",q:"Metsä puhuu maan alla.",b:"Sienirihmasto yhdistää puiden juuret ja siirtää ravinteita puulta toiselle.",a:"Esittele toisilleen kaksi ihmistä, jotka hyötyisivät tutustumisesta.",k:"Kenet voisit yhdistää?",w:"Verkosto"},
+{s:"puu",e:"🌲",p:"🔥",t:"Mänty",q:"Juuret halkeamaan, latva taivaalle.",b:"Mänty kasvaa karuun kalliomaahan ja kestää kuivuutta.",a:"Seiso minuutti: jalat juurina, päälaki ylös, hartiat alas.",k:"Mitä halkeamaa voisit hyödyntää?",w:"Juuret"},
+{s:"puu",e:"🌊",p:"🌙",t:"Vesi",q:"Pehmeä voittaa kovan, kun aikaa on tarpeeksi.",b:"Vesi ottaa astian muodon ja kuluttaa kiven. Tao Te Ching käyttää vettä esimerkkinä pehmeän voimasta (oma mukaelma).",a:"Älä hakkaa estettä. Listaa kolme reittiä sen ympäri.",k:"Miten vesi kiertäisi tämän?",w:"Joustavuus"},
+{s:"klassikko",e:"🏛️",p:"🌙",t:"Marcus Aurelius",q:"Este muuttuu tieksi.",b:"Rooman keisari kirjoitti itselleen muistiinpanoja, jotka tunnetaan nimellä Itsetutkiskeluja (5.20, oma käännös).",a:"Kirjoita illalla kaksi listaa: mitä hallitsin tänään ja mitä en.",k:"Mitä tämä este opettaa?",d:"Marcus kirjoitti sotaretkellä teltassa, väsyneenä. Hän ei kirjoittanut yleisölle vaan muistuttaakseen itseään. Mitä sinun pitäisi muistuttaa itsellesi joka aamu?",w:"Asenne",r:"Oma käännös kreikasta. Alkuteos (n. 170 jaa.) on vapaa, mutta moderneja käännöksiä ei kopioida."},
+{s:"klassikko",e:"⏳",p:"💼",t:"Seneca",q:"Elämä ei ole lyhyt. Me tuhlaamme sitä.",b:"Stoalainen filosofi teoksessa Elämän lyhyydestä (oma mukaelma).",a:"Laske illalla, mihin tämän päivän tunnit menivät.",k:"Mihin käyttäisit tunnin, jos se olisi viimeinen?",w:"Aika",r:"Oma mukaelma latinasta. Alkuteos on vapaa."},
+{s:"klassikko",e:"⚖️",p:"🌙",t:"Epiktetos",q:"Jotkin asiat ovat vallassamme, toiset eivät.",b:"Orjana syntynyt stoalainen opettaja (Käsikirja 1, oma käännös).",a:"Jaa paperi kahtia: mitä voin hallita, mitä en. Toimi vasemmalla puolella ja päästä irti oikeasta.",k:"Mihin käytät voimaa, joka ei kuulu sinulle?",w:"Hallinta",r:"Oma käännös kreikasta. Alkuteos on vapaa."},
+{s:"klassikko",e:"🏞️",p:"🌱",t:"Herakleitos",q:"Samaan jokeen ei voi astua kahdesti.",b:"Kreikkalainen filosofi, jonka mukaan kaikki virtaa (oma mukaelma fragmentista).",a:"Tee tänään yksi tuttu asia eri tavalla.",k:"Mitä yrität pitää ennallaan?",w:"Muutos",r:"Oma mukaelma. Alkuteos on vapaa."},
+{s:"klassikko",e:"📜",p:"🌱",t:"Saarnaaja",q:"Kaikella on aikansa.",b:"Raamatun Saarnaajan kirja 3:1: aika istuttaa ja aika repiä, aika itkeä ja aika nauraa.",a:"Kirjoita: onko nyt minun aikani kylvää, korjata vai levätä?",k:"Mitä yrität tehdä väärään aikaan?",w:"Ajoitus",r:"Oma käännös. Alkuteksti on vapaa, mutta Raamattu 1992 -käännös on suojattu."},
+{s:"klassikko",e:"🌙",p:"🌙",t:"Koraani 94:5–6",q:"Vaikeuden kanssa tulee helpotus.",b:"Koraanin suura 94 toistaa lupauksen kahdesti peräkkäin.",a:"Kirjoita yksi vaikeus, joka toi mukanaan jotain hyvää.",k:"Mikä helpotus voisi kulkea tämän vaikeuden mukana?",w:"Toivo",r:"Oma käännös arabiankielisestä alkutekstistä. Suomennoksia ei kopioida."},
+{s:"klassikko",e:"🌽",p:"💼",t:"Popol Vuh",q:"Maailma tehtiin uudestaan, kunnes se onnistui.",b:"Mayojen Popol Vuhissa luojat yrittävät tehdä ihmisen mudasta ja puusta, ja vasta maissista se onnistuu.",a:"Tee tänään versio 2 jostain, mikä epäonnistui.",k:"Mikä on sinun maissisi, se oikea materiaali?",d:"Netissä kiertää paljon keksittyjä mayojen viisauksia. Tämä kortti nojaa Popol Vuhin luomiskertomukseen: iteroi, kunnes materiaali on oikea.",w:"Iterointi",r:"Kertomus on vapaa. Moderneja käännöksiä ei kopioida."},
+{s:"klassikko",e:"🛋️",p:"🌙",t:"Freud: sublimaatio",q:"Kanavoi energia, älä tukahduta sitä.",b:"Sigmund Freudin käsite: viettienergia ohjataan luovaksi tai hyödylliseksi toiminnaksi.",a:"Muuta tämänhetkinen kiukku tai levottomuus 10 minuutin liikkeeksi tai luonnokseksi.",k:"Mihin turhautumisesi voisi muuttua?",w:"Energia",r:"Freud kuoli 1939, joten hänen tekstinsä ovat vapaita. Moni Freudin nimissä kiertävä sitaatti on kuitenkin keksitty."}
+];
+const FUN=[
+{s:"leffa",e:"🥊",p:"🔥",t:"Underdog-nyrkkeilijä",q:"Erä 15. Kädet painaa. Nouset silti. Siinä koko juttu.",b:"Jokaisessa urheiluleffassa tulee hetki, jolloin kaikki näyttää menetetyltä ja sankari nousee. Tämä on se hetki.",a:"Tee 10 kyykkyä ja kuvittele, että taustalla soi montaasimusiikki.",k:"Mikä on sinun 15. eräsi?",w:"Nousu"},
+{s:"tv",e:"💅",p:"💼",t:"Reality-diiva",q:"Kulta, sä et pyydä lupaa. Sä ilmoitat.",b:"Tosi-tv:n kuningattaret eivät jää odottamaan, että joku huomaa heidät.",a:"Lähetä tänään se viesti, jota olet hionut viikon. Sellaisenaan.",k:"Mihin olet odottanut lupaa?",w:"Itsevarmuus"},
+{s:"leffa",e:"🎵",p:"🔥",t:"Treenimontaasi",q:"Yksi biisi, kolme minuuttia, ja olet eri ihminen.",b:"Montaasi tiivistää kuukausien työn kolmeen minuuttiin. Oikeassa elämässä kuukaudet koostuvat juuri näistä kolmesta minuutista.",a:"Laita lempibiisi soimaan ja liiku koko biisin ajan.",k:"Mikä on sinun montaasibiisisi?",w:"Treeni"},
+{s:"urheilu",e:"📣",p:"💼",t:"Pukuhuonepuhe",q:"Tauko on ohi. Kenttä ei odota.",b:"Toisella puoliajalla valmentaja nousee penkille ja kaikki hiljenevät.",a:"Sano tiimille tai peilille yksi lause, joka alkaa sanoilla \"Tästä eteenpäin me…\"",k:"Mitä sinun pitää sanoa ääneen?",w:"Johtajuus"},
+{s:"tv",e:"👨‍🍳",p:"💼",t:"Huutava keittiömestari",q:"Tämä annos on raaka! Uudestaan, ja nyt kunnolla!",b:"Kokkiohjelmissa huudetaan, koska mestari tietää, että pystyt parempaan.",a:"Ota yksi eilen tehty \"ihan ok\" -työ ja paranna siitä yhtä yksityiskohtaa.",k:"Mikä työsi on vielä raakaa?",w:"Laatu"},
+{s:"leffa",e:"🕶️",p:"💼",t:"Heist-tiimi",q:"Suunnitelma on hyvä. Tiimi on parempi.",b:"Ryöstöleffassa jokaisella on oma erikoistaitonsa, eikä kukaan tee kaikkea.",a:"Kirjoita tiimisi tai ystäviesi supervoimat, yksi sana per henkilö.",k:"Kenet tarvitset vielä porukkaan?",w:"Tiimi"},
+{s:"leffa",e:"✈️",p:"🌱",t:"Romcomin lentokenttäjuoksu",q:"Juokse portille. Sano se nyt.",b:"Romanttisen komedian lopussa joku juoksee ja sanoo vihdoin ääneen sen, mitä tuntee.",a:"Kerro tänään jollekulle, mitä hän merkitsee sinulle.",k:"Kenelle et ole vielä sanonut sitä?",w:"Rohkeus"},
+{s:"meemi",e:"🗿",p:"🔥",t:"Sigma-aamu (ironisesti)",q:"Herää. Juo vettä. Ole legenda. Mutta ei kello 4.30.",b:"Some on täynnä äärirutiineja. Legendaksi tullaan kuitenkin perusasioilla.",a:"Juo iso lasi vettä nyt.",k:"Mikä on sinun pienin legendateko?",w:"Perusasiat"},
+{s:"suomi",e:"👵",p:"🌱",t:"Sisu-mummo",q:"Ei se tunteile, se tekee. Kahvi on keitetty, mennään.",b:"Suomalainen mummo on kantanut puut, kasvattanut lapset ja käynyt avannossa. Selityksiä hän ei jaksa.",a:"Tee yksi tylsä kotityö loppuun ennen kuin ehdit ajatella sitä.",k:"Mitä mummo sanoisi tekosyistäsi?",w:"Sisu"},
+{s:"urheilu",e:"🎙️",p:"🔥",t:"Urheiluselostaja",q:"JA SIELLÄ HÄN TULEE! KUKAAN EI USKONUT! MAALISUORALLA!",b:"Arkinen tehtävä muuttuu olympiafinaaliksi, kun joku selostaa sitä riittävän kovaa.",a:"Selosta seuraava tehtäväsi ääneen kuin olympiafinaalia.",k:"Mikä on sinun maalisuorasi?",w:"Innostus"},
+{s:"leffa",e:"🧙",p:"🌙",t:"Mentori toisessa näytöksessä",q:"Sinulla on ollut se koko ajan. Minä vain osoitin sen.",b:"Sankaritarinoissa mentori ei anna voimaa. Hän paljastaa sen.",a:"Listaa kolme asiaa, joissa olet parempi kuin uskot.",k:"Mikä taito sinulla on ollut koko ajan?",w:"Itseluottamus"},
+{s:"leffa",e:"🦸",p:"🌱",t:"Origin story",q:"Jokainen sankari oli ensin se, joka kaatui.",b:"Supersankarielokuvat alkavat aina menetyksestä tai epäonnistumisesta.",a:"Kirjoita kolmen rivin origin story: mikä vaikeus teki sinusta sen, mikä olet?",k:"Mikä on sinun alkuperätarinasi?",w:"Tarina"},
+{s:"tv",e:"🔨",p:"💼",t:"Remonttishow",q:"Purkuvaiheessa näyttää aina pahimmalta.",b:"Ennen-jälkeen-kuvissa ei näy viikkoa, jolloin kaikki oli pölyä.",a:"Pura yksi vanha rakenne: kansio, rutiini tai turha kalenterikokous.",k:"Mikä täytyy purkaa, ennen kuin voi rakentaa?",w:"Muutos"},
+{s:"urheilu",e:"🏁",p:"💼",t:"Rallikartturi",q:"Oikea kakkonen, pitkä, älä nosta!",b:"Kartturi lukee tien etukäteen, jotta kuski voi keskittyä ajamiseen.",a:"Kirjoita huomisen kolme tärkeintä mutkaa valmiiksi jo tänään.",k:"Kuka on sinun kartturisi?",w:"Ennakointi"},
+{s:"meemi",e:"🪟",p:"🔥",t:"Vaikuttajan aamurutiini",q:"Viisi askelta esteettiseen päivään. Ykkönen: avaa verhot.",b:"Parodia täydellisistä aamurutiineista, mutta valo oikeasti herättää.",a:"Avaa verhot ja seiso päivänvalossa 2 minuuttia.",k:"Mikä on sinun aamusi ykkösaskel?",w:"Valo"},
+{s:"leffa",e:"🔦",p:"🌙",t:"Kauhuleffan sankari",q:"Älä mene kellariin yksin. Ota valot ja kaveri.",b:"Kauhuelokuvissa jokainen tietää säännön, ja silti joku menee yksin.",a:"Jaa tänään yksi huoli jonkun kanssa.",k:"Mihin kellariin yrität mennä yksin?",w:"Tuki"},
+{s:"tv",e:"🎤",p:"🌱",t:"Koe-esiintyjä",q:"Kädet tärisee, ääni tärisee, ja silti lavalle.",b:"Laulukilpailujen parhaat hetket ovat niitä, joissa jännittää ja silti uskaltaa.",a:"Tee tänään yksi asia, joka jännittää vähän.",k:"Mikä on sinun koe-esiintymisesi?",w:"Uskallus"},
+{s:"urheilu",e:"🏃",p:"🔥",t:"Maratonin 35. kilometri",q:"Seinä on tässä. Seinän takana on maali.",b:"Maratoonarit tuntevat seinän. Se tulee, ja se menee ohi.",a:"Kun tänään tekee mieli lopettaa, jatka vielä 5 minuuttia.",k:"Missä sinun seinäsi on?",w:"Kestävyys"},
+{s:"suomi",e:"🧖",p:"🌙",t:"Saunatonttu",q:"Löyly ei kiirehdi. Ei sinunkaan tarvitse.",b:"Saunan haltija vartioi rauhaa. Kiire jää pukuhuoneeseen.",a:"Ota tänään lämmin suihku tai sauna ilman puhelinta ja viilennä lopuksi.",k:"Mikä on sinun palautumisrituaalisi?",w:"Palautuminen"},
+{s:"leffa",e:"🎬",p:"💼",t:"Jatko-osa",q:"Ykkösosa oli harjoitus. Kakkosesta puhutaan.",b:"Monet kuuluisat jatko-osat ovat parempia kuin ensimmäinen. Tekijät olivat oppineet.",a:"Valitse yksi epäonnistunut projekti ja kirjoita sille jatko-osan juoni.",k:"Mikä ansaitsee comebackin?",w:"Comeback"},
+{s:"tv",e:"🌹",p:"🌱",t:"Ruususeremonia",q:"Kenelle annat ruusun tänään?",b:"Kaikille ei riitä aikaa. Valitse, kenelle annat sitä.",a:"Anna yhdelle ihmiselle 15 minuuttia jakamatonta huomiota.",k:"Kuka ansaitsee ruusun?",w:"Valinta"},
+{s:"urheilu",e:"⛷️",p:"🔥",t:"Hiihtäjän viimeinen nousu",q:"Nousu on se kohta, jossa kisa ratkeaa.",b:"Hiihtokisat ratkeavat usein viimeisessä mäessä, ei tasaisella.",a:"Kävele tänään portaat hissin sijaan.",k:"Mikä on sinun viimeinen noususi?",w:"Puuska"},
+{s:"meemi",e:"🐈",p:"🌙",t:"Kissavideo",q:"Putoa pöydältä, laskeudu jaloillesi ja esitä, että se oli tarkoitus.",b:"Internetin vanhin viisaus: moka muuttuu legendaksi, kun sille nauraa.",a:"Naura yhdelle omalle mokallesi ääneen.",k:"Minkä mokan voisit kääntää vitsiksi?",w:"Huumori"},
+{s:"leffa",e:"📜",p:"🌱",t:"Lopputekstit",q:"Kuka kaikki oli mukana tekemässä sinua?",b:"Elokuvan lopussa luetellaan jokainen, joka teki sen mahdolliseksi.",a:"Kirjoita omat lopputekstisi: viisi ihmistä. Kiitä yhtä tänään.",k:"Kenet unohdit kiittää?",w:"Kiitollisuus"}
+];
+const LEVELS=[[0,"🌰 Siemen"],[100,"🌱 Taimi"],[250,"🌳 Puu"],[500,"🌲 Metsä"],[1000,"⛰️ Vuori"]];
+const KEY="kami-app-v1";
+const $=id=>document.getElementById(id);
+let S, deck=[], cur=null, flipped=false, deepened=false;
+
+function today(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function fresh(){return {path:null,xp:0,pieces:[],saved:[],principles:[],streak:1,lastDay:today(),swiped:0,skips:0,filter:"all",dailySeen:{}}}
+
+function touchStreak(){
+  const t=today(); if(S.lastDay===t) return;
+  const y=new Date(); y.setDate(y.getDate()-1);
+  const yd=y.getFullYear()+"-"+(y.getMonth()+1)+"-"+y.getDate();
+  S.streak = S.lastDay===yd ? S.streak+1 : 1; S.lastDay=t; save();
+}
+function level(){let l=LEVELS[0],n=null;for(let i=0;i<LEVELS.length;i++){if(S.xp>=LEVELS[i][0]){l=LEVELS[i];n=LEVELS[i+1]||null}}return {l,n}}
+function hud(){
+  $("hPieces").textContent=S.pieces.length; $("hXp").textContent=S.xp; $("hStreak").textContent=S.streak;
+  const {l,n}=level(); $("hLevel").textContent=l[1];
+  $("xpFill").style.width = n ? ((S.xp-l[0])/(n[0]-l[0])*100)+"%" : "100%";
+}
+function addXp(x){const before=level().l;S.xp+=x;const after=level().l;hud();save();
+  if(after!==before) setTimeout(()=>toast("Tasonnousu: "+after[1]+"!"),700)}
+let tt; function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),1600)}
+
+function pool(){const all=S.path==="wis"?WIS:FUN;return all.filter(c=>S.filter==="all"||c.p===S.filter)}
+function hash(s){let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function buildDeck(){
+  const p=pool(); deck=shuffle(p.slice());
+  const dk=S.path+today();
+  if(S.filter==="all" && !S.dailySeen[dk]){
+    const daily=p[hash(dk)%p.length]; deck=deck.filter(c=>c!==daily); deck.unshift({...daily,daily:true});
+  }
+  // avoid same source twice in a row
+  for(let i=1;i<deck.length;i++){ if(deck[i].s===deck[i-1].s){const j=deck.findIndex((c,k)=>k>i&&c.s!==deck[i-1].s); if(j>0)[deck[i],deck[j]]=[deck[j],deck[i]]}}
+}
+function nextCard(){
+  if(!deck.length) buildDeck();
+  cur=deck.shift(); S.swiped++; cur.boss = S.swiped%7===0; flipped=false; deepened=false;
+  if(cur.daily){S.dailySeen[S.path+today()]=true; save()}
+  render();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function cardHTML(c,cls){
+  const path=S.path; const r=c.r||(path==="wis"?R_WIS:R_FUN);
+  const tag=c.daily?"Päivän kortti":c.boss?"Bossi ×2 XP":c.p+" "+({"💼":"Business","🌱":"Elämä","🔥":"Keho","🌙":"Mieli"})[c.p];
+  return `<div class="card ${path} ${c.boss?"boss":""} ${cls||""}">
+    <div class="stamp r">OSUU</div><div class="stamp l">OHI</div><div class="stamp u">SYVEMMÄLLE</div><div class="stamp d">TEKO</div>
+    <div class="face front">
+      <div class="meta"><span>${SRC[c.s]}</span><span class="badge">${esc(tag)}</span></div>
+      <div class="emoji" aria-hidden="true">${c.e}</div>
+      <h2 class="ttl">${esc(c.t)}</h2>
+      <p class="quote">${esc(c.q)}</p>
+      <p class="body">${esc(c.b)}</p>
+      <div class="rows">
+        <div class="row"><b>Liike nyt</b>${esc(c.a)}</div>
+        <div class="row"><b>Kysymys sinulle</b>${esc(c.k)}</div>
+      </div>
+    </div>
+    <div class="face back">
+      <div class="meta"><span>⬆️ Syvemmälle</span><span class="badge">${esc(c.w)}</span></div>
+      <h2 class="ttl">${esc(c.t)}</h2>
+      <p class="body" style="font-size:16px">${esc(c.d||("Pysähdy kysymyksen äärelle 60 sekunniksi: "+c.k+" Vastaa kolmella sanalla, ääneen tai paperille."))}</p>
+      <div class="rows"><div class="row"><b>Avainsana palapeliin</b>${esc(c.w)}</div></div>
+      <p class="rights">© ${esc(r)}</p>
+      <p class="rights">Swipe ⬆️ kääntää takaisin.</p>
+    </div>
+  </div>`;
+}
+function render(){
+  const st=$("stack"); const peek=deck[0];
+  st.innerHTML=(peek?cardHTML(peek,"under"):"")+cardHTML(cur,"top");
+  bindDrag(st.querySelector(".card.top"));
+}
+
+/* drag */
+function bindDrag(el){
+  let sx=0,sy=0,dx=0,dy=0,on=false;
+  const st={r:el.querySelector(".stamp.r"),l:el.querySelector(".stamp.l"),u:el.querySelector(".stamp.u"),d:el.querySelector(".stamp.d")};
+  el.addEventListener("pointerdown",e=>{on=true;sx=e.clientX;sy=e.clientY;dx=dy=0;el.classList.add("drag");el.setPointerCapture(e.pointerId)});
+  el.addEventListener("pointermove",e=>{if(!on)return;dx=e.clientX-sx;dy=e.clientY-sy;
+    el.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`;
+    const h=Math.abs(dx)>Math.abs(dy);
+    st.r.style.opacity=h&&dx>0?Math.min(dx/90,1):0; st.l.style.opacity=h&&dx<0?Math.min(-dx/90,1):0;
+    st.u.style.opacity=!h&&dy<0?Math.min(-dy/90,1):0; st.d.style.opacity=!h&&dy>0?Math.min(dy/90,1):0;});
+  const end=()=>{if(!on)return;on=false;el.classList.remove("drag");Object.values(st).forEach(s=>s.style.opacity=0);
+    const h=Math.abs(dx)>Math.abs(dy), T=90;
+    if(h&&dx>T) act("R"); else if(h&&dx<-T) act("L"); else if(!h&&dy<-T) act("U"); else if(!h&&dy>T) act("D");
+    else el.style.transform="";};
+  el.addEventListener("pointerup",end); el.addEventListener("pointercancel",end);
+}
+function fly(dir,cb){const el=document.querySelector(".card.top");if(!el){cb();return}
+  const m={R:"translate(140%,0) rotate(24deg)",L:"translate(-140%,0) rotate(-24deg)"}[dir];
+  el.style.transform=m; el.style.opacity=0; setTimeout(cb,260);}
+function act(dir){
+  if(!cur) return;
+  const mult=cur.boss?2:1;
+  if(dir==="R"){
+    S.pieces.push({t:cur.t,w:cur.w,a:cur.a,e:cur.e}); S.saved.unshift({t:cur.t,q:cur.q,e:cur.e,path:S.path,day:today()}); S.saved=S.saved.slice(0,60); S.skips=0;
+    addXp(10*mult); toast(`🧩 +1 · +${10*mult} XP`); if(S.path==="fun") boom();
+    fly("R",()=>{ if(S.pieces.length>=4) puzzle(); else nextCard(); });
+  } else if(dir==="L"){
+    S.skips++; if(S.skips>=3){S.streak=Math.max(1,S.streak);} save(); fly("L",nextCard);
+  } else if(dir==="U"){
+    const el=document.querySelector(".card.top"); el.style.transform=""; flipped=!flipped; el.classList.toggle("flipped",flipped);
+    if(!deepened){deepened=true; addXp(5*mult); toast(`⬆️ +${5*mult} XP`)}
+  } else if(dir==="D"){
+    const el=document.querySelector(".card.top"); el.style.transform=""; teko();
+  }
+}
+function boom(){const em=["💥","⭐","🔥","🥊","✨"];for(let i=0;i<14;i++){const s=document.createElement("span");s.className="boom";s.textContent=em[i%em.length];
+  s.style.left=(innerWidth/2)+"px";s.style.top=(innerHeight/2)+"px";s.style.setProperty("--x",(Math.random()*300-150)+"px");s.style.setProperty("--y",(Math.random()*-300-40)+"px");s.style.setProperty("--r",(Math.random()*360)+"deg");
+  document.body.appendChild(s);setTimeout(()=>s.remove(),950)}}
+
+/* sheets */
+function sheet(html,onMount){const h=$("sheetHost");h.innerHTML=`<div class="veil"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;
+  const v=h.firstChild; v.addEventListener("click",e=>{if(e.target===v)close()}); onMount&&onMount(v); const f=v.querySelector("button,input");f&&f.focus();}
+function close(){$("sheetHost").innerHTML=""}
+function teko(){
+  const c=cur, mult=c.boss?2:1;
+  sheet(`<h2>⬇️ Teko nyt</h2><p style="font-size:18px">${esc(c.a)}</p><p style="color:var(--muted);font-size:13px">Kesto noin 2 minuuttia. Kehotehtävissä kuuntele kehoasi, ja jos sattuu, lopeta.</p>
+    <div class="btns"><button class="btn" id="done">✅ Tehty (+${20*mult} XP)</button><button class="btn ghost" id="later">⏭️ Myöhemmin</button></div>`,v=>{
+    v.querySelector("#done").onclick=()=>{close();addXp(20*mult);toast(`✅ +${20*mult} XP`);if(S.path==="fun")boom();fly("R",nextCard)};
+    v.querySelector("#later").onclick=close;});
+}
+function puzzle(){
+  const p=S.pieces.slice(0,4);
+  sheet(`<h2>🧩 Palapeli valmis!</h2>
+    <div class="puzzle">${p.map(x=>`<div class="piece"><span>${x.e} ${esc(x.t)}</span><b>${esc(x.w)}</b></div>`).join("")}</div>
+    <p><b>Kuvasi:</b> ${p.map(x=>esc(x.w)).join(" + ")}</p>
+    <p><b>🎯 Teko 24 tunnin sisällä:</b> ${esc(p[p.length-1].a)}</p>
+    <label for="principle" style="font-weight:700">📜 Kirjoita oma periaatteesi (enintään 12 sanaa)</label>
+    <input class="field" id="principle" maxlength="120" placeholder="esim. ${esc(p[0].w)} ensin, sitten ${esc(p[1].w.toLowerCase())}.">
+    <div class="btns"><button class="btn" id="keep">Tallenna (+50 XP)</button><button class="btn ghost" id="img">🖼️ Tee palapelistä kuva</button></div>`,v=>{
+    v.querySelector("#keep").onclick=()=>{const t=v.querySelector("#principle").value.trim()||p.map(x=>x.w).join(" + ");
+      S.principles.unshift({t,day:today(),w:p.map(x=>x.w)}); S.pieces=[]; addXp(50); close(); toast("📜 Periaate tallennettu"); nextCard();};
+    v.querySelector("#img").onclick=()=>shareImg({t:"Palapelini",q:(v.querySelector("#principle").value.trim()||p.map(x=>x.w).join(" + ")),e:"🧩",s:S.path==="wis"?"kami":"leffa"});});
+}
+function collection(){
+  const pr=S.principles.map(x=>`<div>📜 <b>${esc(x.t)}</b><br><small style="color:var(--muted)">${esc(x.w.join(" · "))} · ${x.day}</small></div>`).join("")||"<div>Ei vielä periaatteita. Kerää neljä palaa.</div>";
+  const sv=S.saved.slice(0,25).map(x=>`<div>${x.e} <b>${esc(x.t)}</b>: ${esc(x.q)}</div>`).join("")||"<div>Swipeä 👉, niin kortit tallentuvat tänne.</div>";
+  sheet(`<h2>📚 Kokoelma</h2><p style="color:var(--muted);font-size:13px">Tallessa vain tässä selaimessa.</p>
+    <h3 style="margin:0">Periaatteet</h3><div class="list">${pr}</div>
+    <h3 style="margin:0">Osuneet kortit</h3><div class="list">${sv}</div>
+    <div class="btns"><button class="btn" id="cl">Sulje</button><button class="btn ghost" id="reset">Nollaa kaikki</button></div>`,v=>{
+    v.querySelector("#cl").onclick=close;
+    v.querySelector("#reset").onclick=e=>{if(e.target.dataset.sure){S=fresh();save();close();goHome()}else{e.target.dataset.sure=1;e.target.textContent="Varmasti? Paina uudestaan"}};});
+}
+
+/* share as image */
+function wrap(ctx,text,x,y,maxW,lh){const words=text.split(" ");let line="",lines=[];for(const w of words){const t=line?line+" "+w:w;if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w}else line=t}lines.push(line);lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lh));return y+lines.length*lh}
+async function shareImg(c){
+  c=c||cur; const W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;const x=cv.getContext("2d");
+  try{await document.fonts.ready}catch(e){}
+  const fun=S.path==="fun";
+  if(fun){x.fillStyle="#1B1440";x.fillRect(0,0,W,H);const g=x.createRadialGradient(W,0,50,W,0,900);g.addColorStop(0,"rgba(255,61,110,.6)");g.addColorStop(1,"rgba(255,61,110,0)");x.fillStyle=g;x.fillRect(0,0,W,H);}
+  else{x.fillStyle="#F4F5F0";x.fillRect(0,0,W,H);x.fillStyle="#24406E";x.fillRect(0,0,W,22);x.fillStyle="#C23F2A";x.fillRect(90,330,8,360);}
+  x.textBaseline="top";
+  x.font="140px serif";x.fillText(c.e,90,100);
+  x.fillStyle=fun?"#FFD23F":"#24406E";x.font=fun?'64px "Dela Gothic One"':'700 64px "Shippori Mincho"';
+  wrap(x,fun?c.t.toUpperCase():c.t,90,260,900,74);
+  x.fillStyle=fun?"#FFF8E6":"#16201B";x.font=fun?'70px "Dela Gothic One"':'500 72px "Shippori Mincho"';
+  const y=wrap(x,c.q,fun?90:130,360,fun?900:860,fun?92:98);
+  if(c.k){x.font='500 38px "Zen Kaku Gothic New"';x.fillStyle=fun?"#FFD23F":"#52683A";wrap(x,"→ "+c.k,90,Math.min(y+50,1080),900,50)}
+  x.font='700 34px "Zen Kaku Gothic New"';x.fillStyle=fun?"#FF3D6E":"#C23F2A";x.fillText("神 KAMI · "+(fun?"TSEMPPI":"VIISAUS"),90,H-110);
+  x.fillStyle=fun?"rgba(255,248,230,.6)":"rgba(22,32,27,.55)";x.font='28px "Zen Kaku Gothic New"';x.fillText(SRC[c.s]||"",90,H-60);
+  let url; try{url=cv.toDataURL("image/png")}catch(e){toast("Kuvan teko epäonnistui");return}
+  sheet(`<h2>🖼️ Korttikuva</h2><img class="shareimg" src="${url}" alt="Korttikuva: ${esc(c.t)}"><p style="font-size:13px;color:var(--muted)">Puhelimessa: pidä kuvaa pohjassa ja tallenna. Tietokoneella: oikea klikkaus ja Tallenna kuva. Sopii Instagramin pystykuvaksi (4:5).</p><div class="btns"><button class="btn" id="cl">Sulje</button></div>`,v=>v.querySelector("#cl").onclick=close);
+}
+
+/* navigation */
+function goHome(){$("home").hidden=false;$("play").hidden=true;close();hud()}
+function start(path){S.path=path;save();$("home").hidden=true;$("play").hidden=false;
+  document.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.f===S.filter)));
+  buildDeck();nextCard();hud();}
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>start(b.dataset.go));
+document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{S.filter=b.dataset.f;save();document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));buildDeck();nextCard()});
+$("homeBtn").onclick=goHome;
+$("switchBtn").onclick=()=>start(S.path==="wis"?"fun":"wis");
+$("bR").onclick=()=>act("R");$("bL").onclick=()=>act("L");$("bU").onclick=()=>act("U");$("bD").onclick=()=>act("D");
+$("shareBtn").onclick=()=>shareImg();$("colBtn").onclick=collection;
+addEventListener("keydown",e=>{if($("sheetHost").innerHTML){if(e.key==="Escape")close();return}if($("play").hidden)return;
+  const m={ArrowRight:"R",ArrowLeft:"L",ArrowUp:"U",ArrowDown:"D"}[e.key];if(m){e.preventDefault();act(m)}});
+
+function boot(data){
+  S=Object.assign(fresh(),load()||{},data&&data.S?data.S:{}); touchStreak(); hud();
+  window.claude?.hot?.snapshot?.(()=>({S}));
+  if(S.path && data && data.S) start(S.path);
+}
+window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+</script>
