@@ -2,257 +2,330 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>
-/* Layout: brochure that alternates calm "washi" bands (Viisaus) with dark "boxing ring" bands (Tsemppi); single 1080px column that splits to two at desktop. */
+/* Layout: investor/partner pitch. Dark "night feed" bands carry the product, paper bands carry the reasoning; one 1080px column that splits to grids on desktop. */
 :root{
-  --bg:#ECEFEB; --paper:#FAFBF8; --ink:#16201B; --muted:#56635C; --line:#C9D1CB;
-  --ai:#24406E; --shu:#C23F2A; --kin:#A9801F; --moss:#52683A;
-  --ring:#1B1440; --volt:#FFD23F; --pop:#FF3D6E; --ringInk:#FFF8E6;
-  --f-display:"Dela Gothic One","Arial Black",Impact,sans-serif;
-  --f-mincho:"Shippori Mincho","Hiragino Mincho ProN",Georgia,serif;
+  --bg:#EEF0EC; --paper:#FAFBF8; --ink:#14181A; --muted:#55615B; --line:#CDD4CF;
+  --night:#0B0D10; --nightInk:#F6F4EF; --nightDim:rgba(246,244,239,.7);
+  --volt:#F5D229; --pop:#E23D5D; --ok:#1F8A55; --warn:#A5730E; --bad:#C2412B; --blue:#2D5FB8;
+  --f-hype:"Dela Gothic One","Arial Black",Impact,sans-serif;
+  --f-old:"Shippori Mincho","Hiragino Mincho ProN",Georgia,serif;
   --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0F1512; --paper:#18201C; --ink:#E6ECE8; --muted:#9BA8A0; --line:#2C3832;
-  --ai:#94B2E8; --shu:#F07A62; --kin:#E2B85A; --moss:#A0BC7C; color-scheme:dark}}
+  --bg:#101412; --paper:#181E1B; --ink:#E7ECE9; --muted:#9DA9A2; --line:#2D3833;
+  --volt:#FFE14D; --pop:#FF5C7A; --ok:#5BD69A; --warn:#E6B34A; --bad:#FF7A62; --blue:#8DB0FF; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0F1512; --paper:#18201C; --ink:#E6ECE8; --muted:#9BA8A0; --line:#2C3832;
-  --ai:#94B2E8; --shu:#F07A62; --kin:#E2B85A; --moss:#A0BC7C; color-scheme:dark}
+  --bg:#101412; --paper:#181E1B; --ink:#E7ECE9; --muted:#9DA9A2; --line:#2D3833;
+  --volt:#FFE14D; --pop:#FF5C7A; --ok:#5BD69A; --warn:#E6B34A; --bad:#FF7A62; --blue:#8DB0FF; color-scheme:dark}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
 .band{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:56px}
-.wrap{max-width:1080px;margin:0 auto;display:grid;gap:28px}
-.ring{background:var(--ring);color:var(--ringInk)}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:26px}
+.night{background:var(--night);color:var(--nightInk)}
 .paper{background:var(--paper)}
 h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
-h1{font-family:var(--f-display);font-size:clamp(40px,8vw,84px);line-height:1}
-h2{font-family:var(--f-display);font-size:clamp(28px,4.4vw,44px);line-height:1.1}
-h3{font-size:20px;font-weight:700}
-p{margin:0;max-width:62ch}
-.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--shu)}
-.ring .eyebrow{color:var(--volt)}
+h1{font-family:var(--f-hype);font-size:clamp(44px,9vw,96px);line-height:.98}
+h2{font-family:var(--f-hype);font-size:clamp(28px,4.6vw,46px);line-height:1.08}
+h3{font-size:19px;font-weight:700;line-height:1.3}
+p{margin:0;max-width:64ch}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--pop)}
 .muted{color:var(--muted)}
-.ring .muted{color:rgba(255,248,230,.72)}
-a{color:inherit}
-.cta{display:inline-flex;gap:10px;align-items:center;background:var(--shu);color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:12px;width:max-content;max-width:100%}
-.cta:focus-visible{outline:3px solid var(--kin);outline-offset:3px}
+.night .muted{color:var(--nightDim)}
+.night .eyebrow{color:var(--volt)}
+.cta{display:inline-flex;gap:10px;align-items:center;background:var(--volt);color:#111;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:14px;width:max-content;max-width:100%}
+.cta:focus-visible{outline:3px solid var(--pop);outline-offset:3px}
+.grid2{display:grid;gap:16px}@media(min-width:780px){.grid2{grid-template-columns:1fr 1fr}}
+.grid3{display:grid;gap:16px}@media(min-width:900px){.grid3{grid-template-columns:repeat(3,1fr)}}
 
 /* hero */
 .hero{display:grid;gap:36px;align-items:center}
-@media (min-width:820px){.hero{grid-template-columns:1.2fr .8fr}}
-.hero h1 .k{font-family:var(--f-mincho);font-weight:700;color:var(--shu)}
-.hero .lead{font-size:19px}
-.phone{justify-self:center;width:min(300px,100%);aspect-ratio:9/17;max-width:100%;border-radius:38px;background:var(--ink);padding:12px;box-shadow:0 30px 60px -30px rgba(0,0,0,.6);position:relative}
-.screen{height:100%;border-radius:28px;background:var(--bg);overflow:hidden;position:relative;display:grid;place-items:center}
-.mock{position:absolute;inset:18px 16px 70px;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 14px 30px -16px rgba(0,0,0,.5)}
-.mock.back1{transform:rotate(-7deg) translateX(-14px);background:var(--ring);color:var(--ringInk)}
-.mock.front{background:var(--paper);border-top:5px solid var(--ai);transform:rotate(3deg) translateX(10px)}
-.mock .m-src{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--ai)}
-.mock .m-t{font-family:var(--f-mincho);font-weight:700;font-size:20px}
-.mock .m-q{font-family:var(--f-mincho);font-size:15px;line-height:1.35;border-left:3px solid var(--shu);padding-left:8px}
-.mock .m-row{margin-top:auto;font-size:11px;background:color-mix(in srgb,var(--ai) 10%,transparent);border-radius:8px;padding:6px 8px}
-.mock.back1 .m-t{font-family:var(--f-display);color:var(--volt);font-size:16px}
-.mock .stamp{position:absolute;top:14px;right:12px;font-family:var(--f-display);color:var(--moss);border:3px solid;border-radius:8px;padding:0 8px;transform:rotate(12deg);font-size:14px}
-.dock{position:absolute;bottom:16px;left:16px;right:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.dock span{background:var(--paper);border-radius:10px;text-align:center;font-size:16px;padding:4px 0}
+@media(min-width:860px){.hero{grid-template-columns:1.25fr .75fr}}
+.hero h1 em{font-style:normal;color:var(--volt)}
+.hero .lead{font-size:19px;color:var(--nightDim)}
+.phone{justify-self:center;width:min(290px,100%);aspect-ratio:9/18;max-width:100%;border-radius:40px;background:#000;padding:10px;box-shadow:0 0 0 2px #23272c,0 40px 80px -30px rgba(0,0,0,.8)}
+.scr{height:100%;border-radius:31px;background:#251C55;position:relative;overflow:hidden;padding:16px 58px 16px 16px;display:flex;flex-direction:column;gap:10px;color:#F6F4EF}
+.scr::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 55% at 100% 0%,rgba(182,164,255,.45),transparent 65%);pointer-events:none}
+.scr .bars{display:flex;gap:3px;position:relative}.scr .bars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.25)}.scr .bars i.d{background:#fff}
+.scr .chips{display:flex;gap:5px;font-size:10px;font-weight:700;position:relative}.scr .chips span{background:rgba(0,0,0,.3);border-radius:99px;padding:3px 8px}.scr .chips .y{background:#B6A4FF;color:#111}
+.scr .hk{margin-top:auto;font-family:var(--f-old);font-weight:800;font-size:25px;line-height:1.12;position:relative}
+.scr .sr{font-size:11px;color:rgba(246,244,239,.7);position:relative;margin-bottom:auto}
+.scr .rl{position:absolute;right:10px;bottom:22px;display:grid;gap:10px}.scr .rl span{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.32);display:grid;place-items:center;font-size:17px}
+.scr .stamp{position:absolute;top:70px;left:14px;font-family:var(--f-hype);color:#5BE39A;border:3px solid;border-radius:9px;padding:0 9px;transform:rotate(-12deg);font-size:18px}
 
-/* paths */
-.two{display:grid;gap:16px}
-@media (min-width:760px){.two{grid-template-columns:1fr 1fr}}
-.pathcard{border-radius:20px;padding:24px;display:grid;gap:12px;align-content:start}
-.pathcard.wis{background:var(--paper);border-top:6px solid var(--ai);color:var(--ink)}
-.pathcard.wis h3{font-family:var(--f-mincho);font-size:28px;color:var(--ai)}
-.pathcard.fun{background:var(--ring);color:var(--ringInk)}
-.pathcard.fun h3{font-family:var(--f-display);font-weight:400;font-size:28px;color:var(--volt)}
-.tags{display:flex;flex-wrap:wrap;gap:6px;font-size:13px}
-.tags span{border:1px solid currentColor;border-radius:99px;padding:2px 10px;opacity:.85}
-.sample{font-size:15px;border-radius:12px;padding:12px 14px}
-.wis .sample{background:color-mix(in srgb,var(--ai) 9%,transparent);font-family:var(--f-mincho)}
-.fun .sample{background:rgba(255,255,255,.08);font-family:var(--f-display);letter-spacing:.01em}
+/* thesis */
+.thesis{display:grid;gap:14px}
+@media(min-width:860px){.thesis{grid-template-columns:repeat(3,1fr)}}
+.th{border-top:3px solid var(--ink);padding-top:14px;display:grid;gap:6px}
+.th b{font-family:var(--f-old);font-weight:800;font-size:22px;line-height:1.25}
 
-/* mechanics */
-.mech{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-.mech div{border-top:2px solid var(--volt);padding-top:12px;display:grid;gap:4px}
-.mech b{font-family:var(--f-display);font-weight:400;font-size:22px;color:var(--volt)}
+/* loop */
+.loop{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:s}
+@media(min-width:860px){.loop{grid-template-columns:repeat(6,1fr)}}
+.loop li{counter-increment:s;border:1px solid rgba(246,244,239,.18);border-radius:16px;padding:14px;display:grid;gap:4px;position:relative}
+.loop li::before{content:counter(s);font-family:var(--f-hype);color:var(--volt);font-size:22px}
+.loop li b{font-size:16px}
+.loop li span{font-size:13px;color:var(--nightDim)}
+.back{font-size:14px;color:var(--volt);font-weight:700}
+.gest{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-size:14px}
+.gest div{background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px}
+.gest b{display:block;font-size:20px}
 
-/* perspectives */
-.persp{display:grid;gap:18px}
-@media (min-width:900px){.persp{grid-template-columns:repeat(3,1fr)}}
-.pv{background:var(--paper);border-radius:18px;padding:22px;display:grid;gap:10px;align-content:start;border:1px solid var(--line)}
-.pv .who{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
-.pv:nth-child(1) .who{color:var(--shu)} .pv:nth-child(2) .who{color:var(--ai)} .pv:nth-child(3) .who{color:var(--moss)}
-.pv h3{font-family:var(--f-mincho);font-size:24px}
-.pv ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:15px}
-.pv .price{margin-top:6px;font-size:14px;border-top:1px dashed var(--line);padding-top:10px}
-
-/* roadmap */
-.road{display:grid;gap:12px}
-@media (min-width:760px){.road{grid-template-columns:repeat(3,1fr)}}
-.step{border-left:3px solid var(--line);padding:4px 0 4px 16px;display:grid;gap:6px}
-.step.now{border-color:var(--shu)}
-.step small{font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:11px;color:var(--muted)}
-.step.now small{color:var(--shu)}
-.step ul{margin:0;padding-left:18px;font-size:15px}
-
-/* rights table */
-.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
-table{border-collapse:collapse;width:100%;min-width:620px;font-size:14px}
+/* matrix */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:14px}
 th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-tr:last-child td{border-bottom:0}
-.ok{color:var(--moss);font-weight:700} .no{color:var(--shu);font-weight:700} .warn{color:var(--kin);font-weight:700}
+thead th{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+tbody th{font-weight:700;white-space:nowrap}
+tr:last-child td,tr:last-child th{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.ok{color:var(--ok);font-weight:700}.warn{color:var(--warn);font-weight:700}.no{color:var(--bad);font-weight:700}
+
+/* moats */
+.moat{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:8px;align-content:start}
+.moat .k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--blue)}
+.moat h3{font-family:var(--f-old);font-weight:800;font-size:22px}
+.big{font-family:var(--f-old);font-weight:800;font-size:clamp(24px,3.6vw,34px);line-height:1.25;max-width:30ch}
+
+/* money */
+.rev{border-radius:18px;padding:20px;display:grid;gap:8px;align-content:start;background:rgba(255,255,255,.05);border:1px solid rgba(246,244,239,.16)}
+.rev .tag{justify-self:start;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:var(--volt);color:#111;border-radius:99px;padding:3px 10px}
+.rev h3{font-size:21px}
+.rev .px{font-size:14px;color:var(--volt);font-weight:700}
+.rev .gr{font-size:13px;color:var(--nightDim);border-top:1px dashed rgba(246,244,239,.2);padding-top:8px}
+.hero-rev{border-color:var(--volt);box-shadow:inset 0 0 0 1px var(--volt)}
+.night .tablewrap{background:transparent;border-color:rgba(246,244,239,.18)}
+.night th,.night td{border-color:rgba(246,244,239,.14)}
+.night thead th{color:var(--nightDim)}
+.total td,.total th{font-weight:700;color:var(--volt)}
+
+/* growth */
+.loops{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.lp{border-left:3px solid var(--pop);padding:2px 0 2px 14px;display:grid;gap:4px}
+.lp b{font-size:17px}
+.lp span{font-size:14px;color:var(--muted)}
+.time{display:grid;gap:10px}
+@media(min-width:860px){.time{grid-template-columns:repeat(4,1fr)}}
+.tm{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:6px;align-content:start}
+.tm small{font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:11px;color:var(--muted)}
+.tm.launch{border-color:var(--pop);box-shadow:inset 0 0 0 1px var(--pop)}
+.tm.launch small{color:var(--pop)}
+.tm ul{margin:0;padding-left:18px;font-size:14px;display:grid;gap:3px}
+
+/* metrics */
+.ns{display:grid;gap:6px;background:var(--night);color:var(--nightInk);border-radius:20px;padding:24px}
+.ns .v{font-family:var(--f-hype);font-size:clamp(28px,5vw,44px);color:var(--volt);line-height:1.05}
 footer{font-size:13px}
 </style>
 
-<section class="band">
+<section class="band night">
   <div class="wrap hero">
-    <div style="display:grid;gap:20px">
-      <span class="eyebrow">Mentoripakka · MVP-esite</span>
-      <h1>Vedä kortti.<br><span class="k">Pam,</span> oivallus.</h1>
-      <p class="lead">KAMI on swipe-mentori businekseen, elämään, kehoon ja mieleen. Joka päivä yksi kortti, ja neuvoja antavat kami, karhu, koivu, Marcus Aurelius tai underdog-nyrkkeilijä. Kortti, kysymys ja teko vievät alle minuutin.</p>
-      <a class="cta" href="https://claude.ai/artifact/BdYJToj3CUh2ZWAXTH96db" target="_blank" rel="noopener">Kokeile sovellusta →</a>
+    <div style="display:grid;gap:22px">
+      <span class="eyebrow">KAMI · pitch & kasvustrategia · lokakuu 2026</span>
+      <h1>TikTok,<br>joka <em>loppuu.</em></h1>
+      <p class="lead">KAMI on 7 kortin päivittäinen viisausfeed. Swipeä, opi 15 sekunnissa ja tee 2 minuutin teko. Sitten feed loppuu, ja huomenna palaat. Sisältönä on vanhaa viisautta, tutkittua tietoa ja kansan sananlaskuja rahasta, mielestä, kehosta, unesta ja irti päästämisestä. Jokaisen kortin takana on ovi oikeaan ammattilaiseen.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center"><a class="cta" href="https://claude.ai/artifact/BdYJToj3CUh2ZWAXTH96db" target="_blank" rel="noopener">Kokeile demoa →</a><span class="muted" style="font-size:14px">Vinkki: laita demossa <b>€ Bisnes</b> päälle, niin näet ansaintalogiikan korttien päällä.</span></div>
     </div>
-    <div class="phone" aria-label="Kuva sovelluksesta">
-      <div class="screen">
-        <div class="mock back1"><div class="m-t">UNDERDOG-NYRKKEILIJÄ</div><div style="font-family:var(--f-display);font-size:14px">Erä 15. Kädet painaa. Nouset silti.</div></div>
-        <div class="mock front">
-          <span class="stamp">OSUU</span>
-          <span class="m-src">⛩️ Kami · Päivän kortti</span>
-          <span style="font-size:40px;line-height:1">🦊</span>
-          <span class="m-t">Inari</span>
-          <span class="m-q">Kettu ei kilpaile jyvästä. Se vartioi koko peltoa.</span>
-          <span class="m-row"><b>Kysymys:</b> Mikä on se sato, jota vain sinä voit tarjota?</span>
-        </div>
-        <div class="dock"><span>👈</span><span>⬆️</span><span>⬇️</span><span>👉</span></div>
+    <div class="phone" aria-label="Kuva KAMI-sovelluksesta">
+      <div class="scr">
+        <div class="bars"><i class="d"></i><i class="d"></i><i class="d"></i><i></i><i></i><i></i><i></i></div>
+        <div class="chips"><span>🧠 Mieli</span><span class="y">🏛️ Vanha viisaus</span></div>
+        <span class="stamp">OSUU</span>
+        <div class="hk">Ensimmäinen nuoli sattuu. Toisen ammut itse.</div>
+        <div class="sr">— Buddhalainen vertaus kahdesta nuolesta</div>
+        <div class="rl"><span>❤️</span><span>💡</span><span>✈️</span><span>🖼️</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="band paper">
-  <div class="wrap">
-    <span class="eyebrow">Kaksi polkua, yksi pakka</span>
-    <h2>Valitse, kuka mentoroi tänään</h2>
-    <div class="two">
-      <article class="pathcard wis">
-        <span class="eyebrow" style="color:var(--ai)">Polku 1</span>
-        <h3>Viisaus</h3>
-        <p>Rauhallinen ja syvä polku. Mentoreina ovat shinton kamit, zen-buddhalaisuuden opetukset, eläimet, puut ja antiikin filosofit. Lisäksi mukana on pyhiä tekstejä omina käännöksinä.</p>
-        <div class="tags"><span>⛩️ Inari, Amaterasu, misogi</span><span>☸️ Daruma, kaksi nuolta, kintsugi</span><span>🐻 karhu, lohi, korppi</span><span>🌲 koivu, bambu, sienirihmasto</span><span>🏛️ Marcus Aurelius, Saarnaaja, Popol Vuh, Freud</span></div>
-        <div class="sample">"Ensimmäinen nuoli sattuu. Toisen ammut itse." · Kaksi nuolta</div>
-        <p class="muted" style="font-size:14px">Sopii aamuun, iltaan ja vaikeisiin päätöksiin.</p>
-      </article>
-      <article class="pathcard fun">
-        <span class="eyebrow">Polku 2</span>
-        <h3>Tsemppi</h3>
-        <p>Hauska ja nopea polku. Popkulttuurin tutut hahmot tsemppaavat: urheiluleffat, tosi-tv, meemit ja suomalaiset arjen sankarit. Kaikki tekstit ovat omia, ja hahmot ovat arkkityyppejä.</p>
-        <div class="tags"><span>🥊 Underdog-nyrkkeilijä</span><span>💅 Reality-diiva</span><span>👨‍🍳 Huutava keittiömestari</span><span>👵 Sisu-mummo</span><span>🎙️ Urheiluselostaja</span></div>
-        <div class="sample">"Kulta, sä et pyydä lupaa. Sä ilmoitat."</div>
-        <p class="muted" style="font-size:14px">Sopii päivän piristykseen, treeniin ja someen jaettavaksi.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="band ring">
-  <div class="wrap">
-    <span class="eyebrow">Näin se toimii</span>
-    <h2>Neljä swipeä ja palapeli</h2>
-    <div class="mech">
-      <div><b>👉 Osuu</b><span class="muted">Kortista tulee palapelin pala ja saat +10 XP.</span></div>
-      <div><b>👈 Ohi</b><span class="muted">Seuraava kortti tulee heti. Pakka vaihtaa lähdettä.</span></div>
-      <div><b>⬆️ Syvemmälle</b><span class="muted">Kortti kääntyy, ja takana on tarina, myytti tai vaikeampi kysymys.</span></div>
-      <div><b>⬇️ Teko</b><span class="muted">Saat kahden minuutin tehtävän heti. Kun teet sen, saat +20 XP.</span></div>
-      <div><b>🧩 Palapeli</b><span class="muted">Neljästä palasta syntyy oma periaate ja yksi teko seuraavaksi vuorokaudeksi.</span></div>
-      <div><b>🖼️ Korttikuva</b><span class="muted">Mikä tahansa kortti muuttuu 4:5-kuvaksi Instagramiin tai WhatsAppiin.</span></div>
-    </div>
-    <p class="muted">Päivän kortti, putki päivinä, tasot Siemen → Taimi → Puu → Metsä → Vuori ja joka seitsemäs kortti bossikorttina tuplapistein.</p>
-  </div>
-</section>
-
 <section class="band">
   <div class="wrap">
-    <span class="eyebrow">Kolme näkökulmaa</span>
-    <h2>Kenelle KAMI on?</h2>
-    <p class="muted">Sama korttimoottori taipuu kolmeen tuotteeseen. MVP testaa ensimmäistä. Kaksi muuta ovat seuraavat kokeilut.</p>
-    <div class="persp">
-      <article class="pv">
-        <span class="who">Näkökulma A · Kuluttaja</span>
-        <h3>Taskutsemppari</h3>
-        <p>Yksi kortti aamulla ja yksi illalla. Kevyt ja hauska, ja korttikuvan voi jakaa. Kilpailee Instagramin aamuskrollauksen kanssa, ei terapian.</p>
-        <ul>
-          <li>Ilmoitus: "Päivän kortti odottaa"</li>
-          <li>Putki, tasot ja jaettavat kortit</li>
-          <li>Teemapakat: Juhannus, Pääsykoe, Maraton</li>
-        </ul>
-        <p class="price"><b>Malli:</b> ilmainen perusversio ja premium noin 4–6 €/kk (kaikki pakat, AI-mentori, oma palapeliarkisto).</p>
-      </article>
-      <article class="pv">
-        <span class="who">Näkökulma B · Työpaikka ja HR</span>
-        <h3>Tiimin aamukortti</h3>
-        <p>Teamsiin tai Slackiin tulee joka aamu sama kortti koko tiimille. Perjantaina tiimi kokoaa yhteisen palapelin ja periaatteen. Matala kynnys hyvinvointiin ja keskusteluun.</p>
-        <ul>
-          <li>Business- ja Mieli-pakat painottuvat</li>
-          <li>Tiimipalapeli ja retro-kysymykset</li>
-          <li>Anonyymi fiilismittari swipeistä</li>
-        </ul>
-        <p class="price"><b>Malli:</b> 3–5 €/käyttäjä/kk tai työhyvinvointipaketti. Latentin konsultointi täydentää.</p>
-      </article>
-      <article class="pv">
-        <span class="who">Näkökulma C · Valmentaja ja brändi</span>
-        <h3>Oma pakka</h3>
-        <p>Personal trainer, urheiluseura, kirjailija tai yritys tekee oman korttipakkansa omalla äänellään. Jos sopimus sallii, mukana voi olla myös aitoja lisensoituja sitaatteja.</p>
-        <ul>
-          <li>Pakkaeditori ja oma ulkoasu</li>
-          <li>Asiakkaille jaettava linkki</li>
-          <li>Esimerkiksi seuran oma "Pukuhuonepuhe"-pakka</li>
-        </ul>
-        <p class="price"><b>Malli:</b> pakkalisenssi 49–199 €/kk tai kertaprojekti.</p>
-      </article>
+    <span class="eyebrow">Havainto</span>
+    <h2>Ihmiset eivät kaipaa lisää sisältöä. He kaipaavat lopun.</h2>
+    <div class="thesis">
+      <div class="th"><b>Loputon feed väsyttää.</b><p class="muted">Ruutuajasta tuntee syyllisyyttä, ja sovellukset palkitsevat katselusta, eivät elämän muuttumisesta. Feed, joka loppuu, on lupaus, jota iso alusta ei voi antaa.</p></div>
+      <div class="th"><b>Viisaussitaatit ovat täynnä feikkejä.</b><p class="muted">Einstein, Buddha, Gandhi ja Freud saavat nimiinsä lauseita, joita he eivät koskaan sanoneet. Tarkistettu viisaus ja "Tosi vai feikki?" -visa tekevät tästä sekä opettavaista että viihdyttävää.</p></div>
+      <div class="th"><b>Ammattilaiset eivät tavoita oikeaa hetkeä.</b><p class="muted">Psykologi, talousvalmentaja ja personal trainer ostavat mainontaa, joka osuu satunnaisesti. KAMI tietää aiheen silloin, kun ihminen juuri pohtii sitä.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band night">
+  <div class="wrap">
+    <span class="eyebrow">Tuote</span>
+    <h2>Yksi silmukka, joka muuttaa käyttäytymistä</h2>
+    <ol class="loop">
+      <li><b>Swipe</b><span>Kortti on yksi iso lause. → osuu, ← ohi, ↑ seuraava.</span></li>
+      <li><b>Opi 15 s</b><span>Napautus kääntää kortin: tutkittu tieto tai tarina.</span></li>
+      <li><b>Teko 2 min</b><span>"✅ Tein" tai "📌 Muistuta huomenna".</span></li>
+      <li><b>Ovi</b><span>Ammattilainen tai maksuton apu, aiheen mukaan.</span></li>
+      <li><b>Loppu</b><span>Seitsemän korttia ja päivä on paketissa. Jakamalla saa +3.</span></li>
+      <li><b>Check-in</b><span>Huomenna kysytään: "Teitkö?" Teko-putki kasvaa.</span></li>
+    </ol>
+    <p class="back">↺ Ja huomenna uudestaan. Putki lasketaan teoista, ei katselusta.</p>
+    <div class="gest">
+      <div><b>🔬 Nykyviisaus</b>Tutkittu tieto: Parkinsonin laki, kofeiinin puoliintumisaika, 5:1-sääntö</div>
+      <div><b>🏛️ Vanha viisaus</b>Stoalaiset, zen, kamit, Saarnaaja ja Koraani omina käännöksinä</div>
+      <div><b>🧶 Kansanviisaus</b>"Aamu on iltaa viisaampi", "Ei kysyvä tieltä eksy"</div>
+      <div><b>🥊 Tsemppi</b>Underdog-nyrkkeilijä, Reality-diiva ja Sisu-mummo, kaikki arkkityyppejä</div>
+      <div><b>🕵️ Tosi vai feikki?</b>Sanoiko Einstein oikeasti näin? Arvaa ja opi.</div>
+      <div><b>🧬 Viisaus-DNA</b>"Tutkiva säästäjä" tai "Muinaisviisas strategi", jaettava kuva</div>
     </div>
   </div>
 </section>
 
 <section class="band paper">
   <div class="wrap">
-    <span class="eyebrow">Sisältö ja oikeudet</span>
-    <h2>Saako Rockya ja Kardashianeja lainata?</h2>
-    <p>Lyhyesti: pyhät tekstit ja antiikin filosofit kyllä, kun käännös on oma. Leffarepliikit ja julkkikset eivät, ellei niihin ole lupaa. Siksi Tsemppi-polku käyttää <b>arkkityyppejä omin sanoin</b>: underdog-nyrkkeilijän tunnistaa ilman nimeä ja repliikkiä.</p>
+    <span class="eyebrow">Sisältömatriisi</span>
+    <h2>Neljä viisauden lähdettä × seitsemän elämän aluetta</h2>
+    <p class="muted">Jokaisella aiheella on oma värinsä ja oma ovensa apuun. Esimerkit ovat demon oikeita kortteja.</p>
     <div class="tablewrap">
       <table>
-        <thead><tr><th>Lähde</th><th>Alkuteksti</th><th>Käännös tai repliikki</th><th>KAMI käyttää</th></tr></thead>
+        <thead><tr><th>Aihe</th><th>Nykyviisaus 🔬</th><th>Vanha viisaus 🏛️</th><th>Kansanviisaus 🧶</th><th>Ovi apuun</th></tr></thead>
         <tbody>
-          <tr><td>Raamattu, Koraani, sutrat, Kojiki</td><td class="ok">Vapaa</td><td class="no">Modernit suomennokset suojattuja (esim. Raamattu 1992)</td><td>Oma käännös + jaeviite</td></tr>
-          <tr><td>Marcus Aurelius, Seneca, Epiktetos, Herakleitos</td><td class="ok">Vapaa</td><td class="no">Modernit käännökset suojattuja</td><td>Oma käännös tai mukaelma</td></tr>
-          <tr><td>Freud (k. 1939)</td><td class="ok">Vapaa EU:ssa</td><td class="warn">Netin "Freud-sitaatit" usein keksittyjä</td><td>Käsitteet, esim. sublimaatio</td></tr>
-          <tr><td>Mayat (Popol Vuh)</td><td class="ok">Vapaa</td><td class="warn">Netin "mayaviisaudet" usein keksittyjä</td><td>Luomiskertomus omin sanoin</td></tr>
-          <tr><td>Elokuvat (esim. Rocky)</td><td class="no">Suojattu</td><td class="no">Lyhytkin omaperäinen repliikki voi olla suojattu (EU, Infopaq). Nimet usein tavaramerkkejä.</td><td>Arkkityyppi: "Underdog-nyrkkeilijä"</td></tr>
-          <tr><td>Julkkikset (esim. Kardashianit)</td><td class="warn">Tekstiä harvoin suojattu</td><td class="no">Nimen ja kuvan kaupallinen käyttö vaatii luvan</td><td>Arkkityyppi: "Reality-diiva"</td></tr>
-          <tr><td>Laulujen sanoitukset</td><td class="no">Suojattu</td><td class="no">Lisenssi tarvitaan</td><td>Ei käytetä</td></tr>
+          <tr><th>💰 Raha</th><td>100 €/kk × 30 v ≈ 122 000 €</td><td>Maksa ensin itsellesi</td><td>Säästetty euro on ansaittu euro</td><td>Talousvalmentaja · Takuusäätiö</td></tr>
+          <tr><th>🧠 Mieli</th><td>Nimeä tunne, niin se hiljenee</td><td>Kaksi nuolta · Epiktetos</td><td>Aamu on iltaa viisaampi</td><td>Laillistettu psykologi · Mielenterveystalo</td></tr>
+          <tr><th>💪 Keho</th><td>10 min kävely aterian jälkeen</td><td>Terve mieli terveessä ruumiissa</td><td>(UGC: mummojen liikuntaviisaudet)</td><td>Personal trainer</td></tr>
+          <tr><th>🔓 Irti</th><td>Himo on aalto · alkoholi ja REM-uni</td><td>Zen: huomaa ja päästä irti</td><td>Ei kysyvä tieltä eksy · Talo voittaa aina</td><td class="ok">Vain maksuton apu: Päihdelinkki, Peluuri</td></tr>
+          <tr><th>❤️ Suhteet</th><td>5:1-sääntö (Gottman)</td><td>Kannon: kuuntele</td><td>Oma maa mansikka</td><td>Pariterapeutti</td></tr>
+          <tr><th>🚀 Ura</th><td>Parkinsonin laki · Eisenhower</td><td>Seneca: tiedä satamasi · Inari</td><td>Joka kuuseen kurkottaa</td><td>Urakoutsi</td></tr>
+          <tr><th>🌙 Uni</th><td>Kofeiini ~5 h · sama heräämisaika</td><td>Karhun talviuni</td><td>Hiljaa hyvä tulee</td><td>Unikoutsi · sponsoroitu unihaaste</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="muted" style="font-size:14px">Tekijänoikeuslain 22 §:n sitaattioikeus edellyttää, että lainaus palvelee omaa teosta. Sovellus, jonka koko sisältö on sitaatteja, ei todennäköisesti täytä tätä. Tämä on selvitys, ei oikeudellinen neuvo: tarkistuta linjaus juristilla ennen kaupallista julkaisua.</p>
   </div>
 </section>
 
 <section class="band">
   <div class="wrap">
-    <span class="eyebrow">Tiekartta</span>
-    <h2>MVP:stä metsäksi</h2>
-    <div class="road">
-      <div class="step now"><small>Nyt · MVP</small><h3>Selainsovellus</h3><ul><li>Kaksi polkua, 52 korttia</li><li>Swipe, palapeli, XP, putki</li><li>Korttikuvat jakoon</li><li>Custom GPT -versio ChatGPT:hen</li></ul></div>
-      <div class="step"><small>Seuraava · v1</small><h3>AI-mentori ja PWA</h3><ul><li>AI kirjoittaa kortin omaan haasteeseesi</li><li>Asennettava PWA ja aamuilmoitus</li><li>Mentorineuvosto: kolme mentoria väittelee</li><li>Lisää pakkoja ja kielet (EN, SV)</li></ul></div>
-      <div class="step"><small>Sitten · v2</small><h3>Tiimit ja omat pakat</h3><ul><li>Teams- ja Slack-integraatio</li><li>Pakkaeditori valmentajille</li><li>Lisensoidut virallispakat</li><li>AI-kuvitetut korttitaiteet</li></ul></div>
+    <span class="eyebrow">Miksi tätä ei kopioida</span>
+    <p class="big">Isot alustat elävät katseluajasta. Feed, joka loppuu, söisi niiden omaa liiketoimintaa, joten ne eivät voi kopioida ydintä. Tämä on vastapositiointia (counter-positioning).</p>
+    <div class="grid3">
+      <article class="moat"><span class="k">Vallihauta 1 · Data</span><h3>Teko-graafi</h3><p class="muted">Tiedämme, mikä viisaus johtaa tekoon, emme vain tykkäykseen. Kortti → teko → check-in on data, jota TikTokilla ei ole. Suosittelu optimoi elämänmuutosta, ei katseluaikaa.</p></article>
+      <article class="moat"><span class="k">Vallihauta 2 · Sisältö</span><h3>Tarkistettu viisauskirjasto</h3><p class="muted">Jokaisessa kortissa on alkuperämerkintä: 🔬 tutkimus, 📜 oma käännös, 🧶 kansanperinne tai 🎭 arkkityyppi. Oikeudet ovat kunnossa ja sisältö on suomeksi. Tällaisen kirjaston rakentaminen vie vuosia, ja feikkivisa vaatii juuri sitä.</p></article>
+      <article class="moat"><span class="k">Vallihauta 3 · Verkosto</span><h3>Ammattilaiset tuovat käyttäjiä</h3><p class="muted">Varmennetut ammattilaiset kirjoittavat kortteja ja saavat jakelua. Käyttäjät saavat ilmaista sisältöä. Jokainen ammattilainen markkinoi omia korttejaan omalle yleisölleen, ja tarjonta tuo kysyntää.</p></article>
+      <article class="moat"><span class="k">Vallihauta 4 · Yhteisö</span><h3>Kansanviisaus-arkisto</h3><p class="muted">"Mitä mummosi sanoi?" Käyttäjät lähettävät sananlaskuja, murreviisauksia ja suvun ohjeita. Arkisto kasvaa itsestään, ja suomalainen identiteetti on kulttuurinen omistus, jota globaali kilpailija ei saa.</p></article>
+      <article class="moat"><span class="k">Vallihauta 5 · Luottamus</span><h3>Yksityisyys suunnittelussa</h3><p class="muted">Kumppani valitaan kortin aiheen eikä käyttäjäprofiilin perusteella. Terveyteen liittyvät swipet pysyvät laitteella. Kun aiheena on mieli tai irti päästäminen, luottamus on se, minkä varaan käyttäjä palaa.</p></article>
+      <article class="moat"><span class="k">Vallihauta 6 · Formaatti</span><h3>Rituaali + niukkuus</h3><p class="muted">Seitsemän korttia aamulla, teko ja check-in. Rituaali, ei feed. Mitä useampi päivä putkessa, sitä suurempi on vaihtokustannus. Kukaan ei halua katkaista 40 päivän teko-putkea.</p></article>
     </div>
-    <p class="muted">MVP:n mittarit: kuinka moni palaa seuraavana päivänä (D1 ja D7), osuu-prosentti per lähde, tehdyt teot per käyttäjä ja jaetut korttikuvat.</p>
   </div>
 </section>
 
-<section class="band ring">
+<section class="band night">
   <div class="wrap">
-    <h2>Pam. Oivallus. Pam. Teko.</h2>
-    <a class="cta" href="https://claude.ai/artifact/BdYJToj3CUh2ZWAXTH96db" target="_blank" rel="noopener">Avaa KAMI-sovellus →</a>
-    <footer class="muted">Latentti.fi · KAMI Mentoripakka · Lokakuu 2026</footer>
+    <span class="eyebrow">Ansaintamalli</span>
+    <h2>Mainos, joka on oikeasti hyödyllinen</h2>
+    <p class="muted">Tavallinen mainos on tylsä, koska se keskeyttää. KAMIn kumppanikortti on itsessään elämänohje: ensin ammattilaisen ilmainen vinkki, sitten ovi hänen palveluunsa. Jokaisessa päivän seiskassa on yksi selkeästi merkitty kumppanikortti.</p>
+    <div class="grid3">
+      <article class="rev hero-rev"><span class="tag">Päämalli</span><h3>🤝 Ammattilaisen ovi</h3><p>Kortin aiheeseen sopiva varmennettu ammattilainen: psykologi, talousvalmentaja, PT tai urakoutsi. Käyttäjä varaa 15 minuutin tutustumisajan.</p><p class="px">15–40 € per toteutunut varaus (pay per booking)</p><p class="gr">Ammattilainen maksaa vain tuloksesta. Laillistus tarkistetaan, terveydenhuollon ammattilaisilla Valviran JulkiTerhikki-rekisteristä.</p></article>
+      <article class="rev"><span class="tag">Kontekstimainos</span><h3>📍 Aiheeseen sidottu kumppanikortti</h3><p>Rahakortin yhteydessä budjettisovellus, unikortin yhteydessä patjavalmistaja, kehokortin yhteydessä kuntosaliketju. Yksi kortti seitsemästä, ja se on aina merkitty.</p><p class="px">Premium-CPM, koska aihe on tarkka</p><p class="gr">Kohdennus perustuu sisältöön, ei profiiliin. Sulkulista: alkoholi, rahapelit, pikavipit, lisäravinteiden terveysväitteet.</p></article>
+      <article class="rev"><span class="tag">Kuluttaja</span><h3>⭐ KAMI+</h3><p>Ei päivärajaa. AI-mentori kirjoittaa kortin omaan tilanteeseesi. Koko Viisaus-DNA-historia, teemapakat ja mainokseton kokemus.</p><p class="px">5,99 €/kk tai 39 €/v</p><p class="gr">Ilmaisversio pysyy täysiarvoisena. Raja on rituaali, ei rangaistus.</p></article>
+      <article class="rev"><span class="tag">B2B2C</span><h3>🏁 Sponsoroidut haasteet</h3><p>"Tipaton tammikuu: 31 korttia" tai "Säästöhaaste 30 päivää". Sponsorina esimerkiksi pankki, vakuutusyhtiö tai työeläkeyhtiö, joiden etu on terveempi ja vakavaraisempi asiakas.</p><p class="px">5 000–30 000 € per kampanja</p><p class="gr">Sponsori näkyy, mutta sisällöstä päättää KAMI. Alkoholialan sponsoreita ei hyväksytä.</p></article>
+      <article class="rev"><span class="tag">B2B</span><h3>🏢 Tiimin aamukortti</h3><p>Sama kortti koko tiimille Teamsissa tai Slackissa. Perjantaina tiimi kokoaa yhteisen palapelin. Mukana anonyymi hyvinvointikooste.</p><p class="px">3–5 € per käyttäjä kuukaudessa</p><p class="gr">Työnantaja ei koskaan näe yksittäisen henkilön swipejä.</p></article>
+      <article class="rev"><span class="tag">Tekijät</span><h3>🎨 Pakkastudio</h3><p>Valmentajat, seurat, kirjailijat ja yritykset tekevät oman pakkansa ja saavat analytiikan siitä, mikä kortti johtaa tekoon.</p><p class="px">49–199 €/kk</p><p class="gr">Sisältö käy läpi saman faktantarkistuksen ja alkuperämerkinnät.</p></article>
+    </div>
+
+    <h3 style="margin-top:8px">Esimerkkilaskelma: 10 000 päivittäistä käyttäjää (30 000 kuukausittaista)</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Virta</th><th>Oletus</th><th style="text-align:right">€/kk</th></tr></thead>
+        <tbody>
+          <tr><th>Ammattilaisen ovi</th><td>Kumppanikortti kerran päivässä = 300 000 näyttöä, 1,5 % klikkaa, 10 % varaa → 450 varausta × 20 €</td><td class="num">9 000</td></tr>
+          <tr><th>KAMI+</th><td>3 % kuukausikäyttäjistä × 5,99 €</td><td class="num">5 400</td></tr>
+          <tr><th>Sponsoroitu haaste</th><td>1 kampanja kuussa × 8 000 €</td><td class="num">8 000</td></tr>
+          <tr><th>Tiimin aamukortti</th><td>10 yritystä × 50 henkeä × 3 €</td><td class="num">1 500</td></tr>
+          <tr class="total"><th>Yhteensä</th><td>≈ 287 000 €/vuosi</td><td class="num">23 900</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="font-size:13px">Laskelma on esimerkki eikä ennuste. Luvut ovat oletuksia, jotka beta-testi joko vahvistaa tai kumoaa.</p>
+  </div>
+</section>
+
+<section class="band paper">
+  <div class="wrap">
+    <span class="eyebrow">Eettiset rajat</span>
+    <h2>Kolme mainostasoa. Luottamus ennen klikkauksia.</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Taso</th><th>Aiheet</th><th>Sallittu</th><th>Ei koskaan</th></tr></thead>
+        <tbody>
+          <tr><th class="ok">A · Avoin</th><td>Raha, ura, keho, uni, suhteet</td><td>Kumppanikortit, ammattilaiset, sponsoroidut haasteet</td><td>Pikavipit, rahapelit, alkoholi, takuuvarmat tuottolupaukset, lisäravinteiden terveysväitteet</td></tr>
+          <tr><th class="warn">B · Suojattu</th><td>Mieli, irti</td><td>Vain laillistetut ammattilaiset ja maksuton apu</td><td>Tavalliset mainokset, kohdennus terveystietojen perusteella</td></tr>
+          <tr><th class="no">C · Kriisi</th><td>Kriisiviitteet</td><td>Hätänumero 112, kriisipuhelin 09 2525 0111</td><td>Mikään kaupallinen</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid2">
+      <p class="muted"><b>Kuluttajansuojalaki 2:4 §:</b> markkinoinnin pitää olla tunnistettavaa. Siksi jokaisessa kumppanikortissa lukee "Kumppani · mainos", ja kortti on visuaalisesti erilainen (vaalea).</p>
+      <p class="muted"><b>GDPR 9 artikla:</b> swipe alkoholikortille voi olla terveystietoa. Siksi personointi tehdään laitteella, eikä mainostaja saa profiilia. Synkronointi vaatii erillisen suostumuksen.</p>
+      <p class="muted"><b>Sijoitusneuvonta</b> on Finanssivalvonnan luvanvaraista toimintaa. Rahakortit ovat yleistä tietoa, eikä talousvalmentaja-kumppani anna sijoitussuosituksia ilman lupaa.</p>
+      <p class="muted"><b>Terveysväitteet:</b> kortit eivät lupaa parantaa mitään. "KAMI ei korvaa ammattilaista" näkyy aloituksessa ja jokaisessa ovessa.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <span class="eyebrow">Kasvumoottori</span>
+    <h2>Kuusi silmukkaa, ei mainosbudjettia</h2>
+    <div class="loops">
+      <div class="lp"><b>🖼️ Korttikuva 9:16</b><span>Jokaisesta kortista saa valmiin Stories-, Reels- tai TikTok-kuvan, jossa on KAMI-tunniste. Jokainen jako on mainos.</span></div>
+      <div class="lp"><b>✈️ "Tämä kortti on sulle"</b><span>Lähetä kortti kaverille, niin saat +3 korttia. Niukkuus tekee jakamisesta palkinnon.</span></div>
+      <div class="lp"><b>🕵️ Feikkivisa sisältökoneena</b><span>"Sanoiko Einstein oikeasti näin?" toimii lyhytvideona sellaisenaan, ja jokainen feikki on uusi video.</span></div>
+      <div class="lp"><b>🧬 Viisaus-DNA Wrapped</b><span>Kuukauden lopussa jaettava profiili: "Olen Muinaisviisas strategi". Sama mekaniikka kuin Spotify Wrappedissa.</span></div>
+      <div class="lp"><b>🧑‍⚕️ Ammattilaiset jakajina</b><span>Psykologi jakaa oman korttinsa Instagramissa, ja seuraajat tulevat KAMIin. Tarjonta tuo kysyntää.</span></div>
+      <div class="lp"><b>🔎 Kortti = hakusivu</b><span>Jokaisella kortilla on oma julkinen sivu, esimerkiksi "kaksi nuolta buddhalaisuus". Pitkän hännän hakuliikenne tulee ilmaiseksi.</span></div>
+    </div>
+    <h3>Lanseeraus: Tipaton tammikuu 2027</h3>
+    <p class="muted">Suomen luonnollisin kampanjahetki: miljoonat miettivät tammikuussa alkoholia, rahaa ja kuntoa. "31 päivää, 31 korttia" yhdistää Irti-, Raha- ja Keho-aiheet.</p>
+    <div class="time">
+      <div class="tm"><small>Lokakuu</small><h3>MVP ja validointi</h3><ul><li>Demo 50 testaajalla</li><li>Mitataan D1-paluu ja tekojen osuus</li><li>10 ammattilaista mukaan</li></ul></div>
+      <div class="tm"><small>Marraskuu</small><h3>Suljettu beta</h3><ul><li>300 käyttäjää ja 150 tarkistettua korttia</li><li>Kansanviisaus-UGC auki</li><li>PWA ja aamuilmoitus</li></ul></div>
+      <div class="tm"><small>Joulukuu</small><h3>Ennakkorekisteröinti</h3><ul><li>"31 päivää, 31 korttia"</li><li>Feikkivisa-videot someen</li><li>Haasteelle sponsori</li></ul></div>
+      <div class="tm launch"><small>1.1.2027</small><h3>Lanseeraus</h3><ul><li>Tipaton tammikuu -haaste</li><li>Helmikuussa Wrapped-jako</li><li>Säästöhaaste jatkaa</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="band paper">
+  <div class="wrap">
+    <span class="eyebrow">Mittarit</span>
+    <div class="ns"><span class="eyebrow">North Star</span><span class="v">Viikoittaiset tekijät</span><p class="muted">Niiden käyttäjien määrä, jotka tekivät viikon aikana vähintään yhden teon. Ei katseluaikaa, ei avauksia, vaan elämän muutos mitattuna.</p></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Mittari</th><th>Miksi</th><th style="text-align:right">Betan tavoite</th></tr></thead>
+        <tbody>
+          <tr><th>D1 / D7 / D30 -paluu</th><td>Toimiiko rituaali?</td><td class="num">45 % / 25 % / 12 %</td></tr>
+          <tr><th>Päivän seiska loppuun</th><td>Onko seitsemän oikea määrä?</td><td class="num">≥ 70 %</td></tr>
+          <tr><th>Teko per käyttäjä per viikko</th><td>Muuttuuko mitään?</td><td class="num">≥ 3</td></tr>
+          <tr><th>Jakoaste (K-tekijä)</th><td>Kasvaako ilman mainoksia?</td><td class="num">≥ 0,3</td></tr>
+          <tr><th>Oven klikkaus → varaus</th><td>Toimiiko päämalli?</td><td class="num">≥ 8 %</td></tr>
+          <tr><th>Ammattilaisen arvio liidistä</th><td>Ovatko liidit laadukkaita?</td><td class="num">≥ 4 / 5</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="font-size:13px">Tavoitteet ovat oletuksia, jotka beta-testi joko vahvistaa tai kumoaa.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <span class="eyebrow">Sisältö ja oikeudet</span>
+    <h2>Rocky ja Kardashianit? Arkkityyppinä kyllä, sitaattina ei.</h2>
+    <div class="grid2">
+      <p class="muted"><b class="ok">Vapaat:</b> Raamatun, Koraanin, sutrien, Kojikin ja Popol Vuhin alkutekstit sekä Marcus Aurelius, Seneca, Epiktetos, Laozi, Freudin alkuteokset (Freud kuoli 1939) ja sananlaskut. Moderneja käännöksiä ei käytetä, vaan KAMI kääntää itse.</p>
+      <p class="muted"><b class="no">Suojatut:</b> elokuvarepliikit (EU:ssa jo 11 sanan omaperäinen ote voi olla suojattu, Infopaq C-5/08), laulujen sanoitukset sekä julkkisten nimen ja kuvan kaupallinen käyttö. Siksi Tsemppi-kortit ovat arkkityyppejä: "Underdog-nyrkkeilijä" ja "Reality-diiva".</p>
+    </div>
+    <p class="muted" style="font-size:13px">Tarkempi selvitys on repossa tiedostossa <code>kami-app/TEKIJANOIKEUDET.md</code>. Tämä ei ole oikeudellinen neuvo, joten tarkistuta linjaus juristilla ennen kaupallista julkaisua.</p>
+  </div>
+</section>
+
+<section class="band night">
+  <div class="wrap">
+    <h2>Seitsemän korttia. Yksi teko. Huomenna uudestaan.</h2>
+    <a class="cta" href="https://claude.ai/artifact/BdYJToj3CUh2ZWAXTH96db" target="_blank" rel="noopener">Avaa KAMI-demo →</a>
+    <footer class="muted">Latentti.fi · KAMI · Lokakuu 2026 · Demossa näkyvät kumppanit ovat esimerkkejä.</footer>
   </div>
 </section>

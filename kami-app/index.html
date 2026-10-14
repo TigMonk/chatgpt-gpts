@@ -2,456 +2,604 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>
-/* Layout: one-screen phone app. Header HUD → card stack → four swipe buttons → deck chips. Two paths re-skin the card only. */
+/* Layout: full-bleed vertical feed (TikTok) with Tinder swipes. Story-progress bar on top, action rail on the right, one card fills the stage. Deliberately one dark "night feed" world; every topic owns a colour field. */
 :root{
-  --bg:#E6EAE6; --surface:#FAFBF8; --ink:#16201B; --muted:#56635C; --line:#C6CEC8;
-  --ai:#24406E; --shu:#C23F2A; --kin:#B08628; --moss:#52683A;
-  --ring:#1B1440; --volt:#FFD23F; --pop:#FF3D6E; --ringInk:#FFF8E6;
-  --shadow:0 18px 40px -18px rgba(20,30,40,.45);
-  --f-display:"Dela Gothic One","Arial Black",Impact,sans-serif;
-  --f-mincho:"Shippori Mincho","Hiragino Mincho ProN",Georgia,serif;
+  --chrome:#07090B; --ink:#F6F4EF; --dim:rgba(246,244,239,.68); --line:rgba(246,244,239,.18);
+  --volt:#FFE14D; --pop:#FF4D6D; --ok:#5BE39A; --bad:#FF6B5B; --acc:#FFE14D; --bg:#16161A;
+  --f-hype:"Dela Gothic One","Arial Black",Impact,sans-serif;
+  --f-old:"Shippori Mincho","Hiragino Mincho ProN",Georgia,serif;
   --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#101613; --surface:#1A221E; --ink:#E8EDE9; --muted:#9AA79F; --line:#2E3A34;
-  --ai:#8FAEE6; --shu:#F0765E; --kin:#E2B85A; --moss:#9DB878; --shadow:0 18px 40px -18px rgba(0,0,0,.8); color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#101613; --surface:#1A221E; --ink:#E8EDE9; --muted:#9AA79F; --line:#2E3A34;
-  --ai:#8FAEE6; --shu:#F0765E; --kin:#E2B85A; --moss:#9DB878; --shadow:0 18px 40px -18px rgba(0,0,0,.8); color-scheme:dark}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;overflow:hidden;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible{outline:3px solid var(--kin);outline-offset:2px}
-.app{height:100%;max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding-block:10px}
+body{background:var(--chrome);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;overflow:hidden;
+  padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+a{color:inherit}
+button:focus-visible,a:focus-visible{outline:3px solid var(--volt);outline-offset:2px}
+.app{height:100%;max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:8px;padding-block:8px}
 
-/* header */
-.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.logo{font-family:var(--f-display);font-size:22px;letter-spacing:.04em;background:none;border:0;padding:0;display:flex;align-items:center;gap:8px}
-.logo i{font-family:var(--f-mincho);font-style:normal;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:6px;background:var(--shu);color:#fff;font-size:15px}
-.hud{display:flex;gap:6px;font-size:12px;font-variant-numeric:tabular-nums;flex-wrap:wrap;justify-content:flex-end}
-.pill{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:3px 9px;white-space:nowrap}
-.pill b{font-weight:700}
-.xpbar{height:4px;border-radius:4px;background:var(--line);overflow:hidden}
-.xpbar span{display:block;height:100%;background:linear-gradient(90deg,var(--moss),var(--kin));width:0;transition:width .5s}
+/* top bar */
+.prog{display:flex;gap:3px;height:3px}
+.prog i{flex:1;border-radius:3px;background:var(--line);overflow:hidden;position:relative}
+.prog i.done{background:var(--ink)}
+.prog i.now{background:linear-gradient(90deg,var(--ink) 50%,var(--line) 50%)}
+.barrow{display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:var(--f-hype);font-size:20px;letter-spacing:.06em;display:flex;align-items:center;gap:7px}
+.logo b{font-family:var(--f-old);font-weight:800;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:7px;background:var(--pop);color:#fff;font-size:15px}
+.tools{display:flex;gap:6px;align-items:center;font-size:13px}
+.tools .pill{border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tools button.pill[aria-pressed="true"]{background:var(--volt);color:#111;border-color:var(--volt);font-weight:700}
 
-/* home */
-.home{flex:1;display:flex;flex-direction:column;gap:14px;overflow:auto;padding-bottom:8px}
-.home h1{font-family:var(--f-display);font-size:clamp(30px,9vw,40px);line-height:1.05;margin:6px 0 0;text-wrap:balance;font-weight:400}
-.home p.lead{margin:0;color:var(--muted)}
-.paths{display:grid;gap:12px}
-.path{border:0;text-align:left;border-radius:18px;padding:18px;display:grid;gap:6px;box-shadow:var(--shadow);position:relative;overflow:hidden;min-height:150px}
-.path small{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:700;opacity:.8}
-.path strong{font-size:26px;line-height:1.1}
-.path span{font-size:14px;max-width:30ch}
-.path.wis{background:var(--surface);color:var(--ink);border-top:6px solid var(--ai)}
-.path.wis strong{font-family:var(--f-mincho);font-weight:700;color:var(--ai)}
-.path.wis::after{content:"⛩";position:absolute;right:14px;bottom:4px;font-size:64px;opacity:.16}
-.path.fun{background:var(--ring);color:var(--ringInk)}
-.path.fun strong{font-family:var(--f-display);font-weight:400;color:var(--volt)}
-.path.fun::after{content:"🥊";position:absolute;right:14px;bottom:6px;font-size:58px;transform:rotate(-14deg)}
-.howto{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:12px;text-align:center;color:var(--muted)}
-.howto div{border:1px dashed var(--line);border-radius:10px;padding:8px 4px}
-.howto b{display:block;font-size:18px;color:var(--ink)}
-
-/* play */
-.play{flex:1;display:flex;flex-direction:column;gap:10px;min-height:0}
-.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 11px;font-size:13px;white-space:nowrap}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.stack{flex:1;position:relative;min-height:0;touch-action:none}
-.card{perspective:1400px;position:absolute;inset:0;border-radius:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;user-select:none;-webkit-user-select:none;will-change:transform;transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .32s}
-.card.under{transform:scale(.94) translateY(14px);opacity:.7}
+/* stage */
+.stage{flex:1;position:relative;min-height:0}
+.card{position:absolute;inset:0;border-radius:24px;overflow:hidden;background:var(--bg);color:var(--fg,var(--ink));touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .34s;will-change:transform}
 .card.drag{transition:none}
-.face{position:absolute;inset:0;display:flex;flex-direction:column;padding:18px 20px;gap:10px;overflow:auto;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .45s}
-.face.back{transform:rotateY(180deg)}
-.card.flipped .face.front{transform:rotateY(-180deg)}
-.card.flipped .face.back{transform:rotateY(0)}
-.meta{display:flex;justify-content:space-between;align-items:center;font-size:11px;text-transform:uppercase;letter-spacing:.14em;font-weight:700}
-.badge{border-radius:99px;padding:2px 8px;font-size:10px}
-.emoji{font-size:52px;line-height:1}
-.ttl{font-size:24px;line-height:1.15;margin:0;text-wrap:balance}
-.quote{font-size:21px;line-height:1.35;margin:0;text-wrap:balance}
-.body{margin:0;font-size:14px}
-.rows{display:grid;gap:8px;margin-top:auto}
-.row{border-radius:12px;padding:9px 12px;font-size:14px}
-.row b{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
-.rights{font-size:11px;opacity:.7;margin:0}
-/* wisdom skin */
-.card.wis{background:var(--surface);color:var(--ink)}
-.card.wis .face{background:var(--surface)}
-.card.wis .meta{color:var(--ai)}
-.card.wis .badge{background:var(--ai);color:var(--surface)}
-.card.wis .ttl{font-family:var(--f-mincho);font-weight:700}
-.card.wis .quote{font-family:var(--f-mincho);font-weight:500;border-left:3px solid var(--shu);padding-left:12px}
-.card.wis .row{background:color-mix(in srgb,var(--ai) 9%,transparent)}
-.card.wis .row b{color:var(--ai)}
-.card.wis::before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:var(--ai);z-index:2}
-/* fun skin: deliberately always-dark boxing ring */
-.card.fun{background:var(--ring);color:var(--ringInk)}
-.card.fun .face{background:radial-gradient(120% 70% at 100% 0%,color-mix(in srgb,var(--pop) 40%,transparent),transparent 60%),var(--ring)}
-.card.fun .meta{color:var(--volt)}
-.card.fun .badge{background:var(--pop);color:#fff}
-.card.fun .ttl{font-family:var(--f-display);font-weight:400;color:var(--volt);text-transform:uppercase;font-size:22px}
-.card.fun .quote{font-family:var(--f-display);font-weight:400;font-size:22px;line-height:1.25}
-.card.fun .row{background:rgba(255,255,255,.08)}
-.card.fun .row b{color:var(--volt)}
-.card.boss{outline:3px solid var(--kin);outline-offset:-3px}
-.stamp{position:absolute;z-index:5;font-family:var(--f-display);font-size:28px;padding:4px 14px;border:4px solid;border-radius:10px;opacity:0;pointer-events:none;letter-spacing:.06em}
-.stamp.r{top:28px;left:20px;color:var(--moss);transform:rotate(-14deg)}
-.stamp.l{top:28px;right:20px;color:var(--shu);transform:rotate(14deg)}
-.stamp.u{bottom:40%;left:50%;transform:translateX(-50%);color:var(--ai)}
-.stamp.d{top:40%;left:50%;transform:translateX(-50%);color:var(--kin)}
-.card.fun .stamp.r{color:var(--volt)} .card.fun .stamp.l{color:var(--pop)} .card.fun .stamp.u{color:#9FD8FF}
-.ctrl{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.ctrl button{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:8px 0 6px;display:grid;gap:0;font-size:11px;color:var(--muted)}
-.ctrl button span{font-size:22px;line-height:1.2}
-.ctrl button:active{transform:scale(.95)}
-.tools{display:flex;gap:8px;justify-content:space-between;font-size:13px}
-.tools button{background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:2px 0}
+.card.enter{transform:translateY(100%)}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 55% at 100% 0%,color-mix(in srgb,var(--acc) 34%,transparent),transparent 65%),radial-gradient(70% 40% at 0% 100%,rgba(0,0,0,.35),transparent 70%);pointer-events:none}
+.face{position:absolute;inset:0;display:flex;flex-direction:column;gap:12px;padding:18px 74px 20px 20px;transition:opacity .25s,transform .25s}
+.face.back{opacity:0;transform:translateY(16px);pointer-events:none;overflow:auto;padding-right:20px;background:color-mix(in srgb,var(--bg) 92%,#000)}
+.card.flipped .face.front{opacity:0;transform:translateY(-16px);pointer-events:none}
+.card.flipped .face.back{opacity:1;transform:none;pointer-events:auto}
+.face.back{touch-action:pan-y}
+.card.flipped .rail{display:none}
+.ctop{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;font-weight:700;letter-spacing:.04em}
+.ctop span{background:rgba(0,0,0,.28);border-radius:99px;padding:4px 10px;white-space:nowrap}
+.ctop .ty{background:var(--acc);color:#111}
+.mid{margin-block:auto;display:grid;gap:14px}
+.hook{margin:0;font-size:clamp(30px,8.6vw,44px);line-height:1.08;text-wrap:balance;font-weight:900;letter-spacing:-.01em}
+.ty-vanha .hook,.ty-kansa .hook{font-family:var(--f-old);font-weight:800;letter-spacing:0}
+.ty-tsemppi .hook{font-family:var(--f-hype);font-weight:400;text-transform:uppercase;font-size:clamp(28px,8vw,40px)}
+.src{margin:0;font-size:14px;color:var(--dim);display:flex;gap:6px;align-items:baseline}
+.src b{color:var(--acc);font-weight:700}
+.tap{font-size:13px;color:var(--dim);display:flex;gap:8px;align-items:center}
+.tap kbd{font-family:inherit;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.lbl{margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--acc)}
+.learn{margin:0;font-size:18px;line-height:1.45}
+.teko{margin:0;font-size:20px;font-weight:700;line-height:1.3}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.b{border-radius:12px;padding:10px 14px;font-weight:700;background:var(--ink);color:#111}
+.b.ghost{background:rgba(0,0,0,.25);color:var(--ink);border:1px solid var(--line)}
+.b.acc{background:var(--acc);color:#111}
+.help{display:flex;gap:10px;align-items:center;border-radius:14px;padding:12px 14px;background:rgba(0,0,0,.3);border:1px solid var(--line);text-decoration:none;font-size:14px}
+.help small{display:block;color:var(--dim);font-size:12px}
+.rights{margin:0;font-size:12px;color:var(--dim)}
+.biz{display:none;margin:0;font-size:12px;font-weight:700;background:var(--volt);color:#111;border-radius:10px;padding:7px 10px;line-height:1.35}
+body.lens .biz{display:block}
+.stamp{position:absolute;z-index:6;font-family:var(--f-hype);font-size:30px;padding:2px 14px;border:4px solid;border-radius:12px;opacity:0;pointer-events:none;letter-spacing:.04em;background:rgba(0,0,0,.25)}
+.stamp.r{top:70px;left:18px;color:var(--ok);transform:rotate(-12deg)}
+.stamp.l{top:70px;right:18px;color:var(--bad);transform:rotate(12deg)}
+.stamp.u{bottom:120px;left:50%;transform:translateX(-50%);color:var(--ink)}
 
-/* sheets */
-.veil{position:fixed;inset:0;background:rgba(10,14,12,.55);display:grid;place-items:end center;z-index:20;
-  padding:0 max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
-.sheet{background:var(--surface);color:var(--ink);width:100%;max-width:440px;border-radius:20px;padding:18px;display:grid;gap:12px;max-height:88vh;overflow:auto;box-shadow:var(--shadow)}
-.sheet h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:22px}
-.sheet p{margin:0}
-.btns{display:flex;gap:8px;flex-wrap:wrap}
-.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:700;background:var(--ink);color:var(--bg)}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-.puzzle{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.piece{position:relative;border-radius:10px;padding:12px 10px;min-height:86px;font-size:13px;display:grid;align-content:space-between;gap:4px;color:#fff}
-.piece:nth-child(1){background:var(--ai)} .piece:nth-child(2){background:var(--moss)} .piece:nth-child(3){background:var(--shu)} .piece:nth-child(4){background:var(--kin);color:#1d1606}
-.piece::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:inherit;right:-12px;top:calc(50% - 9px);z-index:1}
-.piece:nth-child(n+3)::before{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:inherit;top:-12px;left:calc(50% - 9px)}
-.piece:nth-child(2n)::after{display:none}
-.piece b{font-size:15px}
-.field{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit}
-.shareimg{width:100%;border-radius:12px;border:1px solid var(--line)}
-.list{display:grid;gap:8px;font-size:14px}
-.list div{border-bottom:1px solid var(--line);padding-bottom:6px}
-.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 14px);transform:translateX(-50%) translateY(-120%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:99px;font-weight:700;font-size:14px;z-index:30;transition:transform .3s;white-space:nowrap}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.boom{position:fixed;pointer-events:none;z-index:25;font-size:22px;animation:boom .9s ease-out forwards}
-@keyframes boom{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+/* rail */
+.rail{position:absolute;right:10px;bottom:22px;display:grid;gap:14px;z-index:5}
+.rail button{display:grid;justify-items:center;gap:2px;font-size:11px;color:var(--ink)}
+.rail button span{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:rgba(0,0,0,.32);backdrop-filter:blur(6px)}
+.rail button[aria-pressed="true"] span{background:var(--pop)}
+.rail button:active span{transform:scale(.9)}
+
+/* topic fields */
+.t-raha{--bg:#0D3A2D;--acc:#E9C64A}
+.t-mieli{--bg:#251C55;--acc:#B6A4FF}
+.t-keho{--bg:#7A2A12;--acc:#FFB46B}
+.t-irti{--bg:#0B4549;--acc:#7FE6D2}
+.t-suhteet{--bg:#651B38;--acc:#FF9EBB}
+.t-ura{--bg:#12304D;--acc:#6FD3FF}
+.t-uni{--bg:#0E1330;--acc:#F2D98B}
+.t-quiz{--bg:#16161A;--acc:#FFE14D}
+.t-partner{--bg:#ECEEF1;--acc:#1F6FEB;--fg:#14171C;--dim:rgba(20,23,28,.66);--line:rgba(20,23,28,.18)}
+.t-partner .ctop span{background:rgba(20,23,28,.08)} .t-partner .ctop .ty{background:#14171C;color:#fff}
+.t-partner .b{background:#14171C;color:#fff} .t-partner .rail button{color:#14171C} .t-partner .rail button span{background:rgba(20,23,28,.08)}
+.t-partner .face.back{background:#E2E5EA}
+.t-partner::before{display:none}
+.pro{display:flex;gap:12px;align-items:center}
+.pro .av{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:#fff;box-shadow:0 0 0 3px var(--acc)}
+.pro b{display:block;font-size:16px}
+.pro small{color:var(--dim)}
+.quote{margin:0;font-family:var(--f-old);font-weight:800;font-size:clamp(26px,7.4vw,36px);line-height:1.2;text-wrap:balance}
+.claim{margin:0;font-size:16px;color:var(--dim)}
+.claim b{color:var(--ink)}
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.duel .b{padding:14px;font-size:16px}
+.duel .fake{background:var(--bad);color:#111} .duel .real{background:var(--ok);color:#111}
+.verdict{font-family:var(--f-hype);font-size:40px;line-height:1;margin:0}
+
+/* onboarding + end */
+.panel{position:absolute;inset:0;overflow:auto;display:flex;flex-direction:column;gap:16px;padding:8px 6px 16px}
+.panel h1{margin:0;font-family:var(--f-hype);font-weight:400;font-size:clamp(38px,11vw,54px);line-height:1;text-wrap:balance}
+.panel h1 em{font-style:normal;color:var(--volt)}
+.panel h2{margin:0;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.panel p{margin:0;color:var(--dim);max-width:46ch}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--pop)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);border-radius:99px;padding:8px 14px;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--ink);color:#111;border-color:var(--ink);font-weight:700}
+.vibes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.vibe{border:1px solid var(--line);border-radius:14px;padding:12px 6px;display:grid;gap:2px;text-align:center;font-size:13px;color:var(--dim)}
+.vibe b{font-size:22px;color:var(--ink)}
+.vibe[aria-pressed="true"]{border-color:var(--volt);box-shadow:inset 0 0 0 1px var(--volt);color:var(--ink)}
+.go{background:var(--volt);color:#111;font-family:var(--f-hype);font-size:20px;border-radius:16px;padding:16px;margin-top:auto}
+.go:disabled{opacity:.4}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stats div{border:1px solid var(--line);border-radius:14px;padding:10px 4px}
+.stats b{display:block;font-family:var(--f-hype);font-size:26px;font-weight:400;font-variant-numeric:tabular-nums}
+.stats small{color:var(--dim);font-size:12px}
+.tlist{display:grid;gap:6px}
+.tlist label{display:flex;gap:10px;align-items:flex-start;border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}
+.tlist input{width:20px;height:20px;accent-color:var(--ok);flex:none}
+.arche{font-family:var(--f-hype);font-size:26px;color:var(--volt);line-height:1.1}
+
+/* sheet */
+.veil{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:end center;z-index:40;
+  padding:0 max(10px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+.sheet{background:#15181C;color:var(--ink);width:100%;max-width:460px;border-radius:22px;padding:18px;display:grid;gap:12px;max-height:88vh;overflow:auto;border:1px solid var(--line)}
+.sheet h3{margin:0;font-family:var(--f-hype);font-weight:400;font-size:22px}
+.sheet p{margin:0;color:var(--dim)}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:92px 1fr 34px;gap:8px;align-items:center;font-size:13px;font-variant-numeric:tabular-nums}
+.bar i{height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar i span{display:block;height:100%;background:var(--volt)}
+.shot{width:100%;border-radius:14px;border:1px solid var(--line)}
+.ta{width:100%;min-height:90px;background:#0D0F12;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+.hint{font-size:12px;color:var(--dim);text-align:center;letter-spacing:.02em}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 54px);transform:translate(-50%,-180%);background:var(--ink);color:#111;padding:9px 16px;border-radius:99px;font-weight:700;font-size:14px;z-index:50;transition:transform .3s;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{transform:translate(-50%,0)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 
-<div class="app" id="app">
-  <header class="top">
-    <button class="logo" id="homeBtn" aria-label="Etusivulle"><i>神</i>KAMI</button>
-    <div class="hud" aria-live="polite">
-      <span class="pill">🧩 <b id="hPieces">0</b>/4</span>
-      <span class="pill">⚡ <b id="hXp">0</b></span>
-      <span class="pill">🔥 <b id="hStreak">1</b> pv</span>
-      <span class="pill" id="hLevel">🌰 Siemen</span>
-    </div>
-  </header>
-  <div class="xpbar" aria-hidden="true"><span id="xpFill"></span></div>
-
-  <section class="home" id="home">
-    <h1>Vedä kortti.<br>Pam, oivallus.</h1>
-    <p class="lead">Mentoripakka businekseen, elämään, kehoon ja mieleen. Valitse polku:</p>
-    <div class="paths">
-      <button class="path wis" data-go="wis">
-        <small>Polku 1 · Viisaus</small>
-        <strong>Kamit, zen, eläimet, puut ja klassikot</strong>
-        <span>Rauhallinen mentori. Inari, Daruma, karhu, koivu, Marcus Aurelius, Saarnaaja…</span>
-      </button>
-      <button class="path fun" data-go="fun">
-        <small>Polku 2 · Tsemppi</small>
-        <strong>Leffat, tosi-tv, urheilu ja meemit</strong>
-        <span>Hauska päivätsemppari. Underdog-nyrkkeilijä, reality-diiva, Sisu-mummo…</span>
-      </button>
-    </div>
-    <div class="howto" aria-label="Swipe-ohje">
-      <div><b>👉</b>Osuu<br>palapeliin</div>
-      <div><b>👈</b>Ohi</div>
-      <div><b>⬆️</b>Syvemmälle</div>
-      <div><b>⬇️</b>Teko nyt</div>
-    </div>
-    <p class="lead" style="font-size:12px">Neljä osunutta korttia tekee palapelin, josta tulee oma periaate. Näppäimistöllä toimivat nuolinäppäimet.</p>
-  </section>
-
-  <section class="play" id="play" hidden>
-    <div class="chips" role="group" aria-label="Pakka">
-      <button class="chip" data-f="all" aria-pressed="true">Kaikki</button>
-      <button class="chip" data-f="💼" aria-pressed="false">💼 Business</button>
-      <button class="chip" data-f="🌱" aria-pressed="false">🌱 Elämä</button>
-      <button class="chip" data-f="🔥" aria-pressed="false">🔥 Keho</button>
-      <button class="chip" data-f="🌙" aria-pressed="false">🌙 Mieli</button>
-    </div>
-    <div class="stack" id="stack"></div>
-    <div class="ctrl">
-      <button id="bL" aria-label="Ohi"><span>👈</span>Ohi</button>
-      <button id="bU" aria-label="Syvemmälle"><span>⬆️</span>Syvemmälle</button>
-      <button id="bD" aria-label="Teko nyt"><span>⬇️</span>Teko</button>
-      <button id="bR" aria-label="Osuu"><span>👉</span>Osuu</button>
-    </div>
-    <div class="tools">
-      <button id="shareBtn">🖼️ Tee kortista kuva</button>
-      <button id="colBtn">📚 Kokoelma</button>
-      <button id="switchBtn">🔀 Vaihda polkua</button>
-    </div>
-  </section>
-</div>
-<div class="toast" id="toast" role="status"></div>
-<div id="sheetHost"></div>
-
-<script>
-const R_WIS="Alkuperäinen KAMI-teksti.";
-const R_FUN="Alkuperäinen KAMI-teksti arkkityypin hengessä. Ei elokuva- tai tv-sitaatteja.";
-const SRC={kami:"⛩️ Kami",dharma:"☸️ Dharma",elain:"🐺 Eläin",puu:"🌲 Luonto",klassikko:"🏛️ Klassikko",
-  leffa:"🎬 Leffa-arkkityyppi",tv:"📺 Tosi-tv",urheilu:"🏆 Urheilu",meemi:"📱 Meemi",suomi:"🧶 Suomi-hahmo"};
-const WIS=[
-{s:"kami",e:"🦊",p:"💼",t:"Inari",q:"Kettu ei kilpaile jyvästä. Se vartioi koko peltoa.",b:"Inari on shinton sadon, riisin ja kaupan kami. Sen viestintuojat ovat kettuja.",a:"Kysy yhdeltä asiakkaalta: miltä onnistunut vuosi näyttää teille?",k:"Mikä on se sato, jota vain sinä voit tarjota?",d:"Fushimi Inarin pyhäkössä Kiotossa on tuhansia punaisia torii-portteja. Jokainen on lahjoitus, usein yritykseltä kiitokseksi menestyksestä. Mitä antaisit takaisin, jos tämä onnistuu?",w:"Arvo"},
-{s:"kami",e:"☀️",p:"🌱",t:"Amaterasu",q:"Valo palaa, kun tulet ulos luolasta.",b:"Aurinkojumalatar vetäytyi luolaan, ja maailma pimeni.",a:"Näytä keskeneräinen työ yhdelle ihmiselle tänään.",k:"Mihin luolaan olet vetäytynyt?",d:"Muut kamit eivät saaneet häntä ulos voimalla. Ne pitivät luolan suulla juhlat, ja uteliaisuus voitti. Mikä houkuttelisi sinut ulos ilman pakkoa?",w:"Näkyvyys"},
-{s:"kami",e:"🛤️",p:"💼",t:"Sarutahiko",q:"Risteyksessä ei tarvita karttaa, vaan ensimmäinen askel.",b:"Risteysten ja opastuksen kami, joka näytti taivaasta laskeutuvalle Ninigille tien.",a:"Valitse tie, jota voit kulkea 30 päivää. Arvioi vasta sitten.",k:"Mikä pienin askel paljastaisi oikean tien?",d:"Opas ei kävele puolestasi. Hän näyttää suunnan. Kuka voisi olla sinun oppaasi tässä asiassa? Kysy häneltä tällä viikolla.",w:"Suunta"},
-{s:"kami",e:"💧",p:"🔥",t:"Misogi",q:"Kylmä vesi huuhtoo pois sen, mikä ei ole sinun.",b:"Shinton puhdistautumisriitti vesiputouksen tai kylmän veden alla.",a:"Kylmää vettä kasvoille ja ranteille, sitten kolme syvää hengitystä. Kuuntele kehoasi.",k:"Mitä haluaisit huuhtoa pois tästä päivästä?",d:"Misogissa ei kilpailla kestämisestä. Ajatus on aloittaa puhtaalta pöydältä. Mikä olisi sinun päiväsi nollausnappi?",w:"Nollaus"},
-{s:"kami",e:"🪢",p:"💼",t:"Musubi",q:"Uusi syntyy, kun kaksi asiaa sidotaan yhteen.",b:"Shinton käsite luovasta, yhdistävästä voimasta. Sana tarkoittaa myös solmua.",a:"Kirjoita kaksi ideaa, jotka eivät kuulu yhteen, ja yhdistä ne yhdeksi.",k:"Kenet tai minkä voisit yhdistää?",d:"Pyhäköissä ennustelaput solmitaan puiden oksiin. Mikä solmu pitää sinun elämääsi koossa, ja mikä solmu pitäisi avata?",w:"Yhteys"},
-{s:"kami",e:"💃",p:"🌱",t:"Ame-no-Uzume",q:"Kun voima ei auta, kokeile naurua.",b:"Ilon ja tanssin kami, jonka tanssi houkutteli auringon ulos luolasta.",a:"Tee ongelmastasi naurettava versio ja kerro se jollekulle.",k:"Mitä tapahtuisi, jos tämä saisi olla hauskaa?",w:"Ilo"},
-{s:"dharma",e:"🎎",p:"🔥",t:"Daruma",q:"Kaadu seitsemän kertaa, nouse kahdeksan.",b:"Japanilainen sananlasku. Pyöreäpohjainen daruma-nukke nousee aina pystyyn, ja se on nimetty zenin perustajan Bodhidharman mukaan.",a:"Nimeä yksi tavoite ja piirrä paperille daruma, jolla on vain yksi silmä.",k:"Mikä kaatuminen odottaa vielä nousua?",d:"Japanissa darumaan maalataan toinen silmä vasta, kun tavoite on saavutettu. Puolisokea daruma muistuttaa joka päivä keskeneräisestä lupauksesta.",w:"Sisu"},
-{s:"dharma",e:"🏹",p:"🌙",t:"Kaksi nuolta",q:"Ensimmäinen nuoli sattuu. Toisen ammut itse.",b:"Buddhalainen vertaus: kipu on ensimmäinen nuoli, oma tarinamme kivusta on toinen.",a:"Kirjoita kaksi riviä: mitä tapahtui ja mitä kerroin itselleni siitä.",k:"Kumpi nuoli sattuu enemmän?",d:"Toista nuolta ei poisteta vihaamalla itseään. Riittää, että huomaat sen ja nimeät sen: tässä tulee toinen nuoli.",w:"Selkeys"},
-{s:"dharma",e:"🔥",p:"💼",t:"Fudō Myōō",q:"Liekit ympärillä, katse yhdessä pisteessä.",b:"Liikkumaton suojelija, joka ei horju. Kädessä köysi ja miekka.",a:"Valitse yksi asia ja tee sitä 25 minuuttia ilman ilmoituksia.",k:"Mistä et luovu, vaikka on vaikeaa?",d:"Köysi sitoo harhat, miekka leikkaa ne. Mikä on sinun köytesi, eli rutiini joka pitää sinut paikallasi? Entä miekkasi, eli päätös joka katkaisee?",w:"Fokus"},
-{s:"dharma",e:"🌀",p:"🌙",t:"Shoshin",q:"Aloittelijan mielessä on tilaa.",b:"Zen-käsite: kohtaa asia kuin ensimmäistä kertaa.",a:"Kysy tänään yksi tyhmältä tuntuva kysymys ääneen.",k:"Mitä luulet jo tietäväsi?",d:"Asiantuntijuus on hyvä työkalu mutta huonot silmälasit. Selitä ongelmasi kymmenvuotiaalle. Mikä kohta alkaa kuulostaa oudolta?",w:"Uteliaisuus"},
-{s:"dharma",e:"🍵",p:"🌙",t:"Kintsugi",q:"Halkeama kullataan, ei piiloteta.",b:"Japanilainen korjaustaide: rikkoutunut astia liimataan kultalakalla.",a:"Kerro yhdelle ihmiselle epäonnistumisesta, joka opetti sinulle jotain.",k:"Mikä halkeama sinussa on kultaa?",w:"Arvet"},
-{s:"elain",e:"🐻",p:"🔥",t:"Karhu",q:"Talviuni ei ole laiskuutta. Se on strategia.",b:"Talviunessa karhun sydän hidastuu, ja keväällä se herää täyteen voimaan.",a:"Varaa tälle illalle tunti tietoista lepoa ilman ruutua.",k:"Mikä vuodenaika elämässäsi on nyt?",d:"Ennen talvea karhu syö valtavasti. Lepo vaatii valmistautumista. Mitä sinun pitää kerätä, ennen kuin voit levätä?",w:"Lepo"},
-{s:"elain",e:"🐺",p:"💼",t:"Susi",q:"Lauma ei jahtaa jokaista saalista.",b:"Laumalla on roolit, ja jahti onnistuu yhteistyöllä.",a:"Sano ei yhdelle projektille tai asiakkaalle, joka ei ole sinun.",k:"Mikä on sinun laumasi?",w:"Valinta"},
-{s:"elain",e:"🐟",p:"🔥",t:"Lohi",q:"Vastavirta on tie kotiin.",b:"Lohi ui satoja kilometrejä vastavirtaan ja hyppää koskien yli syntymäjokeensa.",a:"Tee tänään se yksi asia, jota olet vältellyt.",k:"Mikä on sinun syntymäjokesi?",w:"Sitkeys"},
-{s:"elain",e:"🐦‍⬛",p:"💼",t:"Korppi",q:"Mieti kaksi siirtoa eteenpäin.",b:"Korppi on yksi älykkäimmistä linnuista: se käyttää työkaluja ja suunnittelee.",a:"Kirjoita: jos teen tämän, mitä tapahtuu sen jälkeen, ja mitä sen jälkeen?",k:"Mitä tapahtuu kahden siirron päästä?",w:"Ennakointi"},
-{s:"puu",e:"🌳",p:"💼",t:"Koivu",q:"Ensimmäinen kasvaa aukealle.",b:"Koivu on pioneerilaji: se valtaa ensimmäisenä palaneen tai hakatun maan.",a:"Kokeile tänään yhtä uutta kanavaa, työkalua tai tapaa.",k:"Mihin aukeaan voisit kasvaa ensimmäisenä?",d:"Koivu valmistaa maata muille, ja myöhemmin sen suojassa kasvaa kuusi. Kenelle sinä raivaat tietä?",w:"Rohkeus"},
-{s:"puu",e:"🎋",p:"🌱",t:"Bambu",q:"Ensin juuret, sitten metrejä.",b:"Bambu kasvattaa pitkään juurakkoa maan alla ja kasvaa sitten nopeasti. Myrskyssä se taipuu eikä katkea.",a:"Tee 20 minuuttia näkymätöntä perustyötä, jota kukaan ei kehu.",k:"Missä vaiheessa juurten kasvua olet?",w:"Kärsivällisyys"},
-{s:"puu",e:"🍄",p:"💼",t:"Sienirihmasto",q:"Metsä puhuu maan alla.",b:"Sienirihmasto yhdistää puiden juuret ja siirtää ravinteita puulta toiselle.",a:"Esittele toisilleen kaksi ihmistä, jotka hyötyisivät tutustumisesta.",k:"Kenet voisit yhdistää?",w:"Verkosto"},
-{s:"puu",e:"🌲",p:"🔥",t:"Mänty",q:"Juuret halkeamaan, latva taivaalle.",b:"Mänty kasvaa karuun kalliomaahan ja kestää kuivuutta.",a:"Seiso minuutti: jalat juurina, päälaki ylös, hartiat alas.",k:"Mitä halkeamaa voisit hyödyntää?",w:"Juuret"},
-{s:"puu",e:"🌊",p:"🌙",t:"Vesi",q:"Pehmeä voittaa kovan, kun aikaa on tarpeeksi.",b:"Vesi ottaa astian muodon ja kuluttaa kiven. Tao Te Ching käyttää vettä esimerkkinä pehmeän voimasta (oma mukaelma).",a:"Älä hakkaa estettä. Listaa kolme reittiä sen ympäri.",k:"Miten vesi kiertäisi tämän?",w:"Joustavuus"},
-{s:"klassikko",e:"🏛️",p:"🌙",t:"Marcus Aurelius",q:"Este muuttuu tieksi.",b:"Rooman keisari kirjoitti itselleen muistiinpanoja, jotka tunnetaan nimellä Itsetutkiskeluja (5.20, oma käännös).",a:"Kirjoita illalla kaksi listaa: mitä hallitsin tänään ja mitä en.",k:"Mitä tämä este opettaa?",d:"Marcus kirjoitti sotaretkellä teltassa, väsyneenä. Hän ei kirjoittanut yleisölle vaan muistuttaakseen itseään. Mitä sinun pitäisi muistuttaa itsellesi joka aamu?",w:"Asenne",r:"Oma käännös kreikasta. Alkuteos (n. 170 jaa.) on vapaa, mutta moderneja käännöksiä ei kopioida."},
-{s:"klassikko",e:"⏳",p:"💼",t:"Seneca",q:"Elämä ei ole lyhyt. Me tuhlaamme sitä.",b:"Stoalainen filosofi teoksessa Elämän lyhyydestä (oma mukaelma).",a:"Laske illalla, mihin tämän päivän tunnit menivät.",k:"Mihin käyttäisit tunnin, jos se olisi viimeinen?",w:"Aika",r:"Oma mukaelma latinasta. Alkuteos on vapaa."},
-{s:"klassikko",e:"⚖️",p:"🌙",t:"Epiktetos",q:"Jotkin asiat ovat vallassamme, toiset eivät.",b:"Orjana syntynyt stoalainen opettaja (Käsikirja 1, oma käännös).",a:"Jaa paperi kahtia: mitä voin hallita, mitä en. Toimi vasemmalla puolella ja päästä irti oikeasta.",k:"Mihin käytät voimaa, joka ei kuulu sinulle?",w:"Hallinta",r:"Oma käännös kreikasta. Alkuteos on vapaa."},
-{s:"klassikko",e:"🏞️",p:"🌱",t:"Herakleitos",q:"Samaan jokeen ei voi astua kahdesti.",b:"Kreikkalainen filosofi, jonka mukaan kaikki virtaa (oma mukaelma fragmentista).",a:"Tee tänään yksi tuttu asia eri tavalla.",k:"Mitä yrität pitää ennallaan?",w:"Muutos",r:"Oma mukaelma. Alkuteos on vapaa."},
-{s:"klassikko",e:"📜",p:"🌱",t:"Saarnaaja",q:"Kaikella on aikansa.",b:"Raamatun Saarnaajan kirja 3:1: aika istuttaa ja aika repiä, aika itkeä ja aika nauraa.",a:"Kirjoita: onko nyt minun aikani kylvää, korjata vai levätä?",k:"Mitä yrität tehdä väärään aikaan?",w:"Ajoitus",r:"Oma käännös. Alkuteksti on vapaa, mutta Raamattu 1992 -käännös on suojattu."},
-{s:"klassikko",e:"🌙",p:"🌙",t:"Koraani 94:5–6",q:"Vaikeuden kanssa tulee helpotus.",b:"Koraanin suura 94 toistaa lupauksen kahdesti peräkkäin.",a:"Kirjoita yksi vaikeus, joka toi mukanaan jotain hyvää.",k:"Mikä helpotus voisi kulkea tämän vaikeuden mukana?",w:"Toivo",r:"Oma käännös arabiankielisestä alkutekstistä. Suomennoksia ei kopioida."},
-{s:"klassikko",e:"🌽",p:"💼",t:"Popol Vuh",q:"Maailma tehtiin uudestaan, kunnes se onnistui.",b:"Mayojen Popol Vuhissa luojat yrittävät tehdä ihmisen mudasta ja puusta, ja vasta maissista se onnistuu.",a:"Tee tänään versio 2 jostain, mikä epäonnistui.",k:"Mikä on sinun maissisi, se oikea materiaali?",d:"Netissä kiertää paljon keksittyjä mayojen viisauksia. Tämä kortti nojaa Popol Vuhin luomiskertomukseen: iteroi, kunnes materiaali on oikea.",w:"Iterointi",r:"Kertomus on vapaa. Moderneja käännöksiä ei kopioida."},
-{s:"klassikko",e:"🛋️",p:"🌙",t:"Freud: sublimaatio",q:"Kanavoi energia, älä tukahduta sitä.",b:"Sigmund Freudin käsite: viettienergia ohjataan luovaksi tai hyödylliseksi toiminnaksi.",a:"Muuta tämänhetkinen kiukku tai levottomuus 10 minuutin liikkeeksi tai luonnokseksi.",k:"Mihin turhautumisesi voisi muuttua?",w:"Energia",r:"Freud kuoli 1939, joten hänen tekstinsä ovat vapaita. Moni Freudin nimissä kiertävä sitaatti on kuitenkin keksitty."}
-];
-const FUN=[
-{s:"leffa",e:"🥊",p:"🔥",t:"Underdog-nyrkkeilijä",q:"Erä 15. Kädet painaa. Nouset silti. Siinä koko juttu.",b:"Jokaisessa urheiluleffassa tulee hetki, jolloin kaikki näyttää menetetyltä ja sankari nousee. Tämä on se hetki.",a:"Tee 10 kyykkyä ja kuvittele, että taustalla soi montaasimusiikki.",k:"Mikä on sinun 15. eräsi?",w:"Nousu"},
-{s:"tv",e:"💅",p:"💼",t:"Reality-diiva",q:"Kulta, sä et pyydä lupaa. Sä ilmoitat.",b:"Tosi-tv:n kuningattaret eivät jää odottamaan, että joku huomaa heidät.",a:"Lähetä tänään se viesti, jota olet hionut viikon. Sellaisenaan.",k:"Mihin olet odottanut lupaa?",w:"Itsevarmuus"},
-{s:"leffa",e:"🎵",p:"🔥",t:"Treenimontaasi",q:"Yksi biisi, kolme minuuttia, ja olet eri ihminen.",b:"Montaasi tiivistää kuukausien työn kolmeen minuuttiin. Oikeassa elämässä kuukaudet koostuvat juuri näistä kolmesta minuutista.",a:"Laita lempibiisi soimaan ja liiku koko biisin ajan.",k:"Mikä on sinun montaasibiisisi?",w:"Treeni"},
-{s:"urheilu",e:"📣",p:"💼",t:"Pukuhuonepuhe",q:"Tauko on ohi. Kenttä ei odota.",b:"Toisella puoliajalla valmentaja nousee penkille ja kaikki hiljenevät.",a:"Sano tiimille tai peilille yksi lause, joka alkaa sanoilla \"Tästä eteenpäin me…\"",k:"Mitä sinun pitää sanoa ääneen?",w:"Johtajuus"},
-{s:"tv",e:"👨‍🍳",p:"💼",t:"Huutava keittiömestari",q:"Tämä annos on raaka! Uudestaan, ja nyt kunnolla!",b:"Kokkiohjelmissa huudetaan, koska mestari tietää, että pystyt parempaan.",a:"Ota yksi eilen tehty \"ihan ok\" -työ ja paranna siitä yhtä yksityiskohtaa.",k:"Mikä työsi on vielä raakaa?",w:"Laatu"},
-{s:"leffa",e:"🕶️",p:"💼",t:"Heist-tiimi",q:"Suunnitelma on hyvä. Tiimi on parempi.",b:"Ryöstöleffassa jokaisella on oma erikoistaitonsa, eikä kukaan tee kaikkea.",a:"Kirjoita tiimisi tai ystäviesi supervoimat, yksi sana per henkilö.",k:"Kenet tarvitset vielä porukkaan?",w:"Tiimi"},
-{s:"leffa",e:"✈️",p:"🌱",t:"Romcomin lentokenttäjuoksu",q:"Juokse portille. Sano se nyt.",b:"Romanttisen komedian lopussa joku juoksee ja sanoo vihdoin ääneen sen, mitä tuntee.",a:"Kerro tänään jollekulle, mitä hän merkitsee sinulle.",k:"Kenelle et ole vielä sanonut sitä?",w:"Rohkeus"},
-{s:"meemi",e:"🗿",p:"🔥",t:"Sigma-aamu (ironisesti)",q:"Herää. Juo vettä. Ole legenda. Mutta ei kello 4.30.",b:"Some on täynnä äärirutiineja. Legendaksi tullaan kuitenkin perusasioilla.",a:"Juo iso lasi vettä nyt.",k:"Mikä on sinun pienin legendateko?",w:"Perusasiat"},
-{s:"suomi",e:"👵",p:"🌱",t:"Sisu-mummo",q:"Ei se tunteile, se tekee. Kahvi on keitetty, mennään.",b:"Suomalainen mummo on kantanut puut, kasvattanut lapset ja käynyt avannossa. Selityksiä hän ei jaksa.",a:"Tee yksi tylsä kotityö loppuun ennen kuin ehdit ajatella sitä.",k:"Mitä mummo sanoisi tekosyistäsi?",w:"Sisu"},
-{s:"urheilu",e:"🎙️",p:"🔥",t:"Urheiluselostaja",q:"JA SIELLÄ HÄN TULEE! KUKAAN EI USKONUT! MAALISUORALLA!",b:"Arkinen tehtävä muuttuu olympiafinaaliksi, kun joku selostaa sitä riittävän kovaa.",a:"Selosta seuraava tehtäväsi ääneen kuin olympiafinaalia.",k:"Mikä on sinun maalisuorasi?",w:"Innostus"},
-{s:"leffa",e:"🧙",p:"🌙",t:"Mentori toisessa näytöksessä",q:"Sinulla on ollut se koko ajan. Minä vain osoitin sen.",b:"Sankaritarinoissa mentori ei anna voimaa. Hän paljastaa sen.",a:"Listaa kolme asiaa, joissa olet parempi kuin uskot.",k:"Mikä taito sinulla on ollut koko ajan?",w:"Itseluottamus"},
-{s:"leffa",e:"🦸",p:"🌱",t:"Origin story",q:"Jokainen sankari oli ensin se, joka kaatui.",b:"Supersankarielokuvat alkavat aina menetyksestä tai epäonnistumisesta.",a:"Kirjoita kolmen rivin origin story: mikä vaikeus teki sinusta sen, mikä olet?",k:"Mikä on sinun alkuperätarinasi?",w:"Tarina"},
-{s:"tv",e:"🔨",p:"💼",t:"Remonttishow",q:"Purkuvaiheessa näyttää aina pahimmalta.",b:"Ennen-jälkeen-kuvissa ei näy viikkoa, jolloin kaikki oli pölyä.",a:"Pura yksi vanha rakenne: kansio, rutiini tai turha kalenterikokous.",k:"Mikä täytyy purkaa, ennen kuin voi rakentaa?",w:"Muutos"},
-{s:"urheilu",e:"🏁",p:"💼",t:"Rallikartturi",q:"Oikea kakkonen, pitkä, älä nosta!",b:"Kartturi lukee tien etukäteen, jotta kuski voi keskittyä ajamiseen.",a:"Kirjoita huomisen kolme tärkeintä mutkaa valmiiksi jo tänään.",k:"Kuka on sinun kartturisi?",w:"Ennakointi"},
-{s:"meemi",e:"🪟",p:"🔥",t:"Vaikuttajan aamurutiini",q:"Viisi askelta esteettiseen päivään. Ykkönen: avaa verhot.",b:"Parodia täydellisistä aamurutiineista, mutta valo oikeasti herättää.",a:"Avaa verhot ja seiso päivänvalossa 2 minuuttia.",k:"Mikä on sinun aamusi ykkösaskel?",w:"Valo"},
-{s:"leffa",e:"🔦",p:"🌙",t:"Kauhuleffan sankari",q:"Älä mene kellariin yksin. Ota valot ja kaveri.",b:"Kauhuelokuvissa jokainen tietää säännön, ja silti joku menee yksin.",a:"Jaa tänään yksi huoli jonkun kanssa.",k:"Mihin kellariin yrität mennä yksin?",w:"Tuki"},
-{s:"tv",e:"🎤",p:"🌱",t:"Koe-esiintyjä",q:"Kädet tärisee, ääni tärisee, ja silti lavalle.",b:"Laulukilpailujen parhaat hetket ovat niitä, joissa jännittää ja silti uskaltaa.",a:"Tee tänään yksi asia, joka jännittää vähän.",k:"Mikä on sinun koe-esiintymisesi?",w:"Uskallus"},
-{s:"urheilu",e:"🏃",p:"🔥",t:"Maratonin 35. kilometri",q:"Seinä on tässä. Seinän takana on maali.",b:"Maratoonarit tuntevat seinän. Se tulee, ja se menee ohi.",a:"Kun tänään tekee mieli lopettaa, jatka vielä 5 minuuttia.",k:"Missä sinun seinäsi on?",w:"Kestävyys"},
-{s:"suomi",e:"🧖",p:"🌙",t:"Saunatonttu",q:"Löyly ei kiirehdi. Ei sinunkaan tarvitse.",b:"Saunan haltija vartioi rauhaa. Kiire jää pukuhuoneeseen.",a:"Ota tänään lämmin suihku tai sauna ilman puhelinta ja viilennä lopuksi.",k:"Mikä on sinun palautumisrituaalisi?",w:"Palautuminen"},
-{s:"leffa",e:"🎬",p:"💼",t:"Jatko-osa",q:"Ykkösosa oli harjoitus. Kakkosesta puhutaan.",b:"Monet kuuluisat jatko-osat ovat parempia kuin ensimmäinen. Tekijät olivat oppineet.",a:"Valitse yksi epäonnistunut projekti ja kirjoita sille jatko-osan juoni.",k:"Mikä ansaitsee comebackin?",w:"Comeback"},
-{s:"tv",e:"🌹",p:"🌱",t:"Ruususeremonia",q:"Kenelle annat ruusun tänään?",b:"Kaikille ei riitä aikaa. Valitse, kenelle annat sitä.",a:"Anna yhdelle ihmiselle 15 minuuttia jakamatonta huomiota.",k:"Kuka ansaitsee ruusun?",w:"Valinta"},
-{s:"urheilu",e:"⛷️",p:"🔥",t:"Hiihtäjän viimeinen nousu",q:"Nousu on se kohta, jossa kisa ratkeaa.",b:"Hiihtokisat ratkeavat usein viimeisessä mäessä, ei tasaisella.",a:"Kävele tänään portaat hissin sijaan.",k:"Mikä on sinun viimeinen noususi?",w:"Puuska"},
-{s:"meemi",e:"🐈",p:"🌙",t:"Kissavideo",q:"Putoa pöydältä, laskeudu jaloillesi ja esitä, että se oli tarkoitus.",b:"Internetin vanhin viisaus: moka muuttuu legendaksi, kun sille nauraa.",a:"Naura yhdelle omalle mokallesi ääneen.",k:"Minkä mokan voisit kääntää vitsiksi?",w:"Huumori"},
-{s:"leffa",e:"📜",p:"🌱",t:"Lopputekstit",q:"Kuka kaikki oli mukana tekemässä sinua?",b:"Elokuvan lopussa luetellaan jokainen, joka teki sen mahdolliseksi.",a:"Kirjoita omat lopputekstisi: viisi ihmistä. Kiitä yhtä tänään.",k:"Kenet unohdit kiittää?",w:"Kiitollisuus"}
-];
-const LEVELS=[[0,"🌰 Siemen"],[100,"🌱 Taimi"],[250,"🌳 Puu"],[500,"🌲 Metsä"],[1000,"⛰️ Vuori"]];
-const KEY="kami-app-v1";
-const $=id=>document.getElementById(id);
-let S, deck=[], cur=null, flipped=false, deepened=false;
-
-function today(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||null}catch(e){return null}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function fresh(){return {path:null,xp:0,pieces:[],saved:[],principles:[],streak:1,lastDay:today(),swiped:0,skips:0,filter:"all",dailySeen:{}}}
-
-function touchStreak(){
-  const t=today(); if(S.lastDay===t) return;
-  const y=new Date(); y.setDate(y.getDate()-1);
-  const yd=y.getFullYear()+"-"+(y.getMonth()+1)+"-"+y.getDate();
-  S.streak = S.lastDay===yd ? S.streak+1 : 1; S.lastDay=t; save();
-}
-function level(){let l=LEVELS[0],n=null;for(let i=0;i<LEVELS.length;i++){if(S.xp>=LEVELS[i][0]){l=LEVELS[i];n=LEVELS[i+1]||null}}return {l,n}}
-function hud(){
-  $("hPieces").textContent=S.pieces.length; $("hXp").textContent=S.xp; $("hStreak").textContent=S.streak;
-  const {l,n}=level(); $("hLevel").textContent=l[1];
-  $("xpFill").style.width = n ? ((S.xp-l[0])/(n[0]-l[0])*100)+"%" : "100%";
-}
-function addXp(x){const before=level().l;S.xp+=x;const after=level().l;hud();save();
-  if(after!==before) setTimeout(()=>toast("Tasonnousu: "+after[1]+"!"),700)}
-let tt; function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),1600)}
-
-function pool(){const all=S.path==="wis"?WIS:FUN;return all.filter(c=>S.filter==="all"||c.p===S.filter)}
-function hash(s){let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h}
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function buildDeck(){
-  const p=pool(); deck=shuffle(p.slice());
-  const dk=S.path+today();
-  if(S.filter==="all" && !S.dailySeen[dk]){
-    const daily=p[hash(dk)%p.length]; deck=deck.filter(c=>c!==daily); deck.unshift({...daily,daily:true});
-  }
-  // avoid same source twice in a row
-  for(let i=1;i<deck.length;i++){ if(deck[i].s===deck[i-1].s){const j=deck.findIndex((c,k)=>k>i&&c.s!==deck[i-1].s); if(j>0)[deck[i],deck[j]]=[deck[j],deck[i]]}}
-}
-function nextCard(){
-  if(!deck.length) buildDeck();
-  cur=deck.shift(); S.swiped++; cur.boss = S.swiped%7===0; flipped=false; deepened=false;
-  if(cur.daily){S.dailySeen[S.path+today()]=true; save()}
-  render();
-}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
-function cardHTML(c,cls){
-  const path=S.path; const r=c.r||(path==="wis"?R_WIS:R_FUN);
-  const tag=c.daily?"Päivän kortti":c.boss?"Bossi ×2 XP":c.p+" "+({"💼":"Business","🌱":"Elämä","🔥":"Keho","🌙":"Mieli"})[c.p];
-  return `<div class="card ${path} ${c.boss?"boss":""} ${cls||""}">
-    <div class="stamp r">OSUU</div><div class="stamp l">OHI</div><div class="stamp u">SYVEMMÄLLE</div><div class="stamp d">TEKO</div>
-    <div class="face front">
-      <div class="meta"><span>${SRC[c.s]}</span><span class="badge">${esc(tag)}</span></div>
-      <div class="emoji" aria-hidden="true">${c.e}</div>
-      <h2 class="ttl">${esc(c.t)}</h2>
-      <p class="quote">${esc(c.q)}</p>
-      <p class="body">${esc(c.b)}</p>
-      <div class="rows">
-        <div class="row"><b>Liike nyt</b>${esc(c.a)}</div>
-        <div class="row"><b>Kysymys sinulle</b>${esc(c.k)}</div>
+<div class="app">
+  <header style="display:grid;gap:8px">
+    <div class="prog" id="prog" aria-hidden="true"></div>
+    <div class="barrow">
+      <button class="logo" id="logo" aria-label="Asetukset ja aiheet"><b>神</b>KAMI</button>
+      <div class="tools">
+        <span class="pill" id="streak" title="Teko-putki: päivät, joina teit vähintään yhden teon">🔥 0</span>
+        <button class="pill" id="dnaBtn" aria-label="Viisaus-DNA">🧬 DNA</button>
+        <button class="pill" id="lensBtn" aria-pressed="false" title="Näytä bisneslogiikka korttien päällä">€ Bisnes</button>
       </div>
     </div>
-    <div class="face back">
-      <div class="meta"><span>⬆️ Syvemmälle</span><span class="badge">${esc(c.w)}</span></div>
-      <h2 class="ttl">${esc(c.t)}</h2>
-      <p class="body" style="font-size:16px">${esc(c.d||("Pysähdy kysymyksen äärelle 60 sekunniksi: "+c.k+" Vastaa kolmella sanalla, ääneen tai paperille."))}</p>
-      <div class="rows"><div class="row"><b>Avainsana palapeliin</b>${esc(c.w)}</div></div>
-      <p class="rights">© ${esc(r)}</p>
-      <p class="rights">Swipe ⬆️ kääntää takaisin.</p>
-    </div>
-  </div>`;
-}
-function render(){
-  const st=$("stack"); const peek=deck[0];
-  st.innerHTML=(peek?cardHTML(peek,"under"):"")+cardHTML(cur,"top");
-  bindDrag(st.querySelector(".card.top"));
-}
+  </header>
+  <main class="stage" id="stage"></main>
+  <div class="hint" id="hint" hidden>↑ seuraava · → osuu · ← ohi · napauta = opi 15 s</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="host"></div>
 
-/* drag */
-function bindDrag(el){
-  let sx=0,sy=0,dx=0,dy=0,on=false;
-  const st={r:el.querySelector(".stamp.r"),l:el.querySelector(".stamp.l"),u:el.querySelector(".stamp.u"),d:el.querySelector(".stamp.d")};
-  el.addEventListener("pointerdown",e=>{on=true;sx=e.clientX;sy=e.clientY;dx=dy=0;el.classList.add("drag");el.setPointerCapture(e.pointerId)});
-  el.addEventListener("pointermove",e=>{if(!on)return;dx=e.clientX-sx;dy=e.clientY-sy;
-    el.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`;
-    const h=Math.abs(dx)>Math.abs(dy);
-    st.r.style.opacity=h&&dx>0?Math.min(dx/90,1):0; st.l.style.opacity=h&&dx<0?Math.min(-dx/90,1):0;
-    st.u.style.opacity=!h&&dy<0?Math.min(-dy/90,1):0; st.d.style.opacity=!h&&dy>0?Math.min(dy/90,1):0;});
-  const end=()=>{if(!on)return;on=false;el.classList.remove("drag");Object.values(st).forEach(s=>s.style.opacity=0);
-    const h=Math.abs(dx)>Math.abs(dy), T=90;
-    if(h&&dx>T) act("R"); else if(h&&dx<-T) act("L"); else if(!h&&dy<-T) act("U"); else if(!h&&dy>T) act("D");
-    else el.style.transform="";};
-  el.addEventListener("pointerup",end); el.addEventListener("pointercancel",end);
+<script>
+/* ---------- content ---------- */
+const TOP={raha:["💰","Raha"],mieli:["🧠","Mieli"],keho:["💪","Keho"],irti:["🔓","Irti"],suhteet:["❤️","Suhteet"],ura:["🚀","Ura"],uni:["🌙","Uni"]};
+const TOPSUB={irti:"alkoholi, nikotiini, ruutu, pelit"};
+const TYPE={nyky:["🔬","Nykyviisaus"],vanha:["🏛️","Vanha viisaus"],kansa:["🧶","Kansanviisaus"],tsemppi:["🥊","Tsemppi"]};
+const VER={nyky:"🔬 Tutkimukseen perustuva",para:"📜 Oma käännös vapaasta alkutekstistä",orig:"✍️ KAMI-teksti",kansa:"🧶 Kansanperinne, vapaa",tsemppi:"🎭 Arkkityyppi omin sanoin, ei sitaatti"};
+const HELP={
+  paihde:["Päihdelinkki","Maksuton tieto ja tuki päihteistä","https://www.paihdelinkki.fi"],
+  peli:["Peluuri","Maksuton apu rahapelihaittoihin","https://www.peluuri.fi"],
+  velka:["Takuusäätiö","Maksuton velkaneuvonta","https://www.takuusaatio.fi"],
+  mieli:["Mielenterveystalo","Maksuton omahoito ja tieto","https://www.mielenterveystalo.fi"]};
+const BIZ={
+  nyky:"🔬 Tutkittu tieto = luottamus. Luottamus myy KAMI+:aa ja ammattilaisten ajanvarauksia.",
+  vanha:"📚 Vapaa alkuteksti + oma käännös = nolla lisenssikulua, ja sisältö on vain meidän.",
+  kansa:"🧶 Kansanviisaus-UGC: käyttäjät lähettävät mummon sananlaskuja → ilmaista sisältöä + yhteisö.",
+  tsemppi:"🔁 Jaetuin korttityyppi → korttikuva someen → uusia käyttäjiä ilman mainoskuluja.",
+  quiz:"🎬 Valmis Reels/TikTok-formaatti: \"Arvaatko? Useimmat menee vipuun.\" Orgaaninen kasvumoottori.",
+  help:"🛟 Ei kaupallisia mainoksia tässä aiheessa. Luottamus on tuotteen valuutta.",
+  checkin:"📈 Eilisen teon check-in tuo käyttäjän takaisin seuraavana päivänä (D1-retentio).",
+};
+const C=[
+// RAHA
+{id:"r1",top:"raha",ty:"nyky",h:"100 € kuussa. 30 vuotta. Noin 122 000 €.",s:"Korkoa korolle -laskelma",o:"Esimerkki: 100 €/kk ja 7 %:n vuosituotto kuukausittain laskettuna. Omia rahoja on 36 000 €, loput on tuottoa. Tuotto ei ole taattu, ja aika tekee raskaan työn.",t:"Laske oma lukusi: paljonko voisit siirtää säästöön palkkapäivänä?",help:"velka"},
+{id:"r2",top:"raha",ty:"kansa",h:"Säästetty euro on ansaittu euro.",s:"Kansanviisaus",o:"Säästetty euro on jo verotettu. Saadaksesi euron käteen sinun pitää ansaita se bruttona isompana.",t:"Peru yksi tilaus, jota et ole käyttänyt 30 päivään."},
+{id:"r3",top:"raha",ty:"nyky",h:"Älä osta tänään. Osta huomenna, jos yhä haluat.",s:"24 tunnin sääntö",o:"Heräteostot syntyvät tunteesta. Vuorokauden tauko antaa järjelle aikaa, ja moni halu laantuu itsestään.",t:"Laita yksi ostoskori jäähylle 24 tunniksi."},
+{id:"r4",top:"raha",ty:"vanha",v:"orig",h:"Maksa ensin itsellesi.",s:"Vanha talousperiaate",o:"Siirrä säästö palkkapäivänä automaattisesti ennen laskuja ja ostoksia. Mitä et näe, sitä et kaipaa.",t:"Tee pankkiin automaattinen siirto palkkapäivälle. Vaikka 20 €."},
+{id:"r5",top:"raha",ty:"tsemppi",h:"Kulta, sun lompakko ei oo hyväntekeväisyysjärjestö.",s:"Reality-diiva",o:"Pienet toistuvat kulut, kuten kahvit, kuljetusmaksut ja tilaukset, kasvavat isoiksi. 4 € päivässä on noin 1 460 € vuodessa.",t:"Etsi tiliotteen viimeisistä 30 päivästä suurin pikkukulujen ryöstäjä."},
+// MIELI
+{id:"m1",top:"mieli",ty:"nyky",h:"Nimeä tunne, niin se hiljenee.",s:"Tunteiden nimeämisen aivotutkimus",o:"Kun tunteen sanoo sanoiksi (\"olen turhautunut\"), aivojen pelkoalueen aktivaatio on tutkimuksissa laskenut. Sana luo etäisyyttä tunteeseen.",t:"Kirjoita yksi sana: mitä tunnet juuri nyt?",help:"mieli"},
+{id:"m2",top:"mieli",ty:"vanha",v:"orig",h:"Ensimmäinen nuoli sattuu. Toisen ammut itse.",s:"Buddhalainen vertaus kahdesta nuolesta",o:"Kipu on ensimmäinen nuoli. Oma tarinamme kivusta (\"aina minä\", \"olen surkea\") on toinen. Toista nuolta ei ole pakko ampua.",t:"Kirjoita kaksi riviä: mitä tapahtui ja mitä kerroin itselleni siitä.",help:"mieli"},
+{id:"m3",top:"mieli",ty:"vanha",v:"para",h:"Jotkin asiat ovat vallassasi. Useimmat eivät.",s:"Epiktetos, Käsikirja 1",o:"Stoalaisten perustyökalu on jakaa huolet kahteen pinoon ja käyttää energiaa vain ensimmäiseen. Epiktetos syntyi orjaksi, ja hän tiesi, mistä puhui.",t:"Jaa paperi kahtia: voin vaikuttaa / en voi vaikuttaa.",help:"mieli"},
+{id:"m4",top:"mieli",ty:"kansa",h:"Aamu on iltaa viisaampi.",s:"Suomalainen sananlasku",o:"Väsyneenä aivot näkevät herkemmin uhkia ja mustavalkoisuutta. Iso päätös kannattaa nukkua yön yli.",t:"Siirrä tämän illan isoin päätös aamuun ja kirjoita se muistiin.",help:"mieli"},
+{id:"m5",top:"mieli",ty:"tsemppi",h:"Sulla on ollut se koko ajan. Mä vaan osoitin sen.",s:"Elokuvien mentori-arkkityyppi",o:"Itsemyötätunto ei ole löysäilyä. Tutkimuksissa se on lisännyt halua yrittää uudestaan epäonnistumisen jälkeen.",t:"Puhu itsellesi kuin parhaalle kaverille. Kirjoita siitä yksi lause.",help:"mieli"},
+{id:"m6",top:"mieli",ty:"kansa",h:"Kaadu seitsemän kertaa, nouse kahdeksan.",s:"Japanilainen sananlasku · Daruma",o:"Daruma-nukke nousee aina pystyyn. Japanissa siihen maalataan toinen silmä vasta, kun tavoite on saavutettu.",t:"Nimeä yksi asia, jossa nouset vielä kerran tänään.",help:"mieli"},
+// KEHO
+{id:"k1",top:"keho",ty:"nyky",h:"10 minuutin kävely ruoan jälkeen.",s:"Liikuntatutkimus",o:"Jo lyhyt kävely aterian jälkeen auttaa tasaamaan verensokerin nousua. Ei tarvita salia eikä varusteita.",t:"Kävele 10 minuuttia seuraavan aterian jälkeen."},
+{id:"k2",top:"keho",ty:"tsemppi",h:"Erä 15. Kädet painaa. Nouset silti.",s:"Underdog-nyrkkeilijä",o:"Liikunnassa vaikeinta on aloittaa. Kun treenivaatteet ovat päällä, puolet työstä on tehty.",t:"10 kyykkyä nyt. Montaasimusiikki päässä."},
+{id:"k3",top:"keho",ty:"vanha",v:"para",h:"Terve mieli terveessä ruumiissa.",s:"Juvenalis, Satiirit 10",o:"Alun perin rukous: pyydä tervettä mieltä terveeseen ruumiiseen. Nykytutkimuksen mukaan liikunta on yksi tehokkaimmista mielialan tukijoista.",t:"Tee kaksi minuuttia mitä tahansa liikettä, joka nostaa sykettä."},
+{id:"k4",top:"keho",ty:"vanha",v:"orig",h:"Kylmä vesi pesee pois päivän.",s:"Misogi, shinton puhdistautumisriitti",o:"Misogissa seistään kylmän veden alla mieli nollaten. Arkiversio: kylmää vettä kasvoille. Se herättää ja virkistää.",t:"Kylmää vettä kasvoille ja ranteille ja kolme syvää hengitystä. Kuuntele kehoasi."},
+{id:"k5",top:"keho",ty:"nyky",h:"Älä sitoudu treeniin. Sitoudu kahteen minuuttiin.",s:"Tapojen muodostumisen tutkimus",o:"Tapa syntyy toistosta, ei tehosta. Niin pieni aloitus, ettei sitä voi ohittaa, rakentaa identiteettiä: olen ihminen, joka liikkuu.",t:"Valitse kahden minuutin versio: 5 punnerrusta tai kierros korttelin ympäri."},
+// IRTI
+{id:"i1",top:"irti",ty:"nyky",h:"Himo on aalto. Se nousee ja laskee.",s:"Mielihalun surffaus",o:"Mielihalu laantuu usein kymmenissä minuuteissa, jos sitä ei ruoki. Huomaa aalto, hengitä ja odota. Joka kerta aalto pienenee.",t:"Kun himo tulee, laita 20 minuutin ajastin ja juo lasi vettä.",help:"paihde"},
+{id:"i2",top:"irti",ty:"nyky",h:"Alkoholi nukuttaa, mutta varastaa unen.",s:"Unitutkimus",o:"Alkoholi voi auttaa nukahtamaan, mutta se heikentää unen laatua ja varsinkin REM-unta. Aamulla olo on väsyneempi kuin luulit.",t:"Pidä tänään alkoholiton ilta ja katso huomenna, miten nukuit.",help:"paihde"},
+{id:"i3",top:"irti",ty:"kansa",h:"Ei kysyvä tieltä eksy.",s:"Suomalainen sananlasku",o:"Avun pyytäminen on taito. Moni päihde- tai peliongelma helpottaa, kun sen sanoo ääneen yhdelle ihmiselle tai ammattilaiselle.",t:"Kerro yhdelle ihmiselle, mitä yrität vähentää.",help:"paihde"},
+{id:"i4",top:"irti",ty:"tsemppi",h:"Eka viikko on traileri. Kuukausi on koko leffa.",s:"Leffa-arkkityyppi",o:"Taukokuukauden, kuten tipattoman tammikuun, aikana moni huomaa parempaa unta, enemmän energiaa ja säästöjä jo muutamassa viikossa.",t:"Merkitse kalenteriin 30 päivän tauko ja laske, paljonko säästät.",help:"paihde"},
+{id:"i5",top:"irti",ty:"nyky",h:"Puhelin harmaaksi. Koukku löystyy.",s:"Ruutuajan tutkimus",o:"Värit ovat osa sovellusten koukkua. Monella harmaasävytila vähentää ruutuaikaa. Ja kyllä, siksi KAMIkin loppuu seitsemään korttiin.",t:"Laita puhelin harmaasävytilaan tunniksi."},
+{id:"i6",top:"irti",ty:"kansa",h:"Talo voittaa aina.",s:"Kasinoviisaus",o:"Rahapelit on rakennettu niin, että pelaaja häviää pitkällä aikavälillä. Läheltä piti -tilanteet on suunniteltu tuntumaan melkein voitoilta.",t:"Laske viimeisen kuukauden pelikulut yhteen.",help:"peli"},
+// SUHTEET
+{id:"s1",top:"suhteet",ty:"nyky",h:"Viisi hyvää jokaista huonoa kohden.",s:"Parisuhdetutkimus (Gottman)",o:"Kestävissä suhteissa myönteisiä hetkiä on riidankin aikana selvästi enemmän kuin kielteisiä, noin viisi yhtä kohden.",t:"Anna tänään läheiselle viisi pientä kiitosta tai kehua."},
+{id:"s2",top:"suhteet",ty:"vanha",v:"orig",h:"Kuuntele niin, että toinen tuntee tulleensa kuulluksi.",s:"Kannon, myötätunnon bodhisattva",o:"Kannon \"kuulee maailman huudot\", ja hänet kuvataan usein monikätisenä auttajana. Keskeyttämätön kuuntelu on suurimpia lahjoja.",t:"Kuuntele tänään yhtä ihmistä viisi minuuttia keskeyttämättä."},
+{id:"s3",top:"suhteet",ty:"kansa",h:"Oma maa mansikka, muu maa mustikka.",s:"Suomalainen sananlasku",o:"Kotiin ja omiin ihmisiin tottuu. Arvostus kasvaa, kun sen sanoo ääneen.",t:"Lähetä yhdelle läheiselle viesti siitä, miksi hän on tärkeä."},
+{id:"s4",top:"suhteet",ty:"tsemppi",h:"Juokse portille. Sano se nyt.",s:"Romcomin lentokenttäjuoksu",o:"Ihmiset aliarvioivat, kuinka paljon kiitosviesti ilahduttaa saajaansa. Näin on havaittu kiitoskirjeitä koskevissa tutkimuksissa.",t:"Kirjoita kolmen rivin kiitosviesti ja lähetä se."},
+// URA
+{id:"u1",top:"ura",ty:"nyky",h:"Työ venyy täyttämään sille annetun ajan.",s:"Parkinsonin laki (1955)",o:"Jos tehtävälle antaa tunnin, se vie tunnin. Lyhyt ja tiukka aikaraja pakottaa keskittymään olennaiseen.",t:"Puolita seuraavan tehtävän aika ja laita ajastin päälle."},
+{id:"u2",top:"ura",ty:"vanha",v:"para",h:"Ei ole myötätuulta sille, joka ei tiedä satamaansa.",s:"Seneca, Kirje 71",o:"Ilman päämäärää jokainen tuuli on väärä. Kun suunta on selvä, päätökset helpottuvat.",t:"Kirjoita yhdellä lauseella, mihin satamaan purjehdit tänä vuonna."},
+{id:"u3",top:"ura",ty:"vanha",v:"orig",h:"Kettu ei kilpaile jyvästä. Se vartioi peltoa.",s:"Inari, shinton sadon ja kaupan kami",o:"Inarin viestintuojat ovat kettuja. Bisneksessä tämä tarkoittaa, että hinnoittelet arvon ja sadon, et yksittäisiä tunteja.",t:"Kysy yhdeltä asiakkaalta: miltä onnistunut vuosi näyttää teille?"},
+{id:"u4",top:"ura",ty:"kansa",h:"Joka kuuseen kurkottaa, se katajaan kapsahtaa.",s:"Suomalainen sananlasku",o:"Iso tavoite toimii, kun seuraava askel on pieni. Kurota kuuseen yksi oksa kerrallaan.",t:"Pilko iso tavoite: mikä on seuraava 30 minuutin askel?"},
+{id:"u5",top:"ura",ty:"tsemppi",h:"Oikea kakkonen, pitkä, älä nosta!",s:"Rallikartturi",o:"Kun suunnittelet huomisen jo illalla, aamu vapautuu tekemiseen. Päätökset on silloin jo tehty.",t:"Kirjoita huomisen kolme tärkeintä tehtävää jo tänään."},
+{id:"u6",top:"ura",ty:"nyky",h:"Kiireellinen ei ole sama kuin tärkeä.",s:"Eisenhowerin matriisi",o:"Tärkeät mutta ei kiireelliset asiat, kuten terveys, oppiminen ja ihmissuhteet, jäävät kiireen jalkoihin, ellei niille varaa aikaa.",t:"Varaa kalenteriin 30 minuuttia tärkeälle asialle, joka ei ole kiireellinen."},
+// UNI
+{id:"n1",top:"uni",ty:"nyky",h:"Kahvin puoliintumisaika on noin 5 tuntia.",s:"Unitutkimus",o:"Iltapäivällä juotua kahvia on yhä veressä nukkumaan mennessä. Kofeiini voi vähentää syvää unta, vaikka nukahtaisitkin.",t:"Juo päivän viimeinen kahvi tänään ennen kahta."},
+{id:"n2",top:"uni",ty:"nyky",h:"Sama heräämisaika. Myös lauantaina.",s:"Unen säännöllisyys",o:"Säännöllinen heräämisaika vakauttaa sisäistä kelloa, ja silloin myös nukahtaminen helpottuu.",t:"Aseta koko viikolle herätys samaan aikaan."},
+{id:"n3",top:"uni",ty:"vanha",v:"orig",h:"Talviuni ei ole laiskuutta. Se on strategia.",s:"Karhu, Suomen kansalliseläin",o:"Talviunessa karhun sydän hidastuu, ja keväällä se herää täysissä voimissa. Lepo on osa suoritusta.",t:"Ole tänä iltana tunti ilman ruutua ennen nukkumaanmenoa."},
+{id:"n4",top:"uni",ty:"kansa",h:"Hiljaa hyvä tulee.",s:"Suomalainen sananlasku",o:"Iltarutiini on signaali aivoille. Kun järjestys on joka ilta sama (valot himmeälle, suihku, kirja), nukahtaminen helpottuu.",t:"Himmennä valot tuntia ennen nukkumaanmenoa."},
+];
+const QUIZ=[
+{id:"q1",q:"Hulluutta on tehdä sama asia uudelleen ja odottaa eri tulosta.",who:"Albert Einstein",real:false,x:"Lausetta ei löydy Einsteinin teksteistä. Se esiintyy 1980-luvun toipumiskirjallisuudessa ja liitettiin Einsteiniin myöhemmin."},
+{id:"q2",q:"Ei ole myötätuulta sille, joka ei tiedä, mihin satamaan purjehtii.",who:"Seneca",real:true,x:"Aito. Senecan kirjeet Luciliukselle, kirje 71. (Oma käännös latinasta.)"},
+{id:"q3",q:"Ole itse se muutos, jonka haluat nähdä maailmassa.",who:"Mahatma Gandhi",real:false,x:"Gandhi kirjoitti samansuuntaisesti, mutta tätä tiivistä muotoa ei löydy hänen teksteistään. Se on myöhempi tiivistelmä."},
+{id:"q4",q:"Tuhannen mailin matka alkaa yhdestä askeleesta.",who:"Laozi",real:true,x:"Aito. Tao Te Ching, luku 64. Alkuteksti sanoo tarkemmin, että matka alkaa jalkojen alta."},
+{id:"q5",q:"Vihan pitäminen on kuin tarttuisi kuumaan hiileen aikeenaan heittää se toiseen.",who:"Buddha",real:false,x:"Lausetta ei löydy Buddhan puheista. Ajatus muistuttaa myöhempää buddhalaista kommentaarikirjallisuutta, mutta tämä muoto on moderni."},
+{id:"q6",q:"Kaadu seitsemän kertaa, nouse kahdeksan.",who:"Japanilainen sananlasku",real:true,x:"Aito: nana korobi ya oki. Se liittyy daruma-nukkeen, joka nousee aina pystyyn."},
+{id:"q7",q:"Joskus sikari on vain sikari.",who:"Sigmund Freud",real:false,x:"Ei ole näyttöä siitä, että Freud olisi sanonut näin. Lausahdus ilmestyy painettuna vasta hänen kuolemansa jälkeen."},
+{id:"q8",q:"Ei vahvin laji selviydy, vaan se, joka sopeutuu muutokseen parhaiten.",who:"Charles Darwin",real:false,x:"Ei Darwinin. Liiketalouden professori Leon Megginson tiivisti Darwinin ajatuksen näin 1960-luvulla."},
+{id:"q9",q:"Samaan jokeen ei voi astua kahdesti.",who:"Herakleitos",real:true,x:"Aito ajatus, mutta Platonin välittämänä. Herakleitoksen omista teksteistä on säilynyt vain katkelmia."},
+];
+const PARTNER={
+ raha:{av:"👩‍💼",who:"Laura, talousvalmentaja",cred:"DEMO · ei sijoitusneuvontaa",h:"Kolmen tilin malli: käyttö, laskut ja säästö.",o:"Kun säästötili on eri pankissa, siihen ei tule koskettua ohimennen. Automaattinen siirto palkkapäivänä hoitaa loput.",cta:"Varaa 15 min maksuton budjettisparraus",biz:"💶 Ammattilaisen ovi: valmentaja maksaa vain varatusta tapaamisesta, noin 15–30 € per liidi. Konteksti valitsee kumppanin, ei käyttäjäprofiili."},
+ mieli:{av:"🧑‍⚕️",who:"Sanna, psykologi",cred:"DEMO · laillistus tarkistetaan Valviran rekisteristä",h:"Huolihetki: 15 minuuttia päivässä murehtimiselle.",o:"Kirjaa huoli ylös heti kun se tulee, ja siirrä se huolihetkeen. Huolien lykkääminen on tutkittu kognitiivisen terapian menetelmä.",cta:"Varaa 15 min tutustumisaika",biz:"🛡️ Mieli-aiheessa näytetään vain laillistettuja ammattilaisia. Ei tavallisia mainoksia eikä terveystietoihin perustuvaa kohdennusta."},
+ keho:{av:"🏋️",who:"Mikko, personal trainer",cred:"DEMO",h:"Istumatyön ryhti korjaantuu kolmella liikkeellä.",o:"Rintarangan kierto, lonkankoukistajan venytys ja lapojen puristus. Kaksi minuuttia, kahdesti päivässä.",cta:"Kokeile 20 min etätreeniä",biz:"💶 Liidi tai provisio. Personal trainerit saavat jakelun, ja käyttäjä saa ilmaisen vinkin."},
+ suhteet:{av:"🤝",who:"Pari- ja perheterapeutti",cred:"DEMO",h:"Riidan sääntö: \"minä\"-viestit \"sinä aina\" -syytösten sijaan.",o:"\"Minä jäin yksin\" avaa keskustelun, \"sinä et koskaan\" sulkee sen. Pieni muutos laskee puolustusreaktiota.",cta:"Varaa tutustumisaika",biz:"💶 Ammattilaisen ovi: tilausmaksu tai liidikohtainen hinta."},
+ ura:{av:"🧭",who:"Aino, urakoutsi",cred:"DEMO",h:"Palkkaneuvottelussa ensimmäinen luku ankkuroi.",o:"Selvitä alan palkkataso ennen kuin sanot numeron. Sano ensin vaihteluväli ja perustelu, sitten pysy hiljaa.",cta:"Varaa CV- ja palkkasparraus",biz:"💶 Liidi 20–40 €. Uran ja rahan aiheissa liidien arvo on korkein."},
+ uni:{av:"😴",who:"Unikoutsi",cred:"DEMO",h:"Makuuhuone viileäksi, ruutu ulos.",o:"Monella nukahtaminen helpottuu, kun huoneen lämpö on noin 18 astetta ja puhelin latautuu toisessa huoneessa.",cta:"Tee kahden minuutin unitesti",biz:"💶 Kumppanikortti tai sponsoroitu unihaaste (esim. vakuutusyhtiö)."},
+};
+const ADJ={vanha:"Muinaisviisas",nyky:"Tutkiva",kansa:"Kansanviisas",tsemppi:"Hypetetty"};
+const NOUN={raha:"säästäjä",mieli:"mielenkesyttäjä",keho:"liikkuja",irti:"vapautuja",suhteet:"sydänystävä",ura:"strategi",uni:"unimestari"};
+
+/* ---------- state ---------- */
+const KEY="kami-v2";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function dayStr(off=0){const d=new Date();d.setDate(d.getDate()+off);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fresh(){return {on:false,topics:["raha","mieli","keho","uni"],vibe:"mix",w:{},likes:[],seen:{},tekos:[],streak:0,lastTeko:"",day:"",deck:[],pos:0,bonusDay:"",plusDay:"",lens:false,quiz:{ok:0,n:0},answered:{}}}
+let S=fresh();
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s)S=Object.assign(fresh(),s)}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),1700)}
+
+/* ---------- deck building ---------- */
+function allowedType(ty){return S.vibe==="viisas"?ty!=="tsemppi":true}
+function typeBoost(ty){return S.vibe==="tsemppi"?({tsemppi:3,kansa:1.5,nyky:1,vanha:.6})[ty]:1}
+function wOf(top){return S.w[top]??3}
+function pickCards(n,exclude){
+  let pool=C.filter(c=>S.topics.includes(c.top)&&allowedType(c.ty)&&!exclude.has(c.id));
+  let fresh=pool.filter(c=>!S.seen[c.id]);
+  if(fresh.length<n){pool.forEach(c=>delete S.seen[c.id]);fresh=pool}
+  const out=[];let last="";
+  while(out.length<n&&fresh.length){
+    const scored=fresh.map(c=>({c,s:wOf(c.top)*typeBoost(c.ty)*(c.top===last?.35:1)*(0.4+Math.random())})).sort((a,b)=>b.s-a.s);
+    const c=scored[0].c;out.push(c.id);last=c.top;fresh=fresh.filter(x=>x!==c);
+  }
+  return out;
 }
-function fly(dir,cb){const el=document.querySelector(".card.top");if(!el){cb();return}
-  const m={R:"translate(140%,0) rotate(24deg)",L:"translate(-140%,0) rotate(-24deg)"}[dir];
-  el.style.transform=m; el.style.opacity=0; setTimeout(cb,260);}
-function act(dir){
-  if(!cur) return;
-  const mult=cur.boss?2:1;
-  if(dir==="R"){
-    S.pieces.push({t:cur.t,w:cur.w,a:cur.a,e:cur.e}); S.saved.unshift({t:cur.t,q:cur.q,e:cur.e,path:S.path,day:today()}); S.saved=S.saved.slice(0,60); S.skips=0;
-    addXp(10*mult); toast(`🧩 +1 · +${10*mult} XP`); if(S.path==="fun") boom();
-    fly("R",()=>{ if(S.pieces.length>=4) puzzle(); else nextCard(); });
-  } else if(dir==="L"){
-    S.skips++; if(S.skips>=3){S.streak=Math.max(1,S.streak);} save(); fly("L",nextCard);
-  } else if(dir==="U"){
-    const el=document.querySelector(".card.top"); el.style.transform=""; flipped=!flipped; el.classList.toggle("flipped",flipped);
-    if(!deepened){deepened=true; addXp(5*mult); toast(`⬆️ +${5*mult} XP`)}
-  } else if(dir==="D"){
-    const el=document.querySelector(".card.top"); el.style.transform=""; teko();
+function topTopic(){const ts=S.topics.filter(t=>PARTNER[t]);if(!ts.length)return null;return ts.sort((a,b)=>wOf(b)-wOf(a))[0]}
+function buildDay(){
+  const deck=[];const ex=new Set();
+  const pend=S.tekos.find(t=>!t.done&&t.day<dayStr()&&!t.asked);
+  if(pend){deck.push("chk:"+pend.id);pend.asked=true}
+  const cs=pickCards(5,ex);cs.forEach(id=>ex.add(id));
+  const q=QUIZ.find(q=>!S.answered[q.id])||QUIZ[Math.floor(Math.random()*QUIZ.length)];
+  const tp=topTopic();const p=tp?"p:"+tp:null;
+  deck.push(cs[0],cs[1],"q:"+q.id,cs[2],p,cs[3],cs[4]);
+  S.deck=deck.filter(Boolean);S.pos=0;S.day=dayStr();save();
+}
+function addCards(n){const ex=new Set(S.deck);const cs=pickCards(n,ex);S.deck.push(...cs);save()}
+
+/* ---------- render ---------- */
+function prog(){const p=$("prog");if(!S.on||!S.deck.length){p.innerHTML="";return}
+  p.innerHTML=S.deck.map((_,i)=>`<i class="${i<S.pos?"done":i===S.pos?"now":""}"></i>`).join("");}
+function hud(){$("streak").textContent="🔥 "+S.streak;$("lensBtn").setAttribute("aria-pressed",String(S.lens));document.body.classList.toggle("lens",S.lens);prog()}
+function resolve(key){
+  if(key.startsWith("q:")) return {kind:"quiz",...QUIZ.find(q=>q.id===key.slice(2))};
+  if(key.startsWith("p:")) {const t=key.slice(2);return {kind:"partner",top:t,id:key,...PARTNER[t]}}
+  if(key.startsWith("chk:")) {const t=S.tekos.find(x=>x.id===key.slice(4));return t?{kind:"checkin",id:key,teko:t}:null}
+  return {kind:"card",...C.find(c=>c.id===key)};
+}
+const rail=(c)=>`<div class="rail">
+  <button data-a="like" aria-pressed="${S.likes.includes(c.id)}" aria-label="Osuu"><span>❤️</span>Osuu</button>
+  <button data-a="flip" aria-label="Opi 15 sekunnissa"><span>💡</span>Opi</button>
+  <button data-a="send" aria-label="Lähetä kaverille"><span>✈️</span>Lähetä</button>
+  <button data-a="img" aria-label="Tee kortista kuva"><span>🖼️</span>Kuva</button></div>`;
+const stamps=(r,l)=>`<div class="stamp r">${r}</div><div class="stamp l">${l}</div><div class="stamp u">SEURAAVA</div>`;
+function helpHTML(c){
+  let h="";
+  if(c.help){const x=HELP[c.help];h+=`<a class="help" href="${x[2]}" target="_blank" rel="noopener"><span style="font-size:22px">🛟</span><span><b>${x[0]}</b><small>${x[1]} · ammattilaisen ovi</small></span></a>`}
+  if(c.top==="mieli") h+=`<p class="rights">Hätätilanteessa 112 · Kriisipuhelin 09 2525 0111</p>`;
+  return h;
+}
+function cardHTML(c){
+  if(c.kind==="card"){
+    const v=VER[c.v||({nyky:"nyky",kansa:"kansa",tsemppi:"tsemppi",vanha:"orig"})[c.ty]];
+    return `<article class="card t-${c.top} ty-${c.ty}" data-kind="card">${stamps("OSUU","OHI")}
+      <div class="face front">
+        <div class="ctop"><span>${TOP[c.top][0]} ${TOP[c.top][1]}</span><span class="ty">${TYPE[c.ty][0]} ${TYPE[c.ty][1]}</span></div>
+        <div class="mid"><h2 class="hook">${esc(c.h)}</h2><p class="src"><b>—</b>${esc(c.s)}</p></div>
+        <p class="biz">${c.help?BIZ.help:BIZ[c.ty]}</p>
+        <div class="tap"><kbd>napauta</kbd> opi 15 s + teko</div>
+      </div>
+      <div class="face back">
+        <p class="lbl">💡 Opi 15 sekunnissa</p><p class="learn">${esc(c.o)}</p>
+        <p class="lbl">⚡ Teko · 2 min</p><p class="teko">${esc(c.t)}</p>
+        <div class="row"><button class="b acc" data-a="done">✅ Tein</button><button class="b ghost" data-a="later">📌 Muistuta huomenna</button></div>
+        ${helpHTML(c)}
+        <p class="rights">${v} · ${esc(c.s)}</p>
+        <p class="biz">${BIZ.checkin}</p>
+      </div>${rail(c)}</article>`;
+  }
+  if(c.kind==="quiz"){
+    return `<article class="card t-quiz" data-kind="quiz">${stamps("AITO","FEIKKI")}
+      <div class="face front" style="padding-right:20px">
+        <div class="ctop"><span>🕵️ Tosi vai feikki?</span><span class="ty">Arvaa</span></div>
+        <div class="mid"><p class="quote">“${esc(c.q)}”</p><p class="claim">Netin mukaan sanoi: <b>${esc(c.who)}</b></p></div>
+        <p class="biz">${BIZ.quiz}</p>
+        <div class="duel"><button class="b fake" data-a="fake">👈 Feikki</button><button class="b real" data-a="real">Aito 👉</button></div>
+      </div>
+      <div class="face back" id="verdict"></div></article>`;
+  }
+  if(c.kind==="partner"){
+    return `<article class="card t-partner" data-kind="partner">${stamps("OSUU","OHI")}
+      <div class="face front">
+        <div class="ctop"><span>${TOP[c.top][0]} ${TOP[c.top][1]}</span><span class="ty">🤝 Kumppani · mainos</span></div>
+        <div class="mid">
+          <div class="pro"><span class="av">${c.av}</span><span><b>${esc(c.who)}</b><small>${esc(c.cred)}</small></span></div>
+          <h2 class="hook" style="font-size:clamp(26px,7.4vw,36px)">${esc(c.h)}</h2>
+        </div>
+        <p class="biz">${c.biz}</p>
+        <div class="row"><button class="b" data-a="cta">${esc(c.cta)} →</button></div>
+        <div class="tap"><kbd>napauta</kbd> lue vinkki</div>
+      </div>
+      <div class="face back">
+        <p class="lbl">💡 Ammattilaisen vinkki</p><p class="learn">${esc(c.o)}</p>
+        <div class="row"><button class="b" data-a="cta">${esc(c.cta)} →</button></div>
+        <p class="rights">Merkitty mainokseksi (kuluttajansuojalaki 2:4 §). Kumppani valitaan kortin aiheen perusteella. Swipe- tai terveystietojasi ei luovuteta.</p>
+      </div>${rail(c)}</article>`;
+  }
+  if(c.kind==="checkin"){
+    return `<article class="card t-${c.teko.top}" data-kind="checkin">${stamps("TEIN","EN")}
+      <div class="face front" style="padding-right:20px">
+        <div class="ctop"><span>📌 Eilinen lupaus</span></div>
+        <div class="mid"><p class="lbl">Eilen sanoit tekeväsi:</p><h2 class="hook" style="font-size:clamp(26px,7.4vw,36px)">${esc(c.teko.t)}</h2></div>
+        <p class="biz">${BIZ.checkin}</p>
+        <div class="duel"><button class="b fake" data-a="chkno">👈 En ehtinyt</button><button class="b real" data-a="chkyes">Tein 👉</button></div>
+      </div></article>`;
   }
 }
-function boom(){const em=["💥","⭐","🔥","🥊","✨"];for(let i=0;i<14;i++){const s=document.createElement("span");s.className="boom";s.textContent=em[i%em.length];
-  s.style.left=(innerWidth/2)+"px";s.style.top=(innerHeight/2)+"px";s.style.setProperty("--x",(Math.random()*300-150)+"px");s.style.setProperty("--y",(Math.random()*-300-40)+"px");s.style.setProperty("--r",(Math.random()*360)+"deg");
-  document.body.appendChild(s);setTimeout(()=>s.remove(),950)}}
-
-/* sheets */
-function sheet(html,onMount){const h=$("sheetHost");h.innerHTML=`<div class="veil"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;
-  const v=h.firstChild; v.addEventListener("click",e=>{if(e.target===v)close()}); onMount&&onMount(v); const f=v.querySelector("button,input");f&&f.focus();}
-function close(){$("sheetHost").innerHTML=""}
-function teko(){
-  const c=cur, mult=c.boss?2:1;
-  sheet(`<h2>⬇️ Teko nyt</h2><p style="font-size:18px">${esc(c.a)}</p><p style="color:var(--muted);font-size:13px">Kesto noin 2 minuuttia. Kehotehtävissä kuuntele kehoasi, ja jos sattuu, lopeta.</p>
-    <div class="btns"><button class="btn" id="done">✅ Tehty (+${20*mult} XP)</button><button class="btn ghost" id="later">⏭️ Myöhemmin</button></div>`,v=>{
-    v.querySelector("#done").onclick=()=>{close();addXp(20*mult);toast(`✅ +${20*mult} XP`);if(S.path==="fun")boom();fly("R",nextCard)};
-    v.querySelector("#later").onclick=close;});
+let cur=null,flipped=false;
+function show(){
+  hud();
+  if(S.pos>=S.deck.length){endScreen();return}
+  cur=resolve(S.deck[S.pos]);flipped=false;
+  if(!cur||(cur.kind==="card"&&!cur.id)){S.pos++;return show()}
+  if(cur.kind==="card"){S.seen[cur.id]=S.day}
+  $("hint").hidden=false;
+  $("stage").innerHTML=cardHTML(cur);
+  const el=$("stage").querySelector(".card");
+  el.classList.add("enter");requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.remove("enter")));
+  bind(el);save();
 }
-function puzzle(){
-  const p=S.pieces.slice(0,4);
-  sheet(`<h2>🧩 Palapeli valmis!</h2>
-    <div class="puzzle">${p.map(x=>`<div class="piece"><span>${x.e} ${esc(x.t)}</span><b>${esc(x.w)}</b></div>`).join("")}</div>
-    <p><b>Kuvasi:</b> ${p.map(x=>esc(x.w)).join(" + ")}</p>
-    <p><b>🎯 Teko 24 tunnin sisällä:</b> ${esc(p[p.length-1].a)}</p>
-    <label for="principle" style="font-weight:700">📜 Kirjoita oma periaatteesi (enintään 12 sanaa)</label>
-    <input class="field" id="principle" maxlength="120" placeholder="esim. ${esc(p[0].w)} ensin, sitten ${esc(p[1].w.toLowerCase())}.">
-    <div class="btns"><button class="btn" id="keep">Tallenna (+50 XP)</button><button class="btn ghost" id="img">🖼️ Tee palapelistä kuva</button></div>`,v=>{
-    v.querySelector("#keep").onclick=()=>{const t=v.querySelector("#principle").value.trim()||p.map(x=>x.w).join(" + ");
-      S.principles.unshift({t,day:today(),w:p.map(x=>x.w)}); S.pieces=[]; addXp(50); close(); toast("📜 Periaate tallennettu"); nextCard();};
-    v.querySelector("#img").onclick=()=>shareImg({t:"Palapelini",q:(v.querySelector("#principle").value.trim()||p.map(x=>x.w).join(" + ")),e:"🧩",s:S.path==="wis"?"kami":"leffa"});});
-}
-function collection(){
-  const pr=S.principles.map(x=>`<div>📜 <b>${esc(x.t)}</b><br><small style="color:var(--muted)">${esc(x.w.join(" · "))} · ${x.day}</small></div>`).join("")||"<div>Ei vielä periaatteita. Kerää neljä palaa.</div>";
-  const sv=S.saved.slice(0,25).map(x=>`<div>${x.e} <b>${esc(x.t)}</b>: ${esc(x.q)}</div>`).join("")||"<div>Swipeä 👉, niin kortit tallentuvat tänne.</div>";
-  sheet(`<h2>📚 Kokoelma</h2><p style="color:var(--muted);font-size:13px">Tallessa vain tässä selaimessa.</p>
-    <h3 style="margin:0">Periaatteet</h3><div class="list">${pr}</div>
-    <h3 style="margin:0">Osuneet kortit</h3><div class="list">${sv}</div>
-    <div class="btns"><button class="btn" id="cl">Sulje</button><button class="btn ghost" id="reset">Nollaa kaikki</button></div>`,v=>{
-    v.querySelector("#cl").onclick=close;
-    v.querySelector("#reset").onclick=e=>{if(e.target.dataset.sure){S=fresh();save();close();goHome()}else{e.target.dataset.sure=1;e.target.textContent="Varmasti? Paina uudestaan"}};});
+function advance(dir){
+  const el=$("stage").querySelector(".card");
+  const tr={up:"translateY(-110%)",right:"translateX(130%) rotate(18deg)",left:"translateX(-130%) rotate(-18deg)"}[dir];
+  if(el){el.style.transform=tr;el.style.opacity=".2"}
+  S.pos++;save();setTimeout(show,260);
 }
 
-/* share as image */
-function wrap(ctx,text,x,y,maxW,lh){const words=text.split(" ");let line="",lines=[];for(const w of words){const t=line?line+" "+w:w;if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w}else line=t}lines.push(line);lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lh));return y+lines.length*lh}
-async function shareImg(c){
-  c=c||cur; const W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;const x=cv.getContext("2d");
-  try{await document.fonts.ready}catch(e){}
-  const fun=S.path==="fun";
-  if(fun){x.fillStyle="#1B1440";x.fillRect(0,0,W,H);const g=x.createRadialGradient(W,0,50,W,0,900);g.addColorStop(0,"rgba(255,61,110,.6)");g.addColorStop(1,"rgba(255,61,110,0)");x.fillStyle=g;x.fillRect(0,0,W,H);}
-  else{x.fillStyle="#F4F5F0";x.fillRect(0,0,W,H);x.fillStyle="#24406E";x.fillRect(0,0,W,22);x.fillStyle="#C23F2A";x.fillRect(90,330,8,360);}
-  x.textBaseline="top";
-  x.font="140px serif";x.fillText(c.e,90,100);
-  x.fillStyle=fun?"#FFD23F":"#24406E";x.font=fun?'64px "Dela Gothic One"':'700 64px "Shippori Mincho"';
-  wrap(x,fun?c.t.toUpperCase():c.t,90,260,900,74);
-  x.fillStyle=fun?"#FFF8E6":"#16201B";x.font=fun?'70px "Dela Gothic One"':'500 72px "Shippori Mincho"';
-  const y=wrap(x,c.q,fun?90:130,360,fun?900:860,fun?92:98);
-  if(c.k){x.font='500 38px "Zen Kaku Gothic New"';x.fillStyle=fun?"#FFD23F":"#52683A";wrap(x,"→ "+c.k,90,Math.min(y+50,1080),900,50)}
-  x.font='700 34px "Zen Kaku Gothic New"';x.fillStyle=fun?"#FF3D6E":"#C23F2A";x.fillText("神 KAMI · "+(fun?"TSEMPPI":"VIISAUS"),90,H-110);
-  x.fillStyle=fun?"rgba(255,248,230,.6)":"rgba(22,32,27,.55)";x.font='28px "Zen Kaku Gothic New"';x.fillText(SRC[c.s]||"",90,H-60);
-  let url; try{url=cv.toDataURL("image/png")}catch(e){toast("Kuvan teko epäonnistui");return}
-  sheet(`<h2>🖼️ Korttikuva</h2><img class="shareimg" src="${url}" alt="Korttikuva: ${esc(c.t)}"><p style="font-size:13px;color:var(--muted)">Puhelimessa: pidä kuvaa pohjassa ja tallenna. Tietokoneella: oikea klikkaus ja Tallenna kuva. Sopii Instagramin pystykuvaksi (4:5).</p><div class="btns"><button class="btn" id="cl">Sulje</button></div>`,v=>v.querySelector("#cl").onclick=close);
+/* ---------- gestures ---------- */
+function bind(el){
+  let sx=0,sy=0,dx=0,dy=0,on=false;
+  const st={r:el.querySelector(".stamp.r"),l:el.querySelector(".stamp.l"),u:el.querySelector(".stamp.u")};
+  el.addEventListener("pointerdown",e=>{if(e.target.closest("button,a,input,textarea"))return;on=true;sx=e.clientX;sy=e.clientY;dx=dy=0;el.classList.add("drag");try{el.setPointerCapture(e.pointerId)}catch(_){}});
+  el.addEventListener("pointermove",e=>{if(!on)return;dx=e.clientX-sx;dy=e.clientY-sy;const h=Math.abs(dx)>Math.abs(dy);
+    if(h){el.style.transform=`translateX(${dx}px) rotate(${dx/22}deg)`}else{el.style.transform=`translateY(${Math.min(dy,0)}px)`}
+    st.r.style.opacity=h&&dx>0?Math.min(dx/90,1):0;st.l.style.opacity=h&&dx<0?Math.min(-dx/90,1):0;st.u.style.opacity=!h&&dy<0?Math.min(-dy/90,1):0;});
+  const end=()=>{if(!on)return;on=false;el.classList.remove("drag");Object.values(st).forEach(s=>s.style.opacity=0);
+    const h=Math.abs(dx)>Math.abs(dy);
+    if(Math.abs(dx)<8&&Math.abs(dy)<8){el.style.transform="";act("flip");return}
+    if(h&&dx>90)act("right");else if(h&&dx<-90)act("left");else if(!h&&dy<-80)act("up");else el.style.transform="";};
+  el.addEventListener("pointerup",end);el.addEventListener("pointercancel",end);
+  el.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(b){e.stopPropagation();act(b.dataset.a)}});
+}
+function bump(top,d){S.w[top]=Math.max(.5,Math.min(9,wOf(top)+d))}
+function act(a){
+  if(!cur)return;
+  const k=cur.kind;
+  if(k==="quiz"){
+    const answered=!!S.answered[cur.id]&&S.answered[cur.id].day===S.day&&S.answered[cur.id].pos===S.pos;
+    if(!answered){
+      if(a==="right"||a==="real")return answerQuiz(true);
+      if(a==="left"||a==="fake")return answerQuiz(false);
+      if(a==="up"){toast("Arvaa ensin: 👈 feikki vai aito 👉");resetCard();return}
+      resetCard();return;
+    }
+    if(["up","right","left","next"].includes(a))return advance(a==="next"?"up":a);
+    if(a==="img")return shareImg();
+    if(a==="send")return sendFriend();
+    return;
+  }
+  if(k==="checkin"){
+    if(a==="right"||a==="chkyes"){markTeko(cur.teko,true);toast("🔥 Lupaus pidetty!");return advance("right")}
+    if(a==="left"||a==="chkno"){toast("Ei haittaa. Tänään uusi mahdollisuus.");return advance("left")}
+    if(a==="up")return advance("up");resetCard();return;
+  }
+  switch(a){
+    case "flip":{const el=$("stage").querySelector(".card");flipped=!flipped;el.classList.toggle("flipped",flipped);if(k==="card")bump(cur.top,.25);break}
+    case "like":case "right":{
+      if(k==="card"){if(!S.likes.includes(cur.id))S.likes.unshift(cur.id);S.likes=S.likes.slice(0,300);bump(cur.top,1);toast("❤️ Lisätty Viisaus-DNA:han")}
+      else if(k==="partner"){toast("❤️ Tallennettu")}
+      if(a==="right")return advance("right");
+      const lb=$("stage").querySelector('[data-a="like"]');lb&&lb.setAttribute("aria-pressed","true");save();break}
+    case "left":{if(k==="card")bump(cur.top,-.6);return advance("left")}
+    case "up":return advance("up");
+    case "done":{const t=addTeko(cur,true);toast("🔥 Teko tehty! Putki: "+S.streak);setTimeout(()=>advance("up"),450);break}
+    case "later":{addTeko(cur,false);toast("📌 Kysyn huomenna, teitkö");setTimeout(()=>advance("up"),450);break}
+    case "send":sendFriend();break;
+    case "img":shareImg();break;
+    case "cta":ctaSheet();break;
+  }
+  save();
+}
+function resetCard(){const el=$("stage").querySelector(".card");if(el)el.style.transform=""}
+function addTeko(c,done){let t=S.tekos.find(x=>x.id===c.id&&x.day===S.day);if(!t){t={id:c.id,top:c.top,t:c.t,day:S.day,done:false};S.tekos.unshift(t);S.tekos=S.tekos.slice(0,120)}
+  if(done)markTeko(t,true);bump(c.top,1.5);save();return t}
+function markTeko(t,done){t.done=done;if(!done)return;const today=dayStr();
+  if(S.lastTeko===today)return;S.streak=S.lastTeko===dayStr(-1)?S.streak+1:1;S.lastTeko=today;hud();save()}
+function answerQuiz(saidReal){
+  const ok=saidReal===cur.real;S.answered[cur.id]={day:S.day,pos:S.pos,ok};S.quiz.n++;if(ok)S.quiz.ok++;save();
+  const el=$("stage").querySelector(".card");el.style.transform="";
+  $("verdict").innerHTML=`<div class="ctop"><span>🕵️ Tosi vai feikki?</span></div>
+    <p class="verdict" style="color:${ok?"var(--ok)":"var(--bad)"}">${ok?"OIKEIN!":"VIPUUN MENI!"}</p>
+    <p class="teko">${cur.real?"✅ AITO":"❌ FEIKKI"}: “${esc(cur.q)}”</p>
+    <p class="learn">${esc(cur.x)}</p>
+    <p class="rights">Sinun tuloksesi: ${S.quiz.ok}/${S.quiz.n} oikein</p>
+    <p class="biz">${BIZ.quiz}</p>
+    <div class="row" style="margin-top:auto"><button class="b acc" data-a="next">Seuraava ↑</button><button class="b ghost" data-a="img">🖼️ Haasta kaveri</button></div>`;
+  flipped=true;el.classList.add("flipped");
 }
 
-/* navigation */
-function goHome(){$("home").hidden=false;$("play").hidden=true;close();hud()}
-function start(path){S.path=path;save();$("home").hidden=true;$("play").hidden=false;
-  document.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.f===S.filter)));
-  buildDeck();nextCard();hud();}
-document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>start(b.dataset.go));
-document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{S.filter=b.dataset.f;save();document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));buildDeck();nextCard()});
-$("homeBtn").onclick=goHome;
-$("switchBtn").onclick=()=>start(S.path==="wis"?"fun":"wis");
-$("bR").onclick=()=>act("R");$("bL").onclick=()=>act("L");$("bU").onclick=()=>act("U");$("bD").onclick=()=>act("D");
-$("shareBtn").onclick=()=>shareImg();$("colBtn").onclick=collection;
-addEventListener("keydown",e=>{if($("sheetHost").innerHTML){if(e.key==="Escape")close();return}if($("play").hidden)return;
-  const m={ArrowRight:"R",ArrowLeft:"L",ArrowUp:"U",ArrowDown:"D"}[e.key];if(m){e.preventDefault();act(m)}});
+/* ---------- sheets ---------- */
+function sheet(html,mount){$("host").innerHTML=`<div class="veil"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;
+  const v=$("host").firstChild;v.addEventListener("click",e=>{if(e.target===v)closeSheet()});mount&&mount(v);const f=v.querySelector("button");f&&f.focus()}
+function closeSheet(){$("host").innerHTML=""}
+function ctaSheet(){
+  sheet(`<h3>🤝 Ammattilaisen ovi</h3><p>Valmiissa tuotteessa tästä avautuisi ${esc(cur.who||"ammattilaisen")} ajanvaraus. Demossa varausta ei tehdä.</p>
+    <p class="biz" style="display:block">${cur.biz||""}</p>
+    <p>Näin se toimii: kortti antaa ilmaisen vinkin, ja ammattilainen maksaa vasta toteutuneesta tapaamisesta. Kumppani valitaan kortin aiheen perusteella, joten profiiliasi ei myydä kenellekään.</p>
+    <div class="row"><button class="b" id="x">Selvä</button></div>`,v=>v.querySelector("#x").onclick=closeSheet);
+}
+function sendText(){const c=cur;if(!c)return "";const line=c.kind==="quiz"?`Tosi vai feikki? “${c.q}” – ${c.who}`:`“${c.h}” – ${c.s||c.who}`;return line+"\n\nTämä kortti on sulle. 🃏 KAMI · 7 korttia päivässä"}
+function sendFriend(onUnlock){
+  const txt=sendText();
+  const unlocked=()=>{if(S.bonusDay!==S.day){S.bonusDay=S.day;addCards(3);prog();onUnlock&&setTimeout(onUnlock,700);return "+3 korttia avattu tälle päivälle 🎁"}return ""};
+  const fallback=()=>sheet(`<h3>✈️ Lähetä kaverille</h3><p>Kopioi teksti ja lähetä se WhatsAppissa, Instagramissa tai missä haluat.</p><textarea class="ta" id="tx" readonly>${esc(txt)}</textarea><div class="row"><button class="b" id="x">Valmis</button></div>`,v=>{const ta=v.querySelector("#tx");ta.focus();ta.select();v.querySelector("#x").onclick=()=>{closeSheet();const u=unlocked();toast(u||"Lähetetty!")}});
+  try{navigator.clipboard.writeText(txt).then(()=>{const u=unlocked();toast("Kopioitu! "+(u||"Liitä viestiin."))},fallback)}catch(e){fallback()}
+}
 
+/* ---------- images ---------- */
+function wrap(x,text,X,Y,maxW,lh){const words=String(text).split(" ");let line="",lines=[];for(const w of words){const t=line?line+" "+w:w;if(x.measureText(t).width>maxW&&line){lines.push(line);line=w}else line=t}lines.push(line);lines.forEach((l,i)=>x.fillText(l,X,Y+i*lh));return Y+lines.length*lh}
+const COL={raha:["#0D3A2D","#E9C64A"],mieli:["#251C55","#B6A4FF"],keho:["#7A2A12","#FFB46B"],irti:["#0B4549","#7FE6D2"],suhteet:["#651B38","#FF9EBB"],ura:["#12304D","#6FD3FF"],uni:["#0E1330","#F2D98B"],quiz:["#16161A","#FFE14D"],partner:["#14171C","#5B9BFF"]};
+async function fonts(){try{await Promise.all(['64px "Dela Gothic One"','800 64px "Shippori Mincho"','900 64px "Zen Kaku Gothic New"','500 40px "Zen Kaku Gothic New"'].map(f=>document.fonts.load(f)))}catch(e){}}
+function canvasBase(bg,acc){const cv=document.createElement("canvas");cv.width=1080;cv.height=1920;const x=cv.getContext("2d");
+  x.fillStyle=bg;x.fillRect(0,0,1080,1920);const g=x.createRadialGradient(1080,0,40,1080,0,1100);g.addColorStop(0,acc+"88");g.addColorStop(1,acc+"00");x.fillStyle=g;x.fillRect(0,0,1080,1920);
+  x.textBaseline="top";return [cv,x]}
+function footer(x,acc){x.fillStyle=acc;x.font='700 40px "Zen Kaku Gothic New"';x.fillText("神 KAMI",90,1730);x.fillStyle="rgba(246,244,239,.7)";x.font='500 34px "Zen Kaku Gothic New"';x.fillText("7 korttia päivässä · vedä omasi",90,1790)}
+async function shareImg(){
+  const c=cur;if(!c)return;await fonts();
+  const key=c.kind==="quiz"?"quiz":c.kind==="partner"?"partner":c.top||c.teko?.top||"raha";
+  const [bg,acc]=COL[key];const [cv,x]=canvasBase(bg,acc);
+  x.fillStyle=acc;x.font='700 40px "Zen Kaku Gothic New"';
+  if(c.kind==="quiz"){
+    x.fillText("🕵️ TOSI VAI FEIKKI?",90,200);x.fillStyle="#F6F4EF";x.font='800 84px "Shippori Mincho"';
+    const y=wrap(x,"“"+c.q+"”",90,330,900,108);x.fillStyle="rgba(246,244,239,.75)";x.font='500 46px "Zen Kaku Gothic New"';wrap(x,"– väitetysti "+c.who,90,y+50,900,60);
+    x.fillStyle=acc;x.font='64px "Dela Gothic One"';x.fillText("ARVAA ENNEN KUIN",90,1440);x.fillText("KATSOT VASTAUKSEN",90,1520);
+  }else{
+    const label=c.kind==="card"?TOP[c.top][1].toUpperCase()+" · "+TYPE[c.ty][1].toUpperCase():"KUMPPANIN VINKKI";
+    x.fillText(label,90,200);x.fillStyle="#F6F4EF";
+    x.font=c.ty==="tsemppi"?'92px "Dela Gothic One"':(c.ty==="vanha"||c.ty==="kansa")?'800 96px "Shippori Mincho"':'900 96px "Zen Kaku Gothic New"';
+    const y=wrap(x,c.ty==="tsemppi"?c.h.toUpperCase():c.h,90,330,900,c.ty==="tsemppi"?116:118);
+    x.fillStyle="rgba(246,244,239,.75)";x.font='500 44px "Zen Kaku Gothic New"';const y2=wrap(x,"— "+(c.s||c.who),90,y+40,900,58);
+    if(c.t){x.fillStyle=acc;x.font='700 46px "Zen Kaku Gothic New"';x.fillText("⚡ TEKO 2 MIN",90,Math.max(y2+120,1280));x.fillStyle="#F6F4EF";x.font='500 46px "Zen Kaku Gothic New"';wrap(x,c.t,90,Math.max(y2+190,1350),900,60)}
+  }
+  footer(x,acc);imgSheet(cv,"Korttikuva 9:16 Storiesiin, Reelsiin ja TikTokiin");
+}
+function imgSheet(cv,cap){let url;try{url=cv.toDataURL("image/png")}catch(e){toast("Kuvan teko epäonnistui");return}
+  sheet(`<h3>🖼️ ${cap}</h3><img class="shot" src="${url}" alt="Jaettava kuva"><p>Puhelimessa: pidä kuvaa pohjassa ja tallenna. Tietokoneella: oikea klikkaus → Tallenna kuva.</p><div class="row"><button class="b" id="x">Sulje</button></div>`,v=>v.querySelector("#x").onclick=closeSheet)}
+
+/* ---------- DNA ---------- */
+function dna(){
+  const L=S.likes.map(id=>C.find(c=>c.id===id)).filter(Boolean);
+  const byT={},byY={};L.forEach(c=>{byT[c.top]=(byT[c.top]||0)+1;byY[c.ty]=(byY[c.ty]||0)+1});
+  const tt=Object.entries(byT).sort((a,b)=>b[1]-a[1]),yy=Object.entries(byY).sort((a,b)=>b[1]-a[1]);
+  const name=L.length?ADJ[yy[0][0]]+" "+NOUN[tt[0][0]]:"Vielä siemen 🌰";
+  return {L,byT,byY,tt,yy,name}
+}
+function dnaSheet(){
+  const d=dna();const max=Math.max(1,...Object.values(d.byT));
+  const bars=Object.keys(TOP).map(t=>`<div class="bar"><span>${TOP[t][0]} ${TOP[t][1]}</span><i><span style="width:${(d.byT[t]||0)/max*100}%"></span></i><span>${d.byT[t]||0}</span></div>`).join("");
+  const types=Object.keys(TYPE).map(t=>`${TYPE[t][0]} ${d.byY[t]||0}`).join(" · ");
+  sheet(`<p class="lbl" style="color:var(--pop)">🧬 Viisaus-DNA</p><div class="arche">${esc(d.name)}</div>
+    <p>${d.L.length?`Rakennettu ${d.L.length} osuneesta kortista.`:"Swipeä ❤️ kortteja, niin DNA alkaa muodostua."}</p>
+    <div class="bars">${bars}</div><p>${types}</p>
+    <div class="stats"><div><b>${S.streak}</b><small>teko-putki</small></div><div><b>${S.tekos.filter(t=>t.done).length}</b><small>tekoa</small></div><div><b>${S.quiz.n?Math.round(S.quiz.ok/S.quiz.n*100):0}%</b><small>feikkitutka</small></div></div>
+    <p class="biz" style="${S.lens?"display:block":""}">🔁 Wrapped-silmukka: kuukausittainen DNA-kuva jaetaan someen, kuten Spotify Wrapped. Jokainen jako on ilmainen mainos.</p>
+    <div class="row"><button class="b acc" id="img">🖼️ Tee DNA-kuva</button><button class="b ghost" id="x">Sulje</button></div>`,v=>{
+      v.querySelector("#x").onclick=closeSheet;v.querySelector("#img").onclick=async()=>{await fonts();const [cv,x]=canvasBase("#14101F","#FF4D6D");
+        x.fillStyle="#FF4D6D";x.font='700 42px "Zen Kaku Gothic New"';x.fillText("🧬 MUN VIISAUS-DNA",90,200);
+        x.fillStyle="#FFE14D";x.font='96px "Dela Gothic One"';const y=wrap(x,d.name.toUpperCase(),90,300,900,116);
+        let yy=Math.max(y+80,640);Object.keys(TOP).forEach(t=>{x.fillStyle="#F6F4EF";x.font='500 44px "Zen Kaku Gothic New"';x.fillText(TOP[t][1],90,yy);x.fillStyle="rgba(255,255,255,.12)";x.fillRect(380,yy+10,610,30);x.fillStyle="#FFE14D";x.fillRect(380,yy+10,610*((d.byT[t]||0)/max),30);yy+=92});
+        x.fillStyle="#F6F4EF";x.font='500 44px "Zen Kaku Gothic New"';x.fillText(`🔥 ${S.streak} pv putki · 🕵️ feikkitutka ${S.quiz.n?Math.round(S.quiz.ok/S.quiz.n*100):0} %`,90,yy+40);
+        footer(x,"#FF4D6D");imgSheet(cv,"DNA-kuva jakoon");}});
+}
+
+/* ---------- onboarding & end ---------- */
+function onboarding(){
+  $("hint").hidden=true;cur=null;prog();
+  const sel=new Set(S.topics);let vibe=S.vibe;
+  $("stage").innerHTML=`<section class="panel">
+    <span class="eyebrow">7 korttia päivässä. Sitten loppuu.</span>
+    <h1>Viisautta <em>swipeillä.</em></h1>
+    <p>Vanhaa viisautta, tutkittua tietoa ja kansan sananlaskuja. Jokaisessa kortissa on 15 sekunnin oppi ja 2 minuutin teko. Sitten jatkat päivääsi.</p>
+    <h2>Mihin kaipaat potkua?</h2>
+    <div class="chips">${Object.keys(TOP).map(t=>`<button class="chip" data-t="${t}" aria-pressed="${sel.has(t)}">${TOP[t][0]} ${TOP[t][1]}${TOPSUB[t]?` <small style="opacity:.7">(${TOPSUB[t]})</small>`:""}</button>`).join("")}</div>
+    <h2>Millä tyylillä?</h2>
+    <div class="vibes">
+      <button class="vibe" data-v="viisas" aria-pressed="${vibe==="viisas"}"><b>🏛️</b>Viisas<br>rauhallinen</button>
+      <button class="vibe" data-v="mix" aria-pressed="${vibe==="mix"}"><b>🎲</b>Sekoitus<br>vähän kaikkea</button>
+      <button class="vibe" data-v="tsemppi" aria-pressed="${vibe==="tsemppi"}"><b>🥊</b>Tsemppi<br>hype päälle</button>
+    </div>
+    <button class="go" id="go">Vedä päivän seiska →</button>
+    <p style="font-size:12px">Tiedot tallentuvat vain tähän selaimeen. KAMI ei korvaa ammattilaista.</p>
+  </section>`;
+  const go=$("go");const upd=()=>go.disabled=!sel.size;
+  $("stage").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const t=b.dataset.t;sel.has(t)?sel.delete(t):sel.add(t);b.setAttribute("aria-pressed",String(sel.has(t)));upd()});
+  $("stage").querySelectorAll(".vibe").forEach(b=>b.onclick=()=>{vibe=b.dataset.v;$("stage").querySelectorAll(".vibe").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
+  go.onclick=()=>{const changed=S.topics.join()!==[...sel].join()||S.vibe!==vibe;S.topics=[...sel];S.vibe=vibe;S.on=true;
+    if(changed||S.day!==dayStr()||!S.deck.length)buildDay();save();show()};
+}
+function endScreen(){
+  $("hint").hidden=true;cur=null;prog();
+  const todays=S.tekos.filter(t=>t.day===S.day);const d=dna();
+  $("stage").innerHTML=`<section class="panel">
+    <span class="eyebrow">Päivän seiska paketissa</span>
+    <h1>Valmista. <em>Nyt elämään.</em></h1>
+    <div class="stats"><div><b>${S.likes.length}</b><small>DNA-korttia</small></div><div><b>🔥${S.streak}</b><small>teko-putki</small></div><div><b>${S.quiz.n?Math.round(S.quiz.ok/S.quiz.n*100):0}%</b><small>feikkitutka</small></div></div>
+    <h2>Tämän päivän teot</h2>
+    <div class="tlist">${todays.length?todays.map((t,i)=>`<label><input type="checkbox" id="tk${i}" data-i="${S.tekos.indexOf(t)}" ${t.done?"checked":""}> <span>${esc(t.t)}</span></label>`).join(""):`<p>Et tallentanut tekoja. Huomenna napauta korttia, niin näet 2 minuutin teon.</p>`}</div>
+    <p>Olet tänään: <b style="color:var(--volt)">${esc(d.name)}</b>. Uusi seiska aukeaa huomenna aamulla.</p>
+    <p class="biz">🔒 Päiväraja on tuotteen ydin. Niukkuus tuo käyttäjän takaisin huomenna, jakaminen avaa +3 korttia ja KAMI+ poistaa rajan. Kilpailijat eivät voi kopioida tätä syömättä omaa ruutuaikamalliaan.</p>
+    <div class="row">
+      ${S.bonusDay!==S.day?`<button class="b acc" id="bonus">✈️ Lähetä kortti kaverille → +3 korttia</button>`:""}
+      <button class="b ghost" id="dnaE">🧬 Viisaus-DNA</button>
+      <button class="b ghost" id="plus">Jatka rajatta (KAMI+ · demo)</button>
+    </div>
+    <button class="b ghost" id="topics" style="justify-self:start">⚙️ Vaihda aiheita</button>
+  </section>`;
+  $("stage").querySelectorAll(".tlist input").forEach(cb=>cb.onchange=()=>{const t=S.tekos[+cb.dataset.i];if(cb.checked){markTeko(t,true);toast("🔥 Teko tehty!")}else{t.done=false;save()}});
+  const b=$("bonus");if(b)b.onclick=()=>{cur=resolve(S.deck[S.deck.length-1]);sendFriend(()=>{if(S.pos<S.deck.length)show()});cur=null};
+  $("dnaE").onclick=dnaSheet;$("topics").onclick=onboarding;
+  $("plus").onclick=()=>{S.plusDay=S.day;addCards(7);toast("KAMI+ demo: 7 korttia lisää");show()};
+}
+
+/* ---------- wiring ---------- */
+$("lensBtn").onclick=()=>{S.lens=!S.lens;hud();save();toast(S.lens?"€ Bisneslinssi päällä: katso keltaiset laput":"€ Bisneslinssi pois")};
+$("dnaBtn").onclick=dnaSheet;$("logo").onclick=onboarding;
+addEventListener("keydown",e=>{if($("host").innerHTML){if(e.key==="Escape")closeSheet();return}if(!cur)return;
+  const m={ArrowRight:"right",ArrowLeft:"left",ArrowUp:"up"," ":"flip",Enter:"flip"}[e.key];if(!m||e.target.closest("input,textarea"))return;if(m==="flip"&&e.target.closest("button,a"))return;e.preventDefault();act(m)});
 function boot(data){
-  S=Object.assign(fresh(),load()||{},data&&data.S?data.S:{}); touchStreak(); hud();
+  load();if(data&&data.S)S=Object.assign(fresh(),data.S);
   window.claude?.hot?.snapshot?.(()=>({S}));
-  if(S.path && data && data.S) start(S.path);
+  if(!S.on){onboarding();hud();return}
+  if(S.day!==dayStr())buildDay();
+  show();
 }
-window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
 </script>
