@@ -99,6 +99,7 @@ Enterprise/Plus-käyttäjät voivat valita mallin:
 | **Financial Analyst** | Suositeltu | **KRIITTINEN** | - | **KRIITTINEN** |
 | **Marketing Strategist** | **KRIITTINEN** | Suositeltu | **KRIITTINEN** | Suositeltu |
 | **HR Advisor** | **KRIITTINEN** | Suositeltu | - | **KRIITTINEN** |
+| **KAMI – Mentoripakka** | Valinnainen | - | Suositeltu | **KRIITTINEN** (korttikirjasto) |
 
 ### Miksi nämä valinnat?
 
@@ -184,6 +185,11 @@ Enterprise/Plus-käyttäjät voivat valita mallin:
 - "Laadi suorituksen johtamisen järjestelmä OKR-mallilla"
 - "Analysoi henkilöstön vaihtuvuutta ja ehdota toimenpiteitä"
 
+**KAMI – Mentoripakka:**
+- "⚡ Pikapakka – 5 korttia, nyt!"
+- "🎯 Minulla on haaste: asiakas ei vastaa tarjoukseen"
+- "🏯 Mentorineuvosto: pitäisikö minun vaihtaa työpaikkaa?"
+
 ### Vinkkejä tehokkaaseen käyttöön
 
 | Vinkki | Esimerkki |
@@ -202,6 +208,7 @@ Enterprise/Plus-käyttäjät voivat valita mallin:
 | **Business Strategy Consultant** | `Business-Strategy-Consultant-GPT.md` | Strateginen suunnittelu, kilpailija-analyysi, SWOT, Porter's Five Forces |
 | **Financial Analyst** | `Financial-Analyst-GPT.md` | Talousennusteet, arvonmääritys, unit economics, ROI-analyysi |
 | **Marketing Strategist** | `Marketing-Strategist-GPT.md` | Go-to-market, growth hacking, brand positioning, AARRR-metriikat |
+| **KAMI – Mentoripakka** | `Kami-Mentori-GPT.md` + `Kami-Mentori-Korttikirjasto.md` (Knowledge) | Pelillinen swipe-mentori: business, elämä, keho, mieli. Mentoreina kamit, zen, eläimet, puut ja persoonat |
 | **HR Advisor** | `HR-Advisor-GPT.md` | Henkilöstöstrategia, suorituksen johtaminen, työlainsäädäntö, TES, organisaation kehittäminen |
 
 ---
