@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pikkuhetki</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800;900&display=swap">
+<style>
+/* Layout: yksi puhelimen levyinen pelipalsta, tahmea yläpalkki, alanavigaatio, peli avautuu koko ruudun kerrokseksi */
+:root{
+  --bg:#FFF3F5; --surface:#FFFFFF; --surface2:#FFE6EC; --ink:#3A1F3D; --muted:#86688A; --line:#F0D6DF;
+  --accent:#E8336B; --accent-ink:#FFFFFF; --mint:#1FA896; --sun:#FFB627; --sky:#3C8DDB; --bad:#D9363E;
+  --paper:#FFFFFF; --paper-ink:#3A1F3D;
+  --shadow:0 6px 0 #EBC3D0;
+  --f-display:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1D1120; --surface:#2A1A2E; --surface2:#3A2340; --ink:#FBEFF4; --muted:#BFA2C3; --line:#45304B;
+  --accent:#FF5C8D; --accent-ink:#2A0C17; --mint:#3ED2BD; --sun:#FFC64F; --sky:#6AAEF0; --bad:#FF6B72;
+  --paper:#FBF1F5; --paper-ink:#3A1F3D; --shadow:0 6px 0 #120914; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#1D1120; --surface:#2A1A2E; --surface2:#3A2340; --ink:#FBEFF4; --muted:#BFA2C3; --line:#45304B;
+  --accent:#FF5C8D; --accent-ink:#2A0C17; --mint:#3ED2BD; --sun:#FFC64F; --sky:#6AAEF0; --bad:#FF6B72;
+  --paper:#FBF1F5; --paper-ink:#3A1F3D; --shadow:0 6px 0 #120914; color-scheme:dark;}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+button:focus-visible,.tile:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;letter-spacing:.01em;margin:0;text-wrap:balance}
+.app{max-width:540px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 96px;min-height:100%}
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;gap:8px;padding-block:10px;flex-wrap:wrap}
+.lvl{display:flex;align-items:center;gap:8px;flex:1 1 140px;min-width:0}
+.lvl-badge{width:42px;height:42px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--f-display);font-size:20px;flex:none}
+.lvl-bar{flex:1;min-width:0}
+.lvl-bar small{display:block;color:var(--muted);font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.bar{height:10px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--mint);border-radius:99px;transition:width .5s}
+.pills{display:flex;gap:6px}
+.pill{display:flex;align-items:center;gap:4px;background:var(--surface);border:2px solid var(--line);border-radius:99px;padding:4px 10px;font-weight:900;font-variant-numeric:tabular-nums;font-size:14px;white-space:nowrap}
+.pill.bump{animation:bump .4s}
+@keyframes bump{40%{transform:scale(1.2)}}
+.iconbtn{width:36px;height:36px;border-radius:50%;background:var(--surface);border:2px solid var(--line);font-size:16px}
+/* views */
+.view{display:grid;gap:16px;padding-top:6px}
+.hero{background:var(--accent);color:var(--accent-ink);border-radius:26px;padding:18px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero .big{font-size:58px;line-height:1;filter:drop-shadow(0 4px 0 rgba(0,0,0,.15))}
+.hero .eyebrow{font-weight:900;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.hero h2{font-size:28px;line-height:1.05}
+.hero p{margin:4px 0 10px;font-weight:700;opacity:.92}
+.x2{position:absolute;right:14px;top:14px;background:var(--sun);color:var(--paper-ink);font-family:var(--f-display);font-size:16px;padding:3px 10px;border-radius:99px;transform:rotate(6deg)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:900;border-radius:16px;padding:12px 18px;background:var(--surface);color:var(--ink);box-shadow:0 4px 0 var(--line);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.btn.mint{background:var(--mint);color:#fff;box-shadow:0 4px 0 color-mix(in srgb,var(--mint) 60%,#000)}
+.btn.sun{background:var(--sun);color:var(--paper-ink);box-shadow:0 4px 0 color-mix(in srgb,var(--sun) 60%,#000)}
+.btn:disabled{opacity:.45;pointer-events:none}
+.hero .btn{background:var(--paper);color:var(--paper-ink);box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:14px;display:grid;gap:8px;text-align:left}
+.card h3{font-size:18px}
+.card .sub{color:var(--muted);font-weight:700;font-size:13px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sec-h h2{font-size:24px}
+.sec-h span{color:var(--muted);font-weight:800;font-size:13px}
+.games{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:12px 6px 10px;display:grid;justify-items:center;gap:2px;text-align:center;min-width:0}
+.tile .em{font-size:34px;line-height:1.1}
+.tile b{font-size:13px;font-weight:900;line-height:1.15;overflow-wrap:anywhere}
+.tile .st{font-size:12px;letter-spacing:1px;color:var(--line)}
+.tile .st .on{color:var(--sun)}
+.tile.locked{background:var(--surface2);border-style:dashed}
+.tile.locked .em{filter:grayscale(1);opacity:.35}
+.tile .lock{position:absolute;inset:auto 0 8px;font-size:11px;font-weight:900;color:var(--muted)}
+.tile .new{position:absolute;top:-7px;right:-4px;background:var(--mint);color:#fff;font-size:10px;font-weight:900;letter-spacing:.06em;padding:2px 7px;border-radius:99px;text-transform:uppercase}
+.tile .cat{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:2px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.nav-in{max-width:540px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.nav button{padding:8px 4px 10px;display:grid;justify-items:center;gap:0;font-weight:900;font-size:12px;color:var(--muted);position:relative}
+.nav button span{font-size:22px}
+.nav button[aria-current="true"]{color:var(--accent)}
+.dot{position:absolute;top:4px;left:calc(50% + 8px);min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--accent);color:var(--accent-ink);font-size:11px;display:grid;place-items:center}
+/* wheel */
+.wheelbox{display:grid;justify-items:center;gap:14px;padding:16px 0 8px;overflow:hidden}
+.wheel-wrap{position:relative;width:min(320px,86vw);aspect-ratio:1;max-width:100%}
+.wheel-wrap canvas{width:100%;height:100%;border-radius:50%;box-shadow:0 8px 0 var(--line);transition:transform 4.2s cubic-bezier(.12,.75,.12,1)}
+.pointer{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:30px solid var(--ink);z-index:2;filter:drop-shadow(0 2px 0 var(--bg))}
+.hub{position:absolute;inset:0;margin:auto;width:22%;height:22%;border-radius:50%;background:var(--surface);border:4px solid var(--ink);display:grid;place-items:center;font-size:24px}
+.note{color:var(--muted);font-weight:700;font-size:13px;text-align:center}
+.shop{display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:12px}
+.row .grow{flex:1;min-width:0}
+/* missions */
+.mission{display:flex;align-items:center;gap:12px;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px}
+.mission .ic{font-size:28px}
+.mission .grow{flex:1;min-width:0}
+.mission b{display:block}
+.mission.done{border-color:var(--mint)}
+.streak{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.streak div{background:var(--surface2);border-radius:12px;padding:6px 2px;text-align:center;font-weight:900;font-size:12px;color:var(--muted)}
+.streak div.on{background:var(--sun);color:var(--paper-ink)}
+.streak div.today{outline:3px solid var(--accent)}
+/* coupons */
+.coupon{display:grid;grid-template-columns:auto 1fr;gap:12px;background:var(--surface);border:2px dashed var(--accent);border-radius:18px;padding:14px;position:relative}
+.coupon .em{font-size:36px}
+.coupon .off{font-family:var(--f-display);font-size:22px;color:var(--accent);line-height:1.1}
+.coupon .code{font-family:ui-monospace,Menlo,monospace;font-weight:700;background:var(--surface2);padding:3px 8px;border-radius:8px;user-select:all;font-size:14px}
+.coupon.used{opacity:.5;border-color:var(--line)}
+.coupon .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.coupon .acts .btn{padding:8px 12px;font-size:13px}
+.demo{font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.empty{text-align:center;padding:30px 10px;color:var(--muted);font-weight:700}
+.empty .em{font-size:48px}
+/* game overlay */
+.ov{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.ov-top{display:flex;align-items:center;gap:8px;padding-block:10px;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));max-width:540px;width:100%;margin:0 auto}
+.ov-top h2{flex:1;font-size:20px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:4px 10px;font-weight:900;font-variant-numeric:tabular-nums;min-width:54px;text-align:center}
+.chip.warn{color:var(--bad);border-color:var(--bad)}
+.stage{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding-block:6px 14px;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));max-width:540px;width:100%;margin:0 auto;position:relative;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.ginfo{font-weight:900;color:var(--muted);text-align:center;min-height:22px}
+.intro{display:grid;justify-items:center;gap:10px;text-align:center;max-width:360px}
+.intro .em{font-size:84px;line-height:1}
+.intro h2{font-size:34px}
+.intro p{margin:0;font-weight:700;color:var(--muted)}
+.goals{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.goals span{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:4px 10px;font-weight:800;font-size:13px}
+.result .stars{font-size:52px;letter-spacing:6px;color:var(--line)}
+.result .stars i{font-style:normal;display:inline-block}
+.result .stars i.on{color:var(--sun);animation:starIn .5s both}
+@keyframes starIn{0%{transform:scale(0) rotate(-40deg)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.result .score{font-family:var(--f-display);font-size:56px;line-height:1}
+.rewards{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.rewards span{background:var(--surface);border:2px solid var(--line);border-radius:99px;padding:6px 12px;font-weight:900}
+.btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+/* generic game parts */
+.board{display:grid;gap:6px;width:min(100%,420px);touch-action:none}
+.cell{aspect-ratio:1;background:var(--surface);border:2px solid var(--line);border-radius:14px;display:grid;place-items:center;font-size:clamp(18px,6vw,30px);font-weight:900;transition:transform .12s,background .15s;min-width:0;padding:0;color:var(--ink)}
+.cell:active{transform:scale(.94)}
+.cell.sel{background:var(--surface2);border-color:var(--accent);transform:scale(1.06)}
+.cell.pop{animation:pop .25s forwards}
+@keyframes pop{to{transform:scale(0);opacity:0}}
+.cell.hit{background:var(--mint);border-color:var(--mint);color:#fff}
+.cell.miss{background:var(--bad);border-color:var(--bad);color:#fff}
+.cell.dim{opacity:.35}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(100%,420px)}
+.choice .btn{padding:16px 10px;font-size:17px}
+.paper{background:var(--paper);color:var(--paper-ink);border-radius:22px;padding:22px 18px;min-height:120px;display:grid;place-items:center;text-align:center;width:min(100%,420px);font-family:var(--f-display);font-size:clamp(28px,9vw,44px);box-shadow:var(--shadow)}
+.area{position:relative;width:min(100%,440px);flex:1;min-height:300px;max-height:560px;background:var(--surface);border:2px solid var(--line);border-radius:22px;overflow:hidden;touch-action:none}
+.bubble{position:absolute;bottom:-70px;width:58px;height:58px;border-radius:50%;font-size:30px;display:grid;place-items:center;background:color-mix(in srgb,var(--sky) 22%,transparent);border:2px solid color-mix(in srgb,var(--sky) 50%,transparent);animation:rise linear forwards}
+.bubble.gold{background:color-mix(in srgb,var(--sun) 40%,transparent);border-color:var(--sun)}
+@keyframes rise{to{transform:translateY(calc(-1 * var(--h)))}}
+.target{position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:radial-gradient(circle,var(--paper) 0 18%,var(--accent) 19% 38%,var(--paper) 39% 58%,var(--accent) 59%);animation:shrink linear forwards}
+@keyframes shrink{from{transform:scale(1)}to{transform:scale(0)}}
+.pad{width:min(100%,420px);aspect-ratio:1.2;border-radius:26px;display:grid;place-items:center;font-family:var(--f-display);font-size:30px;color:#fff;text-align:center;padding:16px;max-height:52vh}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:420px}
+.ltile{min-width:46px;height:52px;border-radius:12px;background:var(--surface);border:2px solid var(--line);box-shadow:0 4px 0 var(--line);font-family:var(--f-display);font-size:24px;padding:0 8px}
+.ltile.used{visibility:hidden}
+.answer{min-height:56px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;font-family:var(--f-display);font-size:30px;letter-spacing:.06em}
+.cvwrap canvas{display:block;border-radius:22px;border:2px solid var(--line);background:var(--surface);touch-action:none;max-width:100%}
+.dpad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,48px);gap:6px}
+.dpad button{background:var(--surface);border:2px solid var(--line);border-radius:12px;font-size:20px}
+.dots{position:relative;aspect-ratio:1;background:var(--surface);border:2px solid var(--line);border-radius:20px}
+.dots i{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--accent);margin:-7px 0 0 -7px}
+.dots.b i{background:var(--mint)}
+/* modal + toast */
+.modal{position:fixed;inset:0;z-index:40;background:color-mix(in srgb,var(--ink) 45%,transparent);display:grid;place-items:center;padding:20px}
+.modal-box{background:var(--surface);border-radius:26px;padding:22px 18px;width:min(100%,380px);display:grid;gap:12px;justify-items:center;text-align:center;box-shadow:var(--shadow);animation:in .3s cubic-bezier(.2,1.4,.4,1)}
+@keyframes in{from{transform:scale(.7);opacity:0}}
+.modal-box .em{font-size:64px;line-height:1}
+.modal-box h2{font-size:28px}
+.modal-box p{margin:0;font-weight:700;color:var(--muted)}
+.scratch{position:relative;width:260px;height:150px;max-width:100%;border-radius:18px;overflow:hidden;background:var(--paper);color:var(--paper-ink);display:grid;place-items:center;font-family:var(--f-display);font-size:28px;text-align:center;padding:10px}
+.scratch canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:14px;font-weight:800;max-width:calc(100% - 32px);text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60}
+.float{position:absolute;font-family:var(--f-display);font-size:22px;color:var(--accent);pointer-events:none;animation:floatUp .8s forwards;text-shadow:0 2px 0 var(--surface)}
+@keyframes floatUp{to{transform:translateY(-50px);opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media (max-width:360px){.games{grid-template-columns:repeat(2,1fr)}.duo{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div class="lvl">
+      <div class="lvl-badge" id="lvlNum">1</div>
+      <div class="lvl-bar"><small id="lvlTxt">Taso 1 · 0/100 XP</small><div class="bar"><i id="xpBar" style="width:0"></i></div></div>
+    </div>
+    <div class="pills">
+      <span class="pill" id="pCoins" title="Kolikot">🪙 <b id="coins">0</b></span>
+      <span class="pill" id="pStreak" title="Päiväputki">🔥 <b id="streakN">0</b></span>
+    </div>
+    <button class="iconbtn" id="sound" aria-label="Äänet päälle tai pois">🔊</button>
+  </header>
+
+  <main id="views">
+    <section class="view" id="v-home"></section>
+    <section class="view" id="v-wheel" hidden></section>
+    <section class="view" id="v-tasks" hidden></section>
+    <section class="view" id="v-coupons" hidden></section>
+  </main>
+</div>
+
+<nav class="nav"><div class="nav-in">
+  <button data-v="home" aria-current="true"><span>🎮</span>Pelit</button>
+  <button data-v="wheel"><span>🎡</span>Onnenpyörä<i class="dot" id="dWheel" hidden></i></button>
+  <button data-v="tasks"><span>✅</span>Tehtävät<i class="dot" id="dTasks" hidden></i></button>
+  <button data-v="coupons"><span>🎟️</span>Kupongit<i class="dot" id="dCoup" hidden></i></button>
+</div></nav>
+
+<div class="ov" id="ov" hidden>
+  <div class="ov-top">
+    <button class="iconbtn" id="ovClose" aria-label="Lopeta peli">✕</button>
+    <h2 id="ovTitle">Peli</h2>
+    <span class="chip" id="ovTime" hidden>0</span>
+    <span class="chip" id="ovScore">0</span>
+  </div>
+  <div class="stage" id="stage"></div>
+</div>
+
+<div class="modal" id="modal" hidden><div class="modal-box" id="modalBox"></div></div>
+<div class="toast" id="toast" hidden></div>
+<canvas id="fx"></canvas>
+
+<script>
+"use strict";
+/* ---------- apurit ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+function h(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+const rnd=n=>Math.floor(Math.random()*n);
+const pick=a=>a[rnd(a.length)];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const dayKey=(d=new Date())=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function seedRand(str){let x=0;for(const ch of str)x=(x*31+ch.charCodeAt(0))>>>0;return()=>{x=(x*1664525+1013904223)>>>0;return x/4294967296}}
+const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- tila ---------- */
+const KEY="pikkuhetki-v1";
+const DEF={coins:150,xp:0,level:1,stars:{},best:{},plays:{},streak:0,lastDay:null,spins:1,coupons:[],chest:0,unlocked:{},today:{},sound:true,playMs:{}};
+let S;
+function load(seed){let d=seed||null;if(!d){try{d=JSON.parse(localStorage.getItem(KEY))}catch(e){}}S=Object.assign(structuredClone(DEF),d||{})}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+window.claude?.hot?.snapshot?.(()=>S);
+
+/* ---------- ääni ---------- */
+let AC;
+function beep(f=660,d=.09,type="sine",v=.05){if(!S.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+const sfx={good:()=>beep(880,.08),pop:()=>beep(520+rnd(300),.06,"triangle"),bad:()=>beep(160,.18,"square",.04),win:()=>{[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.15,"triangle"),i*110))},coin:()=>{beep(988,.06);setTimeout(()=>beep(1318,.1),70)}};
+function buzz(ms=20){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+
+/* ---------- konfetti & leijuvat tekstit ---------- */
+const fx=$("#fx"),fg=fx.getContext("2d");let parts=[],fxOn=false;
+function confetti(n=90){if(reduced)return;const d=devicePixelRatio||1;fx.width=innerWidth*d;fx.height=innerHeight*d;fg.setTransform(d,0,0,d,0,0);const cols=[css("--accent"),css("--sun"),css("--mint"),css("--sky")];for(let i=0;i<n;i++)parts.push({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*11,vy:-Math.random()*11-3,r:Math.random()*6+4,c:pick(cols),a:Math.random()*6,life:1});if(!fxOn){fxOn=true;requestAnimationFrame(fxStep)}}
+function fxStep(){fg.clearRect(0,0,innerWidth,innerHeight);parts=parts.filter(p=>p.life>0);for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.a+=.2;p.life-=.012;fg.save();fg.globalAlpha=Math.max(0,p.life);fg.translate(p.x,p.y);fg.rotate(p.a);fg.fillStyle=p.c;fg.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);fg.restore()}if(parts.length)requestAnimationFrame(fxStep);else{fxOn=false;fg.clearRect(0,0,innerWidth,innerHeight)}}
+function floatText(el,txt,x,y){const f=h("div","float",txt);const r=el.getBoundingClientRect();f.style.left=(x??r.width/2)+"px";f.style.top=(y??r.height/2)+"px";if(getComputedStyle(el).position==="static")el.style.position="relative";el.append(f);setTimeout(()=>f.remove(),800)}
+
+/* ---------- toast & modal ---------- */
+let toastT;function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2400)}
+let modalQ=[],modalOpen=false;
+function modal(build){modalQ.push(build);if(!modalOpen)nextModal()}
+function nextModal(){const b=modalQ.shift();if(!b){modalOpen=false;$("#modal").hidden=true;return}modalOpen=true;const box=$("#modalBox");box.replaceChildren();b(box,()=>nextModal());$("#modal").hidden=false}
+function simpleModal(em,title,text,btn="Jee!",after){modal((box,close)=>{box.append(h("div","em",em),h("h2",null,title));if(text)box.append(h("p",null,text));const b=h("button","btn primary",btn);b.onclick=()=>{close();after&&after()};box.append(b)})}
+
+/* ---------- palkinnot ---------- */
+function addCoins(n){S.coins+=n;tToday().coins+=Math.max(0,n);save();hud(true)}
+function needXP(l){return 80+l*40}
+function addXP(n){S.xp+=n;let up=false;while(S.xp>=needXP(S.level)){S.xp-=needXP(S.level);S.level++;up=true}save();hud();if(up){const L=S.level;S.coins+=100;S.spins++;save();hud(true);modal((box,close)=>{confetti(140);sfx.win();box.append(h("div","em","🎉"),h("h2",null,"Taso "+L+"!"),h("p",null,"Sait 100 kolikkoa ja ilmaisen pyöräytyksen."));const b=h("button","btn primary","Mahtavaa");b.onclick=close;box.append(b)})}}
+const PARTNERS=[
+ ["☕","Kahvila Korvapuusti","-20 % kahvista ja pullasta"],
+ ["💐","Kukkakauppa Kielo","-15 % kimpuista"],
+ ["🧸","Lelupuoti Nalle","-10 € yli 40 € ostoksesta"],
+ ["📚","Kirjakauppa Sivu","-20 % yhdestä kirjasta"],
+ ["🧘","Hyvinvointistudio Hetki","Ilmainen kokeilutunti"],
+ ["🥗","Ruokakassi Tuore","Ilmainen kotiinkuljetus"],
+ ["🎬","Elokuvateatteri Valkokangas","2 lippua 1 hinnalla"],
+ ["💅","Kauneushoitola Helmi","-25 % käsihoidosta"],
+ ["🍦","Jäätelöbaari Kuura","Toinen pallo kaupan päälle"],
+ ["👟","Urheiluliike Askel","-15 % kengistä"]];
+function giveCoupon(){const p=pick(PARTNERS);const exp=new Date(Date.now()+14*864e5);const c={id:Date.now()+""+rnd(999),em:p[0],partner:p[1],offer:p[2],code:"PH-"+Math.random().toString(36).slice(2,7).toUpperCase(),exp:dayKey(exp),used:false,seen:false};S.coupons.unshift(c);save();hud();return c}
+function couponModal(c){modal((box,close)=>{confetti(80);sfx.win();box.append(h("div","em",c.em),h("h2",null,"Uusi kuponki!"),h("p",null,c.partner+": "+c.offer),h("span","demo","Esimerkkikumppani · voimassa "+fmtDate(c.exp)+" asti"));const b=h("button","btn primary","Lompakkoon");b.onclick=close;box.append(b)})}
+const fmtDate=s=>{const[y,m,d]=s.split("-");return +d+"."+ +m+"."};
+
+/* ---------- päivä, putki, tehtävät ---------- */
+function tToday(){const k=dayKey();if(S.today.date!==k)S.today={date:k,played:0,three:0,feat:0,spun:0,starsToday:0,newGame:0,coins:0,claimed:[],allBonus:false,freeSpin:false,remind:false};return S.today}
+const MISSIONS=[
+ {id:"play3",ic:"🎮",t:"Pelaa 3 peliä",goal:3,key:"played"},
+ {id:"play6",ic:"🕹️",t:"Pelaa 6 peliä",goal:6,key:"played"},
+ {id:"three",ic:"⭐",t:"Saa kolme tähteä jossain pelissä",goal:1,key:"three"},
+ {id:"feat",ic:"💖",t:"Pelaa päivän peli",goal:1,key:"feat"},
+ {id:"spin",ic:"🎡",t:"Pyöräytä onnenpyörää",goal:1,key:"spun"},
+ {id:"stars5",ic:"🌟",t:"Kerää 5 uutta tähteä",goal:5,key:"starsToday"},
+ {id:"newg",ic:"✨",t:"Kokeile peliä, jota et ole pelannut",goal:1,key:"newGame"},
+ {id:"coins",ic:"🪙",t:"Ansaitse 250 kolikkoa",goal:250,key:"coins"}];
+function todaysMissions(){const r=seedRand(dayKey()+"m");const pool=MISSIONS.slice();const out=[];while(out.length<3){const i=Math.floor(r()*pool.length);out.push(pool.splice(i,1)[0])}return out}
+function featuredIndex(){const open=GAMES.map((g,i)=>i).filter(isUnlocked);const r=seedRand(dayKey()+"f");return open[Math.floor(r()*open.length)]}
+function checkDaily(){const t=tToday(),k=t.date;if(S.lastDay===k)return;const y=dayKey(new Date(Date.now()-864e5));S.streak=S.lastDay===y?S.streak+1:1;S.lastDay=k;if(!t.freeSpin){S.spins++;t.freeSpin=true}const reward=20*Math.min(S.streak,7)+(S.streak%7===0?100:0);S.coins+=reward;save();hud();
+ modal((box,close)=>{box.append(h("div","em","🔥"),h("h2",null,S.streak>1?S.streak+". päivä putkeen!":"Tervetuloa!"),h("p",null,"Päivän lahja: "+reward+" kolikkoa ja ilmainen pyöräytys."));const row=h("div","streak");row.style.width="100%";const pos=((S.streak-1)%7);for(let i=0;i<7;i++){const d=h("div",(i<=pos?"on ":"")+(i===pos?"today":""),(i===6?"🎁":"P"+(i+1)));row.append(d)}box.append(row,h("p",null,"7. päivänä isompi yllätys. Putki pysyy, kun käyt kerran päivässä."));const b=h("button","btn primary","Kerää");b.onclick=()=>{sfx.coin();confetti(60);close()};box.append(b)})}
+
+/* ---------- avaukset ---------- */
+const totalStars=()=>Object.values(S.stars).reduce((a,b)=>a+b,0);
+const needStars=i=>(i-5)*2;
+const isUnlocked=i=>i<6||!!S.unlocked[i]||totalStars()>=needStars(i);
+
+/* ---------- HUD ---------- */
+function hud(bump){$("#coins").textContent=S.coins;$("#streakN").textContent=S.streak;$("#lvlNum").textContent=S.level;$("#lvlTxt").textContent="Taso "+S.level+" · "+S.xp+"/"+needXP(S.level)+" XP";$("#xpBar").style.width=Math.min(100,S.xp/needXP(S.level)*100)+"%";$("#sound").textContent=S.sound?"🔊":"🔈";
+ if(bump){const p=$("#pCoins");p.classList.remove("bump");void p.offsetWidth;p.classList.add("bump")}
+ const dW=$("#dWheel");dW.hidden=S.spins<1;dW.textContent=S.spins;
+ const t=tToday();const ready=todaysMissions().filter(m=>(t[m.key]||0)>=m.goal&&!t.claimed.includes(m.id)).length;const dT=$("#dTasks");dT.hidden=!ready;dT.textContent=ready;
+ const nc=S.coupons.filter(c=>!c.seen).length;const dC=$("#dCoup");dC.hidden=!nc;dC.textContent=nc}
+
+/* ---------- näkymät ---------- */
+let view="home";
+function show(v){view=v;document.querySelectorAll(".nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===v));["home","wheel","tasks","coupons"].forEach(x=>$("#v-"+x).hidden=x!==v);({home:renderHome,wheel:renderWheel,tasks:renderTasks,coupons:renderCoupons})[v]();scrollTo(0,0)}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));
+$("#sound").onclick=()=>{S.sound=!S.sound;save();hud();sfx.good()};
+
+function starStr(n){return'<span class="on">'+"★".repeat(n)+"</span>"+"★".repeat(3-n)}
+function renderHome(){const v=$("#v-home");v.replaceChildren();const fi=featuredIndex(),fgm=GAMES[fi];
+ const hero=h("div","hero");hero.innerHTML=`<div class="big">${fgm.e}</div><div><div class="eyebrow">Päivän peli</div><h2></h2><p></p></div><span class="x2">2× kolikot</span>`;hero.querySelector("h2").textContent=fgm.n;hero.querySelector("p").textContent=fgm.d;const pb=h("button","btn","▶ Pelaa nyt");pb.onclick=()=>openGame(fi);hero.children[1].append(pb);v.append(hero);
+ const duo=h("div","duo");const t=tToday(),ms=todaysMissions(),done=ms.filter(m=>(t[m.key]||0)>=m.goal).length;
+ const c1=h("button","card");c1.innerHTML=`<h3>🎁 Aarrearkku</h3><div class="sub">${S.chest}/10 uutta tähteä avaa arkun</div><div class="bar"><i style="width:${S.chest*10}%;background:var(--sun)"></i></div>`;c1.onclick=()=>toast("Kerää tähtiä peleistä. Joka 10. tähti avaa arkun.");
+ const c2=h("button","card");c2.innerHTML=`<h3>✅ Tehtävät</h3><div class="sub">${done}/3 tehty tänään</div><div class="bar"><i style="width:${done/3*100}%"></i></div>`;c2.onclick=()=>show("tasks");
+ duo.append(c1,c2);v.append(duo);
+ const sh=h("div","sec-h");sh.innerHTML=`<h2>Kaikki pelit</h2><span>⭐ ${totalStars()}/90 tähteä</span>`;v.append(sh);
+ const grid=h("div","games");GAMES.forEach((g,i)=>{const open=isUnlocked(i);const tl=h("button","tile"+(open?"":" locked"));tl.setAttribute("aria-label",g.n+(open?"":", lukittu"));tl.innerHTML=`<span class="em">${g.e}</span><b></b>${open?`<span class="st">${starStr(S.stars[i]||0)}</span>`:`<span class="lock">🔒 ${needStars(i)} ⭐</span>`}`;tl.querySelector("b").textContent=g.n;if(open&&!S.plays[i])tl.append(h("span","new","Uusi"));tl.onclick=()=>open?openGame(i):unlockModal(i);grid.append(tl)});v.append(grid);
+ v.append(h("p","note","Uusia pelejä aukeaa tähdillä. Jokainen peli on hauska ilman ostoksia."))}
+function unlockModal(i){const g=GAMES[i];modal((box,close)=>{box.append(h("div","em",g.e),h("h2",null,g.n),h("p",null,"Aukeaa, kun sinulla on "+needStars(i)+" tähteä (nyt "+totalStars()+"). Voit myös avata sen heti kolikoilla."));const b=h("button","btn sun","Avaa 250 🪙");b.disabled=S.coins<250;b.onclick=()=>{S.unlocked[i]=true;addCoins(-250);sfx.coin();close();renderHome();openGame(i)};const c=h("button","btn","Myöhemmin");c.onclick=close;box.append(b,c)})}
+
+/* ---------- onnenpyörä ---------- */
+const WHEEL=[
+ {t:"50 🪙",do:()=>{addCoins(50);return["🪙","50 kolikkoa!"]}},
+ {t:"Kuponki",do:()=>{couponModal(giveCoupon());return null}},
+ {t:"100 🪙",do:()=>{addCoins(100);return["💰","100 kolikkoa!"]}},
+ {t:"Arpa",do:()=>{scratchModal();return null}},
+ {t:"25 🪙",do:()=>{addCoins(25);return["🪙","25 kolikkoa"]}},
+ {t:"150 XP",do:()=>{setTimeout(()=>addXP(150),10);return["✨","150 kokemuspistettä!"]}},
+ {t:"Kuponki",do:()=>{couponModal(giveCoupon());return null}},
+ {t:"300 🪙",do:()=>{addCoins(300);return["🤑","JACKPOT! 300 kolikkoa!"]}}];
+let wheelRot=0,spinning=false;
+function drawWheel(cv){const d=devicePixelRatio||1,W=320;cv.width=W*d;cv.height=W*d;const g=cv.getContext("2d");g.scale(d,d);const cols=[css("--accent"),css("--sun"),css("--mint"),css("--sky")];const n=WHEEL.length,a=Math.PI*2/n;
+ WHEEL.forEach((s,i)=>{g.beginPath();g.moveTo(160,160);g.arc(160,160,158,-Math.PI/2+i*a,-Math.PI/2+(i+1)*a);g.closePath();g.fillStyle=cols[i%4];g.fill();g.strokeStyle=css("--surface");g.lineWidth=3;g.stroke();g.save();g.translate(160,160);g.rotate(-Math.PI/2+(i+.5)*a);g.textAlign="right";g.textBaseline="middle";g.fillStyle=(i%4===1||i%4===2)?css("--paper-ink"):"#fff";g.font="20px "+css("--f-display");g.fillText(s.t,140,0);g.restore()})}
+function renderWheel(){const v=$("#v-wheel");v.replaceChildren();const sh=h("div","sec-h");sh.innerHTML=`<h2>Onnenpyörä</h2><span>Pyöräytyksiä: ${S.spins}</span>`;v.append(sh);
+ const box=h("div","wheelbox");const wrap=h("div","wheel-wrap");const cv=h("canvas");cv.style.transform=`rotate(${wheelRot}deg)`;wrap.append(h("div","pointer"),cv,h("div","hub","🍬"));drawWheel(cv);
+ const btn=h("button","btn primary",S.spins>0?"Pyöräytä!":"Ei pyöräytyksiä");btn.style.fontSize="18px";btn.disabled=S.spins<1;
+ btn.onclick=()=>{if(spinning||S.spins<1)return;spinning=true;S.spins--;tToday().spun++;save();hud();btn.disabled=true;const k=rnd(WHEEL.length),seg=360/WHEEL.length;const target=360-(k*seg+seg/2)+(Math.random()-.5)*seg*.6;wheelRot+=360*5+((target-wheelRot%360)+360)%360;cv.style.transform=`rotate(${wheelRot}deg)`;let ticks=0;const tk=setInterval(()=>{beep(400+ticks*8,.03,"triangle",.03);if(++ticks>28)clearInterval(tk)},reduced?5:130);
+  setTimeout(()=>{spinning=false;const r=WHEEL[k].do();if(r){sfx.win();confetti(70);simpleModal(r[0],r[1],null,"Jee!")}renderWheel()},reduced?50:4400)};
+ box.append(wrap,btn,h("p","note","Jokainen lohko on yhtä todennäköinen (1/8). Ilmainen pyöräytys joka päivä, lisää tehtävistä ja tasoista."));v.append(box);
+ v.append(Object.assign(h("div","sec-h"),{innerHTML:"<h2>Kolikkokauppa</h2><span>🪙 "+S.coins+"</span>"}));
+ const shop=h("div","shop");
+ [["🎡","Lisäpyöräytys","Pyöritä uudestaan heti",200,()=>{S.spins++;save();hud();renderWheel()}],
+  ["🎫","Raaputusarpa","Raaputa ja yllätä itsesi",120,()=>scratchModal()],
+  ["🎁","Avaa aarrearkku","Arkku heti auki ilman tähtiä",400,()=>openChest()]].forEach(([em,n,d,p,f])=>{const r=h("div","card row");r.innerHTML=`<span style="font-size:32px">${em}</span><div class="grow"><h3>${n}</h3><div class="sub">${d}</div></div>`;const b=h("button","btn sun",p+" 🪙");b.disabled=S.coins<p;b.onclick=()=>{if(S.coins<p)return;addCoins(-p);sfx.coin();f();renderWheel()};r.append(b);shop.append(r)});v.append(shop)}
+
+function scratchModal(){modal((box,close)=>{const prizes=[["30 🪙",()=>addCoins(30)],["80 🪙",()=>addCoins(80)],["150 🪙",()=>addCoins(150)],["Kuponki!",()=>couponModal(giveCoupon())],["+1 pyöräytys",()=>{S.spins++;save();hud()}],["60 XP",()=>addXP(60)]];const p=pick(prizes);
+ box.append(h("h2",null,"Raaputusarpa"),h("p",null,"Raaputa sormella tai hiirellä."));const sc=h("div","scratch",p[0]);const cv=h("canvas");sc.append(cv);box.append(sc);const b=h("button","btn primary","Lunasta");b.disabled=true;box.append(b);
+ requestAnimationFrame(()=>{const W=sc.clientWidth,H=sc.clientHeight,d=devicePixelRatio||1;cv.width=W*d;cv.height=H*d;const g=cv.getContext("2d");g.scale(d,d);g.fillStyle=css("--muted");g.fillRect(0,0,W,H);g.fillStyle=css("--surface");g.font="18px "+css("--f-display");g.textAlign="center";g.fillText("RAAPUTA TÄSTÄ ✨",W/2,H/2+6);g.globalCompositeOperation="destination-out";let down=false,done=false;
+  const sc_=e=>{if(!down||done)return;const r=cv.getBoundingClientRect();g.beginPath();g.arc(e.clientX-r.left,e.clientY-r.top,22,0,7);g.fill();if(Math.random()<.15){const data=g.getImageData(0,0,cv.width,cv.height).data;let c=0;for(let i=3;i<data.length;i+=64)if(data[i]===0)c++;if(c/(data.length/64)>.5){done=true;cv.style.transition="opacity .4s";cv.style.opacity=0;b.disabled=false;sfx.win();confetti(50)}}};
+  cv.onpointerdown=e=>{down=true;cv.setPointerCapture(e.pointerId);sc_(e)};cv.onpointermove=sc_;cv.onpointerup=()=>down=false});
+ b.onclick=()=>{close();p[1]();hud(true)}})}
+function openChest(){S.chest=0;save();const c=100+rnd(5)*50;addCoins(c);const coupon=Math.random()<.5?giveCoupon():null;modal((box,close)=>{confetti(150);sfx.win();box.append(h("div","em","🎁"),h("h2",null,"Arkku aukesi!"),h("p",null,c+" kolikkoa"+(coupon?" + kuponki: "+coupon.partner:" + ilmainen pyöräytys")));if(!coupon){S.spins++;save();hud()}const b=h("button","btn primary","Ihanaa");b.onclick=close;box.append(b)})}
+
+/* ---------- tehtävät ---------- */
+function renderTasks(){const v=$("#v-tasks");v.replaceChildren();const t=tToday();const ms=todaysMissions();
+ v.append(Object.assign(h("div","sec-h"),{innerHTML:"<h2>Päivän tehtävät</h2><span>Vaihtuvat keskiyöllä</span>"}));
+ ms.forEach(m=>{const val=Math.min(m.goal,t[m.key]||0),ok=val>=m.goal,cl=t.claimed.includes(m.id);const r=h("div","mission"+(ok?" done":""));r.innerHTML=`<span class="ic">${m.ic}</span><div class="grow"><b></b><div class="bar"><i style="width:${val/m.goal*100}%"></i></div><small class="note" style="text-align:left;display:block">${val}/${m.goal} · palkinto 60 🪙 + 🎡</small></div>`;r.querySelector("b").textContent=m.t;const b=h("button","btn "+(ok&&!cl?"mint":""),cl?"✓ Kerätty":"Kerää");b.disabled=!ok||cl;b.onclick=()=>{t.claimed.push(m.id);S.spins++;addCoins(60);sfx.coin();confetti(50);if(t.claimed.length===3&&!t.allBonus){t.allBonus=true;save();couponModal(giveCoupon())}save();hud();renderTasks()};r.append(b);v.append(r)});
+ v.append(h("p","note","Tee kaikki kolme, niin saat bonuksena kumppanikupongin."));
+ v.append(Object.assign(h("div","sec-h"),{innerHTML:"<h2>Päiväputki</h2><span>🔥 "+S.streak+" päivää</span>"}));const row=h("div","streak");const pos=(Math.max(1,S.streak)-1)%7;for(let i=0;i<7;i++)row.append(h("div",(i<=pos?"on ":"")+(i===pos?"today":""),i===6?"🎁":"P"+(i+1)));v.append(row);
+ const mins=Math.round((S.playMs[dayKey()]||0)/60000);const st=h("div","card");st.innerHTML=`<h3>🕊️ Oma hetki</h3><div class="sub">Pelasit tänään ${mins} min. Pelit on tehty lyhyiksi tauoiksi. Muistutamme tauosta 20 minuutin kohdalla.</div>`;v.append(st);
+ const stats=h("div","duo");stats.innerHTML=`<div class="card"><h3>${Object.values(S.plays).reduce((a,b)=>a+b,0)}</h3><div class="sub">pelikertaa yhteensä</div></div><div class="card"><h3>${S.coupons.length}</h3><div class="sub">kuponkia kerätty</div></div>`;v.append(stats)}
+
+/* ---------- kupongit ---------- */
+function renderCoupons(){const v=$("#v-coupons");v.replaceChildren();v.append(Object.assign(h("div","sec-h"),{innerHTML:"<h2>Kuponkilompakko</h2><span>"+S.coupons.filter(c=>!c.used).length+" käytettävissä</span>"}));
+ v.append(h("p","note","Kupongit ovat bonus, pelaaminen on aina ilmaista. Kumppanit ovat tässä versiossa esimerkkejä."));
+ if(!S.coupons.length){const e=h("div","empty");e.innerHTML='<div class="em">🎟️</div><p>Lompakko on vielä tyhjä. Kuponkeja voi voittaa onnenpyörästä, arvoista, arkuista ja päivän tehtävistä.</p>';const b=h("button","btn primary","Pyöräytä onnenpyörää");b.onclick=()=>show("wheel");e.append(b);v.append(e)}
+ S.coupons.forEach(c=>{c.seen=true;const k=h("div","coupon"+(c.used?" used":""));k.innerHTML=`<span class="em">${c.em}</span><div style="min-width:0"><span class="demo">Esimerkkikumppani</span><div class="off"></div><b></b><div class="note" style="text-align:left">Voimassa ${fmtDate(c.exp)} asti · koodi <span class="code"></span></div><div class="acts"></div></div>`;k.querySelector(".off").textContent=c.offer;k.querySelector("b").textContent=c.partner;k.querySelector(".code").textContent=c.code;
+  const acts=k.querySelector(".acts");const cp=h("button","btn","Kopioi koodi");cp.onclick=()=>{navigator.clipboard?.writeText(c.code).then(()=>toast("Koodi kopioitu"),()=>toast("Valitse koodi ja kopioi se käsin"))??toast("Valitse koodi ja kopioi se käsin")};const us=h("button","btn",c.used?"Käytetty":"Merkitse käytetyksi");us.disabled=c.used;us.onclick=()=>{c.used=true;save();renderCoupons()};acts.append(cp,us);v.append(k)});save();hud()}
+
+/* ---------- pelimoottori ---------- */
+let G=null,sessionStart=Date.now();
+function openGame(i){const g=GAMES[i];$("#ov").hidden=false;document.body.style.overflow="hidden";$("#ovTitle").textContent=g.e+" "+g.n;$("#ovScore").textContent="0";$("#ovTime").hidden=true;intro(i)}
+function closeOv(){if(G&&!G.ended){G.end();return}$("#ov").hidden=true;document.body.style.overflow="";G=null;show(view)}
+$("#ovClose").onclick=closeOv;
+function intro(i){const g=GAMES[i],st=$("#stage");st.replaceChildren();const d=h("div","intro");d.append(h("div","em",g.e),h("h2",null,g.n),h("p",null,g.d));const gl=h("div","goals");g.t.forEach((x,j)=>gl.append(h("span",null,"★".repeat(j+1)+" "+x)));d.append(gl);if(S.best[i]!=null)d.append(h("p",null,"Paras tuloksesi: "+S.best[i]));const b=h("button","btn primary","▶ Aloita");b.style.fontSize="20px";b.onclick=()=>start(i);d.append(b);st.append(d);b.focus()}
+function start(i){const g=GAMES[i],st=$("#stage");st.replaceChildren();$("#ovScore").textContent="0";$("#ovTime").hidden=true;const T=[],I=[],C=[];let score=0;const t0=Date.now();
+ const c=G={ended:false,stage:st,
+  get score(){return score},
+  set(n){score=Math.max(0,Math.round(n));$("#ovScore").textContent=score},
+  add(n,el,x,y){c.set(score+n);if(el)floatText(el,(n>0?"+":"")+n,x,y);if(n>0)sfx.pop();else if(n<0)sfx.bad()},
+  after(ms,f){const t=setTimeout(()=>{if(!c.ended)f()},ms);T.push(t);return t},
+  every(ms,f){const t=setInterval(()=>{if(!c.ended)f()},ms);I.push(t);return t},
+  loop(f){let last=performance.now();const step=now=>{if(c.ended)return;const dt=Math.min(40,now-last)/1000;last=now;f(dt);requestAnimationFrame(step)};requestAnimationFrame(step)},
+  countdown(sec,onOut){let left=sec;const el=$("#ovTime");el.hidden=false;const draw=()=>{el.textContent="⏱ "+left;el.classList.toggle("warn",left<=5)};draw();c.timeLeft=()=>left;c.every(1000,()=>{left--;draw();if(left<=5&&left>0)beep(300,.05,"square",.02);if(left<=0)(onOut||c.end)()})},
+  key(f){const k=e=>{if(!c.ended)f(e)};addEventListener("keydown",k);C.push(()=>removeEventListener("keydown",k))},
+  onEnd(f){C.push(f)},
+  info(txt){let e=st.querySelector(".ginfo");if(!e){e=h("div","ginfo");st.prepend(e)}e.textContent=txt},
+  end(){if(c.ended)return;c.ended=true;T.forEach(clearTimeout);I.forEach(clearInterval);C.forEach(f=>{try{f()}catch(e){}});const k=dayKey();S.playMs[k]=(S.playMs[k]||0)+(Date.now()-t0);finish(i,score)}};
+ g.run(st,c)}
+function finish(i,score){const g=GAMES[i],st=$("#stage"),t=tToday();$("#ovTime").hidden=true;const stars=g.t.filter(x=>score>=x).length;const old=S.stars[i]||0;const gained=Math.max(0,stars-old);const first=!S.plays[i];
+ const prevBest=S.best[i];S.plays[i]=(S.plays[i]||0)+1;if(S.best[i]==null||score>S.best[i])S.best[i]=score;if(stars>old)S.stars[i]=stars;t.played++;if(stars===3)t.three++;if(i===featuredIndex())t.feat++;if(first)t.newGame++;t.starsToday+=gained;S.chest+=gained;
+ let coins=5+stars*10+Math.min(20,Math.floor(score/50));if(i===featuredIndex())coins*=2;const xp=10+stars*10;save();
+ st.replaceChildren();const r=h("div","intro result");r.append(h("div","stars"));r.firstChild.innerHTML=[0,1,2].map(j=>`<i class="${j<stars?"on":""}" style="animation-delay:${j*.25}s">★</i>`).join("");r.append(h("div","score",score),h("p",null,stars===3?"Täydellistä! 🎉":stars===2?"Tosi hyvä!":stars===1?"Hyvä alku!":"Melkein! Kokeile uudestaan."));
+ if(prevBest!=null&&score>prevBest)r.append(h("p",null,"🏆 Uusi ennätys!"));
+ const rw=h("div","rewards");rw.append(h("span",null,"+"+coins+" 🪙"),h("span",null,"+"+xp+" XP"));if(gained)rw.append(h("span",null,"+"+gained+" ⭐ uutta"));r.append(rw);
+ const bt=h("div","btns");const again=h("button","btn primary","↻ Uudestaan");again.onclick=()=>start(i);const back=h("button","btn","Pelivalikkoon");back.onclick=()=>{G=null;closeOv()};bt.append(again,back);
+ const nx=GAMES.findIndex((x,j)=>j>i&&isUnlocked(j));if(nx>0){const nb=h("button","btn mint","Seuraava: "+GAMES[nx].e);nb.onclick=()=>{G=null;openGame(nx)};bt.append(nb)}r.append(bt);st.append(r);
+ if(stars)sfx.win();if(stars===3)confetti(120);
+ setTimeout(()=>{addCoins(coins);addXP(xp);
+  const unlockedNow=GAMES.map((x,j)=>j).filter(j=>j>=6&&!S.unlocked[j]&&totalStars()>=needStars(j)&&totalStars()-gained<needStars(j));unlockedNow.forEach(j=>simpleModal(GAMES[j].e,"Uusi peli aukesi!",GAMES[j].n+" odottaa pelivalikossa.","Kiva!"));
+  if(S.chest>=10)openChest();
+  if(t.played%4===0){S.spins++;save();hud();toast("🎡 Neljä peliä pelattu: ilmainen pyöräytys!")}
+  if(Date.now()-sessionStart>20*60000&&!t.remind){t.remind=true;save();simpleModal("🫖","Hyvä hetki tauolle?","Olet pelannut noin 20 minuuttia. Putkesi ja palkintosi odottavat täällä.","Selvä")}},500)}
+
+/* helper: canvas */
+function canvasIn(st,ratio=1.3){const wrap=h("div","cvwrap");st.append(wrap);const avW=Math.min(st.clientWidth-24,440),avH=st.clientHeight-(st.children.length>1?90:40);let W=avW,H=Math.round(W*ratio);if(H>avH){H=Math.max(260,avH);W=Math.min(avW,Math.round(H/ratio))}const d=devicePixelRatio||1;const cv=h("canvas");cv.width=W*d;cv.height=H*d;cv.style.width=W+"px";cv.style.height=H+"px";const g=cv.getContext("2d");g.scale(d,d);wrap.append(cv);const pos=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}};return{cv,g,W,H,pos}}
+function swipe(el,f){let s=null;el.addEventListener("pointerdown",e=>{s={x:e.clientX,y:e.clientY}});el.addEventListener("pointerup",e=>{if(!s)return;const dx=e.clientX-s.x,dy=e.clientY-s.y;s=null;if(Math.max(Math.abs(dx),Math.abs(dy))<24)return;f(Math.abs(dx)>Math.abs(dy)?(dx>0?"R":"L"):(dy>0?"D":"U"))})}
+const ARROWS={ArrowLeft:"L",ArrowRight:"R",ArrowUp:"U",ArrowDown:"D",a:"L",d:"R",w:"U",s:"D"};
+function board(st,n,cls=""){const b=h("div","board "+cls);b.style.gridTemplateColumns=`repeat(${n},1fr)`;st.append(b);return b}
+
+/* ---------- 30 PELIÄ ---------- */
+function gMatch3(st,c){const N=7,T=["🍓","🍋","🫐","🍏","🍊"];let b=[],sel=-1,busy=false,moves=22,combo=1;const r=()=>rnd(T.length);
+ for(let i=0;i<N*N;i++){let v;do{v=r()}while((i%N>=2&&b[i-1]===v&&b[i-2]===v)||(i>=2*N&&b[i-N]===v&&b[i-2*N]===v));b[i]=v}
+ const upd=t=>c.info(t||("Siirtoja jäljellä: "+moves));upd();const grid=board(st,N);const cells=[];
+ for(let i=0;i<N*N;i++){const e=h("button","cell");e.dataset.i=i;e.style.fontSize="clamp(18px,7vw,32px)";cells.push(e);grid.append(e)}
+ const render=(cl=new Set())=>cells.forEach((e,i)=>{e.textContent=b[i]<0?"":T[b[i]];e.classList.toggle("sel",i===sel);e.classList.toggle("pop",cl.has(i))});
+ function matches(){const s=new Set();for(let y=0;y<N;y++)for(let x=0;x<N;){let k=x;while(k<N&&b[y*N+k]===b[y*N+x]&&b[y*N+x]>=0)k++;if(k-x>=3)for(let j=x;j<k;j++)s.add(y*N+j);x=Math.max(k,x+1)}
+  for(let x=0;x<N;x++)for(let y=0;y<N;){let k=y;while(k<N&&b[k*N+x]===b[y*N+x]&&b[y*N+x]>=0)k++;if(k-y>=3)for(let j=y;j<k;j++)s.add(j*N+x);y=Math.max(k,y+1)}return s}
+ const adj=(a,q)=>(Math.abs(a-q)===1&&Math.floor(a/N)===Math.floor(q/N))||Math.abs(a-q)===N;
+ const sw=(a,q)=>{[b[a],b[q]]=[b[q],b[a]]};
+ function hasMove(){for(let i=0;i<N*N;i++)for(const q of[i+1,i+N]){if(q>=N*N||!adj(i,q))continue;sw(i,q);const m=matches().size;sw(i,q);if(m)return true}return false}
+ function step(){const m=matches();if(!m.size){busy=false;combo=1;upd();if(moves<=0){c.after(500,c.end);return}if(!hasMove()){shuffle(b);if(matches().size||!hasMove())return step();render();upd("Sekoitetaan…")}return}
+  c.add(m.size*10*combo);if(combo>1)upd(["","","Makeaa! ×2","Herkullista! ×3","Sokerihumala! ×4","SUPER! ×"+combo][Math.min(combo,5)]||"SUPER!");if(m.size>=5){moves++;upd("5 suora! +1 siirto")}combo++;render(m);buzz(10);
+  c.after(260,()=>{m.forEach(i=>b[i]=-1);for(let x=0;x<N;x++){let w=N-1;for(let y=N-1;y>=0;y--){const v=b[y*N+x];if(v>=0){b[w*N+x]=v;w--}}for(;w>=0;w--)b[w*N+x]=r()}render();c.after(220,step)})}
+ function trySwap(a,q){if(busy||!adj(a,q))return;sw(a,q);if(!matches().size){sw(a,q);cells[a].classList.add("shake");cells[q].classList.add("shake");setTimeout(()=>{cells[a].classList.remove("shake");cells[q].classList.remove("shake")},300);sfx.bad();sel=-1;render();return}sel=-1;moves--;busy=true;render();step()}
+ let down=null;grid.addEventListener("pointerdown",e=>{const t=e.target.closest(".cell");if(!t)return;down={i:+t.dataset.i,x:e.clientX,y:e.clientY}});
+ grid.addEventListener("pointerup",e=>{if(!down||busy){down=null;return}const dx=e.clientX-down.x,dy=e.clientY-down.y,i=down.i;down=null;if(Math.max(Math.abs(dx),Math.abs(dy))>20){const q=Math.abs(dx)>Math.abs(dy)?(dx>0?i+1:i-1):(dy>0?i+N:i-N);if(q>=0&&q<N*N)trySwap(i,q);return}if(sel<0){sel=i}else if(sel===i){sel=-1}else if(adj(sel,i)){trySwap(sel,i);return}else sel=i;render()});
+ render()}
+
+function gMemory(st,c){const E=shuffle(["🌸","🍰","🐱","🌈","🍓","🦋","☕","🎀"]);const d=shuffle([...E,...E]);let open=[],found=0,lock=false;c.countdown(60);c.info("Löydä parit");const gr=board(st,4);
+ d.forEach((em,i)=>{const e=h("button","cell","❔");e.onclick=()=>{if(lock||e.classList.contains("hit")||open.includes(i))return;e.textContent=em;e.classList.add("sel");open.push(i);sfx.pop();if(open.length===2){const[a,q]=open;const A=gr.children[a],B=gr.children[q];if(d[a]===d[q]){A.classList.add("hit");B.classList.add("hit");A.classList.remove("sel");B.classList.remove("sel");open=[];found++;c.add(100);sfx.good();if(found===8){c.add(c.timeLeft()*10);c.after(500,c.end)}}else{lock=true;c.after(700,()=>{A.textContent=B.textContent="❔";A.classList.remove("sel");B.classList.remove("sel");open=[];lock=false})}}};gr.append(e)})}
+
+function gBubbles(st,c){const a=h("div","area");st.append(a);c.countdown(30);c.info("Poksauta kuplat! Kultainen = 5");const H=a.clientHeight+80;const E=["🫧","🍬","🌸","💗","🍭"];
+ c.every(420,()=>{const gold=Math.random()<.1;const bb=h("button","bubble"+(gold?" gold":""),gold?"⭐":pick(E));bb.style.left=(rnd(Math.max(1,a.clientWidth-60)))+"px";bb.style.setProperty("--h",H+"px");bb.style.animationDuration=(3+Math.random()*2.5)+"s";bb.onpointerdown=e=>{e.preventDefault();const r=a.getBoundingClientRect();c.add(gold?5:1,a,e.clientX-r.left,e.clientY-r.top);bb.remove()};bb.onanimationend=()=>bb.remove();a.append(bb)})}
+
+function gReaction(st,c){let round=0,state="idle",t0=0,timer;const pad=h("button","pad");st.append(pad);c.info("Kierros 1/5");
+ const set=(bg,txt)=>{pad.style.background=bg;pad.textContent=txt};
+ const next=()=>{if(round>=5){c.after(400,c.end);return}state="wait";set(css("--bad"),"Odota vihreää…");timer=c.after(1000+Math.random()*2200,()=>{state="go";t0=performance.now();set(css("--mint"),"NAPAUTA!")})};
+ set(css("--sky"),"Napauta aloittaaksesi");
+ pad.onpointerdown=()=>{if(state==="idle"){next();return}if(state==="wait"){clearTimeout(timer);sfx.bad();round++;c.info("Liian aikaisin! Kierros "+Math.min(5,round+1)+"/5");state="pause";set(css("--muted"),"Liian aikaisin 😅");c.after(900,next);return}if(state==="go"){const ms=Math.round(performance.now()-t0);round++;c.add(Math.max(0,600-ms));c.info(ms+" ms · kierros "+Math.min(5,round+1)+"/5");state="pause";set(css("--accent"),ms+" ms"+(ms<250?" ⚡":""));c.after(900,next)}}}
+
+function gStroop(st,c){const C=[["PUNAINEN","#E5383B"],["SININEN","#2D7DD2"],["VIHREÄ","#2A9D48"],["ORANSSI","#E8770E"],["VIOLETTI","#8E44AD"]];let match;c.countdown(30);c.info("Täsmääkö sanan väri sanaan?");const p=h("div","paper");st.append(p);
+ const nx=()=>{const w=pick(C);match=Math.random()<.5;const col=match?w:pick(C.filter(x=>x!==w));p.textContent=w[0];p.style.color=col[1]};nx();
+ const ch=h("div","choice");const y=h("button","btn mint","✓ Täsmää"),n=h("button","btn primary","✗ Ei täsmää");ch.append(y,n);st.append(ch);
+ const ans=v=>{if(v===match){c.add(1,p)}else{c.add(-1,p);p.classList.add("shake");setTimeout(()=>p.classList.remove("shake"),300)}nx()};y.onclick=()=>ans(true);n.onclick=()=>ans(false);c.key(e=>{if(e.key==="ArrowLeft")ans(true);if(e.key==="ArrowRight")ans(false)})}
+
+function gMath(st,c){let ok;c.countdown(30);c.info("Onko lasku oikein?");const p=h("div","paper");st.append(p);
+ const nx=()=>{const op=pick(["+","−","×"]);let a=rnd(12)+2,b=rnd(12)+1;if(op==="−"&&b>a)[a,b]=[b,a];let r=op==="+"?a+b:op==="−"?a-b:a*b;ok=Math.random()<.5;if(!ok)r+=pick([-3,-2,-1,1,2,3]);p.textContent=`${a} ${op} ${b} = ${r}`};nx();
+ const ch=h("div","choice");const y=h("button","btn mint","✓ Oikein"),n=h("button","btn primary","✗ Väärin");ch.append(y,n);st.append(ch);
+ const ans=v=>{v===ok?c.add(1,p):c.add(-1,p);nx()};y.onclick=()=>ans(true);n.onclick=()=>ans(false);c.key(e=>{if(e.key==="ArrowLeft")ans(true);if(e.key==="ArrowRight")ans(false)})}
+
+function g2048(st,c){let b=Array(16).fill(0);c.countdown(120);c.info("Pyyhkäise ja yhdistä samat");const gr=board(st,4);gr.style.width="min(100%,380px)";const cells=[];for(let i=0;i<16;i++){const e=h("div","cell");cells.push(e);gr.append(e)}
+ const add=()=>{const e=b.map((v,i)=>v?-1:i).filter(i=>i>=0);if(e.length)b[pick(e)]=Math.random()<.9?2:4};
+ const render=()=>cells.forEach((e,i)=>{const v=b[i];e.textContent=v||"";const l=v?Math.log2(v):0;e.style.background=v?`hsl(${345-l*22} 85% ${90-l*3}%)`:"";e.style.color=v?"#3A1F3D":"";e.style.fontSize=v>=1000?"clamp(14px,5vw,22px)":"clamp(18px,7vw,30px)"});
+ const lines=d=>{const L=[];for(let k=0;k<4;k++){let l=[];for(let j=0;j<4;j++)l.push(d==="L"||d==="R"?k*4+j:j*4+k);if(d==="R"||d==="D")l.reverse();L.push(l)}return L};
+ const canMove=()=>b.includes(0)||b.some((v,i)=>(i%4<3&&b[i+1]===v)||(i<12&&b[i+4]===v));
+ const move=d=>{let moved=false;for(const l of lines(d)){const vals=l.map(i=>b[i]).filter(v=>v);const out=[];for(let j=0;j<vals.length;j++){if(vals[j]===vals[j+1]){out.push(vals[j]*2);c.add(vals[j]*2);j++}else out.push(vals[j])}while(out.length<4)out.push(0);l.forEach((i,j)=>{if(b[i]!==out[j])moved=true;b[i]=out[j]})}if(moved){add();render();sfx.pop();if(!canMove())c.after(600,c.end)}};
+ add();add();render();swipe(gr,move);c.key(e=>{const d=ARROWS[e.key];if(d){e.preventDefault();move(d)}})}
+
+function gWhack(st,c){c.countdown(30);c.info("Napauta myyrät 🐹, vältä pommit 💣");const gr=board(st,3);gr.style.width="min(100%,360px)";const holes=[];let speed=900;
+ for(let i=0;i<9;i++){const e=h("button","cell","");e.style.fontSize="clamp(30px,10vw,46px)";e.onpointerdown=()=>{if(!e.dataset.k)return;if(e.dataset.k==="m"){c.add(1,e);e.classList.add("hit");buzz(15)}else{c.add(-2,e);e.classList.add("miss");buzz(60)}e.dataset.k="";e.textContent="💥";setTimeout(()=>{e.textContent="";e.classList.remove("hit","miss")},250)};holes.push(e);gr.append(e)}
+ const spawn=()=>{const free=holes.filter(e=>!e.dataset.k);if(free.length){const e=pick(free);const bomb=Math.random()<.15;e.dataset.k=bomb?"b":"m";e.textContent=bomb?"💣":pick(["🐹","🐹","🐰","🦔"]);c.after(speed,()=>{if(e.dataset.k){e.dataset.k="";e.textContent=""}})}speed=Math.max(520,speed-12);c.after(Math.max(320,speed*.7),spawn)};spawn()}
+
+function gSimon(st,c){const cols=["--accent","--mint","--sun","--sky"],tones=[330,440,550,660];let seq=[],inp=0,lock=true;const gr=board(st,2);gr.style.width="min(100%,320px)";const pads=cols.map((k,i)=>{const e=h("button","cell");e.style.background=css(k);e.style.borderColor=css(k);e.style.opacity=.45;e.onpointerdown=()=>press(i);gr.append(e);return e});
+ const flash=(i,ms=380)=>{pads[i].style.opacity=1;beep(tones[i],ms/1000,"triangle",.06);setTimeout(()=>pads[i].style.opacity=.45,ms)};
+ const play=()=>{lock=true;c.info("Katso tarkkaan…");seq.push(rnd(4));seq.forEach((v,j)=>c.after(600+j*560,()=>flash(v)));c.after(600+seq.length*560,()=>{lock=false;inp=0;c.info("Sinun vuorosi: "+seq.length)})};
+ const press=i=>{if(lock)return;flash(i,200);if(i!==seq[inp]){lock=true;sfx.bad();c.info("Hups! Sarjan pituus "+(seq.length-1));c.after(900,c.end);return}inp++;if(inp===seq.length){c.set(seq.length);c.after(500,play)}};play()}
+
+function gWords(st,c){const W=shuffle(["KAHVI","PULLA","SAUNA","KESÄ","OMENA","KUKKA","PERHE","AURINKO","KISSA","KOIRA","LEIPÄ","KAKKU","HYMY","SYDÄN","TÄHTI","METSÄ","JÄRVI","KARKKI","SUKLAA","MANSIKKA","JÄÄTELÖ","MUSTIKKA","ILTA","LOMA","SATEENKAARI","KEVÄT","PIKNIK","KOTI","YSTÄVÄ","HALI"]);let w,got,tiles;c.countdown(75);const ans=h("div","answer"),tl=h("div","tiles"),ctr=h("div","btns");st.append(ans,tl,ctr);
+ const clr=h("button","btn","⌫ Tyhjennä"),skip=h("button","btn","Ohita →");ctr.append(clr,skip);
+ const nx=()=>{w=W.pop()||"HETKI";got=[];let s;do{s=shuffle(w.split(""))}while(s.join("")===w&&w.length>1);ans.textContent="_ ".repeat(w.length).trim();tl.replaceChildren();tiles=s.map(ch=>{const b=h("button","ltile",ch);b.onclick=()=>{b.classList.add("used");got.push(b);upd()};tl.append(b);return b});c.info("Muodosta sana · "+w.length+" kirjainta")};
+ const upd=()=>{const s=got.map(b=>b.textContent).join("");ans.textContent=s+" "+"_ ".repeat(w.length-s.length);sfx.pop();if(s.length===w.length){if(s===w){c.add(1,ans);sfx.good();ans.textContent="✓ "+w;c.after(500,nx)}else{ans.classList.add("shake");sfx.bad();c.after(400,()=>{ans.classList.remove("shake");got.forEach(b=>b.classList.remove("used"));got=[];ans.textContent="_ ".repeat(w.length).trim()})}}};
+ clr.onclick=()=>{got.forEach(b=>b.classList.remove("used"));got=[];ans.textContent="_ ".repeat(w.length).trim()};skip.onclick=()=>{toast("Sana oli "+w);nx()};nx()}
+
+function gStack(st,c){c.info("Napauta pudottaaksesi palan");const{cv,g,W,H}=canvasIn(st,1.4);const bh=24;let blocks=[{x:W*.2,w:W*.6}],cur={x:0,w:W*.6,dir:1},speed=140,cam=0,dead=false;const cols=[css("--accent"),css("--sun"),css("--mint"),css("--sky")];
+ const drop=()=>{if(dead)return;const p=blocks[blocks.length-1];const l=Math.max(p.x,cur.x),r=Math.min(p.x+p.w,cur.x+cur.w);const ov=r-l;if(ov<=2){dead=true;sfx.bad();c.after(700,c.end);return}const perfect=Math.abs(cur.x-p.x)<5;const nb=perfect?{x:p.x,w:p.w}:{x:l,w:ov};blocks.push(nb);c.add(perfect?2:1);if(perfect){c.info("Täydellinen! +2");buzz(20)}cur={x:cur.dir>0?-nb.w:W,w:nb.w,dir:-cur.dir};speed=Math.min(380,speed+9)};
+ cv.addEventListener("pointerdown",drop);c.key(e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();drop()}});
+ c.loop(dt=>{if(!dead){cur.x+=cur.dir*speed*dt;if(cur.x+cur.w>W+cur.w*.5&&cur.dir>0)cur.dir=-1;if(cur.x<-cur.w*.5&&cur.dir<0)cur.dir=1}const tgt=Math.max(0,(blocks.length+2)*bh-H*.6);cam+=(tgt-cam)*.1;g.clearRect(0,0,W,H);
+  blocks.forEach((b,i)=>{g.fillStyle=cols[i%4];g.fillRect(b.x,H-(i+1)*bh+cam,b.w,bh-2)});if(!dead){g.fillStyle=cols[blocks.length%4];g.fillRect(cur.x,H-(blocks.length+1)*bh+cam,cur.w,bh-2)}})}
+
+function gCatch(st,c){c.countdown(40);c.info("Liikuta koria, vältä 💣");const{cv,g,W,H,pos}=canvasIn(st,1.35);let bx=W/2,items=[],spawnT=0;const F=["🍓","🍒","🍑","🍌","🍇","🧁","🍩"];
+ const mv=e=>{bx=pos(e).x};cv.addEventListener("pointermove",mv);cv.addEventListener("pointerdown",mv);c.key(e=>{if(e.key==="ArrowLeft")bx-=30;if(e.key==="ArrowRight")bx+=30});
+ c.loop(dt=>{spawnT-=dt;if(spawnT<=0){spawnT=.45+Math.random()*.4;items.push({x:20+Math.random()*(W-40),y:-20,v:120+Math.random()*120+(40-c.timeLeft())*4,e:Math.random()<.15?"💣":pick(F)})}g.clearRect(0,0,W,H);g.font="30px serif";g.textAlign="center";g.textBaseline="middle";
+  items.forEach(it=>{it.y+=it.v*dt;if(it.y>H-46&&it.y<H-10&&Math.abs(it.x-bx)<42){it.dead=true;if(it.e==="💣"){c.add(-3);buzz(60)}else c.add(1)}if(it.y>H+30)it.dead=true;g.fillText(it.e,it.x,it.y)});items=items.filter(i=>!i.dead);bx=Math.max(30,Math.min(W-30,bx));g.font="48px serif";g.fillText("🧺",bx,H-28)})}
+
+function gLights(st,c){const N=4;let b=Array(N*N).fill(false),moves=0;c.countdown(90,()=>{c.set(b.filter(v=>!v).length*15);c.end()});const gr=board(st,N);gr.style.width="min(100%,340px)";
+ const tog=i=>{const x=i%N,y=Math.floor(i/N);[[0,0],[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const X=x+dx,Y=y+dy;if(X>=0&&X<N&&Y>=0&&Y<N)b[Y*N+X]=!b[Y*N+X]})};
+ do{b.fill(false);for(let k=0;k<6;k++)tog(rnd(N*N))}while(b.every(v=>!v));
+ const render=()=>{[...gr.children].forEach((e,i)=>{e.textContent=b[i]?"💡":"";e.style.background=b[i]?css("--sun"):""});c.info("Sammuta kaikki valot · siirrot "+moves)};
+ for(let i=0;i<N*N;i++){const e=h("button","cell");e.onclick=()=>{tog(i);moves++;sfx.pop();render();if(b.every(v=>!v)){c.set(Math.max(100,1000-moves*25));sfx.win();c.after(600,c.end)}};gr.append(e)}render()}
+
+function gSlide(st,c){let b=[1,2,3,4,5,6,7,8,0],moves=0;const t0=Date.now();c.countdown(150,()=>{c.set(b.filter((v,i)=>v===i+1).length*30);c.end()});const gr=board(st,3);gr.style.width="min(100%,330px)";
+ const nb=i=>[i-3,i+3,i%3?i-1:-1,i%3<2?i+1:-1].filter(j=>j>=0&&j<9);
+ for(let k=0;k<80;k++){const z=b.indexOf(0);const j=pick(nb(z));[b[z],b[j]]=[b[j],b[z]]}if(b.join()==="1,2,3,4,5,6,7,8,0"){[b[7],b[8]]=[b[8],b[7]];[b[5],b[8]]=[b[8],b[5]]}
+ const render=()=>{[...gr.children].forEach((e,i)=>{e.textContent=b[i]||"";e.style.visibility=b[i]?"visible":"hidden";e.style.fontFamily="var(--f-display)"});c.info("Järjestä 1–8 · siirrot "+moves)};
+ for(let i=0;i<9;i++){const e=h("button","cell");e.onclick=()=>{const z=b.indexOf(0);if(!nb(z).includes(i))return;[b[z],b[i]]=[b[i],b[z]];moves++;sfx.pop();render();if(b.join()==="1,2,3,4,5,6,7,8,0"){c.set(Math.max(100,1500-moves*10-Math.round((Date.now()-t0)/1000)*5));sfx.win();c.after(600,c.end)}};gr.append(e)}render()}
+
+function gOdd(st,c){const P=[["😀","😃"],["🙂","🙃"],["🍏","🍎"],["🐻","🐨"],["🌲","🌳"],["💙","💜"],["⭐","🌟"],["🍊","🍑"],["🌷","🌹"],["🍪","🍩"],["🐭","🐹"],["☕","🍵"],["🐳","🐋"],["🌕","🌝"],["🦆","🐥"]];let lvl=0;c.countdown(30);const wrap=h("div");wrap.style.width="min(100%,400px)";st.append(wrap);
+ const nx=()=>{const n=Math.min(7,3+Math.floor(lvl/2));const[a,b]=shuffle(pick(P).slice());const odd=rnd(n*n);wrap.replaceChildren();const gr=board(wrap,n);gr.style.width="100%";gr.style.gap="4px";for(let i=0;i<n*n;i++){const e=h("button","cell",i===odd?b:a);e.style.fontSize=`clamp(14px,${36/n}vw,34px)`;e.style.borderRadius="10px";e.onclick=()=>{if(i===odd){c.add(1);lvl++;nx()}else{c.add(-1);gr.classList.add("shake");setTimeout(()=>gr.classList.remove("shake"),300)}};gr.append(e)}c.info("Etsi erilainen · "+n+"×"+n)};nx()}
+
+function gSchulte(st,c){const n=shuffle([...Array(25)].map((_,i)=>i+1));let next=1;const t0=Date.now();c.countdown(60);c.info("Napauta 1 → 25 järjestyksessä");const gr=board(st,5);gr.style.width="min(100%,380px)";gr.style.gap="5px";
+ n.forEach(v=>{const e=h("button","cell",v);e.style.fontFamily="var(--f-display)";e.onclick=()=>{if(v===next){e.classList.add("hit");next++;sfx.pop();c.info("Seuraava: "+next);if(next>25){c.set(Math.max(100,1500-Math.round((Date.now()-t0)/50)));sfx.win();c.after(500,c.end)}}else{e.classList.add("shake");sfx.bad();setTimeout(()=>e.classList.remove("shake"),300)}};gr.append(e)})}
+
+function gFlappy(st,c){c.info("Napauta lentääksesi");const{cv,g,W,H}=canvasIn(st,1.35);let y=H/2,vy=0,pipes=[],t=0,go=false,dead=false;const gap=Math.max(130,H*.3),bx=W*.28;const mint=css("--mint"),ink=css("--ink");
+ const flap=()=>{if(dead)return;go=true;vy=-290;beep(700,.04,"triangle",.03)};cv.addEventListener("pointerdown",flap);c.key(e=>{if(e.key===" "||e.key==="ArrowUp"){e.preventDefault();flap()}});
+ c.loop(dt=>{if(go&&!dead){vy+=900*dt;y+=vy*dt;t-=dt;if(t<=0){t=1.55;pipes.push({x:W+30,gy:70+Math.random()*(H-140-gap),p:false})}pipes.forEach(p=>{p.x-=145*dt;if(!p.p&&p.x+30<bx){p.p=true;c.add(1)}if(bx+14>p.x&&bx-14<p.x+56&&(y-14<p.gy||y+14>p.gy+gap))dead=true});pipes=pipes.filter(p=>p.x>-70);if(y>H-14||y<0)dead=true;if(dead){sfx.bad();buzz(80);c.after(800,c.end)}}
+  g.clearRect(0,0,W,H);g.fillStyle=mint;pipes.forEach(p=>{g.beginPath();g.roundRect(p.x,-10,56,p.gy+10,10);g.roundRect(p.x,p.gy+gap,56,H,10);g.fill()});g.font="34px serif";g.textAlign="center";g.textBaseline="middle";g.save();g.translate(bx,y);g.rotate(Math.max(-.5,Math.min(1,vy/500)));g.fillText("🐤",0,0);g.restore();if(!go){g.fillStyle=ink;g.font="20px "+css("--f-display");g.fillText("Napauta!",W/2,H*.7)}})}
+
+function gMines(st,c){const N=7,M=7;let mines=null,rev=new Set(),flags=new Set(),flagMode=false,over=false;c.info("Avaa ruudut, vältä miinat");const gr=board(st,N);gr.style.width="min(100%,380px)";gr.style.gap="4px";
+ const nbr=i=>{const x=i%N,y=Math.floor(i/N),o=[];for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const X=x+dx,Y=y+dy;if(X>=0&&X<N&&Y>=0&&Y<N)o.push(Y*N+X)}return o};
+ const cnt=i=>nbr(i).filter(j=>mines.has(j)).length;
+ const render=()=>[...gr.children].forEach((e,i)=>{e.style.borderRadius="10px";if(rev.has(i)){const k=mines.has(i)?"💣":cnt(i)||"";e.textContent=k;e.style.background=css("--surface2");e.style.color=["",css("--sky"),css("--mint"),css("--accent"),css("--bad")][cnt(i)]||css("--ink")}else e.textContent=flags.has(i)?"🚩":""});
+ const open=i=>{if(rev.has(i)||flags.has(i))return;rev.add(i);if(!mines.has(i)&&cnt(i)===0)nbr(i).forEach(open)};
+ for(let i=0;i<N*N;i++){const e=h("button","cell");e.onclick=()=>{if(over)return;if(flagMode){if(!rev.has(i)){flags.has(i)?flags.delete(i):flags.add(i);render()}return}if(!mines){mines=new Set();const safe=new Set([i,...nbr(i)]);while(mines.size<M){const m=rnd(N*N);if(!safe.has(m))mines.add(m)}}if(mines.has(i)){over=true;mines.forEach(m=>rev.add(m));render();e.classList.add("miss");sfx.bad();buzz(100);c.after(1100,c.end);return}open(i);sfx.pop();c.set([...rev].length*10);render();if(rev.size===N*N-M){over=true;c.add(300);sfx.win();c.after(700,c.end)}};gr.append(e)}
+ const fb=h("button","btn","⛏️ Avaustila");fb.onclick=()=>{flagMode=!flagMode;fb.textContent=flagMode?"🚩 Lippumoodi":"⛏️ Avaustila"};st.append(fb)}
+
+function gHiLo(st,c){const L=["","A","2","3","4","5","6","7","8","9","10","J","Q","K"],Su=["♥","♦","♣","♠"];let cur=rnd(13)+1,s=pick(Su);const p=h("div","paper");p.style.minHeight="170px";st.append(p);c.info("Onko seuraava kortti isompi vai pienempi?");
+ const draw=()=>{p.textContent=L[cur]+s;p.style.color=s==="♥"||s==="♦"?"#D23A52":"#3A1F3D"};draw();
+ const ch=h("div","choice");const up=h("button","btn mint","▲ Isompi"),dn=h("button","btn primary","▼ Pienempi");ch.append(up,dn);st.append(ch);
+ const g=hi=>{const nx=rnd(13)+1;const ok=nx===cur||(hi?nx>cur:nx<cur);cur=nx;s=pick(Su);draw();if(ok){c.add(1,p);c.info("Putki: "+c.score)}else{sfx.bad();p.classList.add("shake");up.disabled=dn.disabled=true;c.info("Voi ei! Putki päättyi.");c.after(1000,c.end)}};up.onclick=()=>g(true);dn.onclick=()=>g(false);c.key(e=>{if(e.key==="ArrowUp")g(true);if(e.key==="ArrowDown")g(false)})}
+
+function gFlood(st,c){const N=10,C=["#E8336B","#FFB627","#1FA896","#3C8DDB","#9B5DE5","#F58A5B"];let b=[...Array(N*N)].map(()=>rnd(6)),moves=22;const gr=board(st,N);gr.style.gap="2px";gr.style.width="min(100%,360px)";const cells=[];for(let i=0;i<N*N;i++){const e=h("div","cell");e.style.borderRadius="5px";e.style.border="0";cells.push(e);gr.append(e)}
+ const region=()=>{const s=new Set([0]),q=[0],col=b[0];while(q.length){const i=q.pop();const x=i%N,y=Math.floor(i/N);[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const X=x+dx,Y=y+dy,j=Y*N+X;if(X>=0&&X<N&&Y>=0&&Y<N&&!s.has(j)&&b[j]===col){s.add(j);q.push(j)}})}return s};
+ const render=()=>{cells.forEach((e,i)=>e.style.background=C[b[i]]);c.info("Täytä koko ruutu yhdellä värillä · siirtoja "+moves)};
+ const row=h("div","btns");C.forEach((col,k)=>{const bt=h("button","btn");bt.style.background=col;bt.style.width="46px";bt.style.height="46px";bt.setAttribute("aria-label","Väri "+(k+1));bt.onclick=()=>{if(b[0]===k||moves<=0)return;region().forEach(i=>b[i]=k);moves--;sfx.pop();const r=region();render();c.set(r.size*2);if(r.size===N*N){c.set(200+(moves+1)*50);sfx.win();c.after(600,c.end)}else if(moves<=0)c.after(600,c.end)};row.append(bt)});st.append(row);render()}
+
+function gDodge(st,c){c.info("Raahaa ja väistele");const{cv,g,W,H,pos}=canvasIn(st,1.35);let px=W/2,obs=[],t=0,sp=.8,dead=false,time=0;const acc=css("--accent");
+ const mv=e=>{px=pos(e).x};cv.addEventListener("pointermove",mv);cv.addEventListener("pointerdown",mv);c.key(e=>{if(e.key==="ArrowLeft")px-=28;if(e.key==="ArrowRight")px+=28});
+ c.loop(dt=>{if(dead)return;time+=dt;c.set(Math.floor(time));t-=dt;if(t<=0){t=Math.max(.22,sp-time*.012);const w=30+Math.random()*50;obs.push({x:Math.random()*(W-w),y:-30,w,v:160+time*6})}px=Math.max(18,Math.min(W-18,px));g.clearRect(0,0,W,H);g.fillStyle=acc;
+  obs.forEach(o=>{o.y+=o.v*dt;g.beginPath();g.roundRect(o.x,o.y,o.w,22,8);g.fill();if(o.y+22>H-50&&o.y<H-16&&px+14>o.x&&px-14<o.x+o.w)dead=true});obs=obs.filter(o=>o.y<H+30);g.font="34px serif";g.textAlign="center";g.textBaseline="middle";g.fillText("🦄",px,H-32);if(dead){sfx.bad();buzz(80);c.after(800,c.end)}})}
+
+function gTTT(st,c){let b,round=0,turnAI=false,wins=0,draws=0;const gr=board(st,3);gr.style.width="min(100%,320px)";const cells=[];for(let i=0;i<9;i++){const e=h("button","cell");e.style.fontSize="clamp(30px,11vw,52px)";e.onclick=()=>play(i);cells.push(e);gr.append(e)}
+ const Ls=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];const win=p=>Ls.some(l=>l.every(i=>b[i]===p));
+ const render=()=>cells.forEach((e,i)=>e.textContent=b[i]==="X"?"💗":b[i]==="O"?"🍩":"");
+ const ai=()=>{const free=b.map((v,i)=>v?-1:i).filter(i=>i>=0);const tryP=p=>free.find(i=>{b[i]=p;const w=win(p);b[i]=null;return w});let m=tryP("O")??tryP("X");if(m==null||Math.random()<.25)m=free.includes(4)&&Math.random()<.6?4:pick(free);b[m]="O";render();check()};
+ const newRound=()=>{if(round>=5){c.after(300,c.end);return}b=Array(9).fill(null);round++;render();c.info(`Kierros ${round}/5 · voitot ${wins} · tasapelit ${draws}`);turnAI=round%2===0;if(turnAI)c.after(500,()=>{turnAI=false;ai()})};
+ const check=()=>{if(win("X")){wins++;c.add(3);sfx.win();c.info("Voitit kierroksen! 💗");turnAI=true;c.after(1000,newRound);return true}if(win("O")){sfx.bad();c.info("Donitsi voitti tämän 🍩");turnAI=true;c.after(1000,newRound);return true}if(b.every(v=>v)){draws++;c.add(1);c.info("Tasapeli");turnAI=true;c.after(1000,newRound);return true}return false};
+ const play=i=>{if(turnAI||b[i])return;b[i]="X";sfx.pop();render();if(check())return;turnAI=true;c.after(450,()=>{turnAI=false;ai()})};newRound()}
+
+function gTimer(st,c){let tries=0,running=false,t0=0,raf;const p=h("div","paper","0.00");st.append(p);c.info("Pysäytä kello tasan 5,00 sekunnissa · yritys 1/3");const b=h("button","btn primary","▶ Käynnistä");b.style.fontSize="20px";b.style.minWidth="200px";st.append(b);
+ const tick=()=>{if(c.ended)return;const s=(performance.now()-t0)/1000;p.textContent=s<1.5?s.toFixed(2):"?.??";raf=requestAnimationFrame(tick)};c.onEnd(()=>cancelAnimationFrame(raf));
+ b.onclick=()=>{if(!running){running=true;t0=performance.now();b.textContent="■ Pysäytä";tick();return}running=false;cancelAnimationFrame(raf);const s=(performance.now()-t0)/1000,diff=Math.abs(s-5)*1000;p.textContent=s.toFixed(2);const pts=Math.max(0,Math.round(500-diff));c.add(pts,p);tries++;c.info((diff<50?"Uskomaton! ":diff<200?"Tosi lähellä! ":"")+"Ero "+Math.round(diff)+" ms"+(tries<3?" · yritys "+(tries+1)+"/3":""));b.textContent="▶ Uudestaan";if(tries>=3){b.disabled=true;c.after(1200,c.end)}}}
+
+function gSort(st,c){const A=["🍎","🍌","🍇","🍓","🍒","🍍","🥝","🍉","🍑","🍐","🍋","🫐","🥭"],B=["🥕","🥦","🥒","🌽","🧅","🥔","🍆","🫑","🧄","🥬","🍅"];let cur;c.countdown(30);c.info("Hedelmä vai vihannes? (🍅 on vihannes!)");const p=h("div","paper");p.style.fontSize="80px";st.append(p);
+ const nx=()=>{cur=Math.random()<.5?"A":"B";p.textContent=pick(cur==="A"?A:B)};nx();const ch=h("div","choice");const a=h("button","btn mint","← Hedelmä"),bb=h("button","btn sun","Vihannes →");ch.append(a,bb);st.append(ch);
+ const ans=v=>{v===cur?c.add(1,p):(c.add(-1,p),p.classList.add("shake"),setTimeout(()=>p.classList.remove("shake"),300));nx()};a.onclick=()=>ans("A");bb.onclick=()=>ans("B");swipe(p,d=>{if(d==="L")ans("A");if(d==="R")ans("B")});c.key(e=>{if(e.key==="ArrowLeft")ans("A");if(e.key==="ArrowRight")ans("B")})}
+
+function gSudoku(st,c){let s=[[1,2,3,4],[3,4,1,2],[2,1,4,3],[4,3,2,1]];const map=shuffle([1,2,3,4]);s=s.map(r=>r.map(v=>map[v-1]));if(Math.random()<.5)[s[0],s[1]]=[s[1],s[0]];if(Math.random()<.5)[s[2],s[3]]=[s[3],s[2]];if(Math.random()<.5)s=s.map(r=>[r[1],r[0],r[2],r[3]]);if(Math.random()<.5)s=s.map(r=>[r[0],r[1],r[3],r[2]]);
+ const flat=s.flat(),givens=new Set(shuffle([...Array(16).keys()]).slice(0,6)),b=flat.map((v,i)=>givens.has(i)?v:0);const t0=Date.now();c.countdown(120);c.info("Täytä 1–4: joka rivi, sarake ja 2×2-ruutu");const gr=board(st,4);gr.style.width="min(100%,320px)";const F=["","🍓","🍋","🫐","🍏"];
+ const ok=()=>{const g=(i)=>b[i];for(let k=0;k<4;k++){const r=new Set(),cc=new Set(),bx=new Set();for(let j=0;j<4;j++){r.add(g(k*4+j));cc.add(g(j*4+k));bx.add(g((Math.floor(k/2)*2+Math.floor(j/2))*4+(k%2)*2+j%2))}if(r.size<4||cc.size<4||bx.size<4||r.has(0))return false}return true};
+ b.forEach((v,i)=>{const e=h("button","cell");const x=i%4,y=Math.floor(i/4);e.style.margin=`${y===2?"6px":"0"} 0 0 ${x===2?"6px":"0"}`;if(givens.has(i)){e.style.background=css("--surface2");e.disabled=true}const draw=()=>e.textContent=F[b[i]];draw();e.onclick=()=>{b[i]=(b[i]+1)%5;draw();sfx.pop();if(ok()){c.set(Math.max(200,1000-Math.round((Date.now()-t0)/1000)*8));sfx.win();c.after(600,c.end)}};gr.append(e)});st.append(h("p","note","Napauta ruutua vaihtaaksesi hedelmää. Jokainen hedelmä kerran per rivi, sarake ja kulmaruutu."))}
+
+function gPattern(st,c){let lvl=1,lives=2,target,found,lock=true;const N=4;const gr=board(st,N);gr.style.width="min(100%,340px)";const cells=[];for(let i=0;i<16;i++){const e=h("button","cell");e.onclick=()=>tap(i);cells.push(e);gr.append(e)}
+ const round=()=>{lock=true;found=new Set();cells.forEach(e=>{e.className="cell"});target=new Set(shuffle([...Array(16).keys()]).slice(0,Math.min(12,lvl+2)));c.info("Muista ruudut · taso "+lvl+" · "+"❤️".repeat(lives));target.forEach(i=>cells[i].classList.add("hit"));c.after(900+lvl*150,()=>{cells.forEach(e=>e.className="cell");lock=false;c.info("Napauta muistamasi "+target.size+" ruutua")})};
+ const tap=i=>{if(lock||found.has(i))return;if(target.has(i)){found.add(i);cells[i].classList.add("hit");sfx.pop();if(found.size===target.size){lock=true;c.set(lvl);lvl++;sfx.good();c.after(600,round)}}else{cells[i].classList.add("miss");lives--;sfx.bad();lock=true;if(lives<=0){target.forEach(j=>cells[j].classList.add("hit"));c.after(1000,c.end)}else c.after(800,round)}};round()}
+
+function gAim(st,c){const a=h("div","area");st.append(a);c.countdown(30);c.info("Osu tauluihin ennen kuin ne katoavat");let life=1.5;
+ const spawn=()=>{const t=h("button","target");t.setAttribute("aria-label","Taulu");t.style.left=(40+Math.random()*(a.clientWidth-80))+"px";t.style.top=(40+Math.random()*(a.clientHeight-80))+"px";t.style.animationDuration=life+"s";t.onpointerdown=e=>{e.stopPropagation();const r=a.getBoundingClientRect();c.add(1,a,e.clientX-r.left,e.clientY-r.top);t.remove();life=Math.max(.75,life-.03);spawn()};t.onanimationend=()=>{t.remove();spawn()};a.append(t)};spawn();c.after(6000,spawn)}
+
+function gMore(st,c){c.countdown(30);c.info("Kummassa on enemmän pisteitä?");const row=h("div","choice");row.style.gridTemplateColumns="1fr 1fr";st.append(row);let lvl=0;
+ const fill=(el,n)=>{el.replaceChildren();const used=[];for(let k=0;k<n;k++){let x,y,tries=0;do{x=10+Math.random()*80;y=10+Math.random()*80;tries++}while(tries<40&&used.some(([a,b])=>Math.hypot(a-x,b-y)<11));used.push([x,y]);const d=h("i");d.style.left=x+"%";d.style.top=y+"%";el.append(d)}};
+ const L=h("button","dots"),R=h("button","dots b");L.setAttribute("aria-label","Vasen");R.setAttribute("aria-label","Oikea");row.append(L,R);let big;
+ const nx=()=>{const a=6+rnd(10),diff=Math.max(1,4-Math.floor(lvl/5))+rnd(2);const b=a+diff;big=Math.random()<.5?"L":"R";fill(L,big==="L"?b:a);fill(R,big==="R"?b:a)};
+ const ans=s=>{if(s===big){c.add(1,row);lvl++}else{c.add(-1,row);row.classList.add("shake");setTimeout(()=>row.classList.remove("shake"),300)}nx()};L.onclick=()=>ans("L");R.onclick=()=>ans("R");c.key(e=>{if(e.key==="ArrowLeft")ans("L");if(e.key==="ArrowRight")ans("R")});nx()}
+
+function gEmoji(st,c){const Q=[["🧖‍♀️🔥💧","Sauna"],["☕🥐","Aamupala"],["🎄🎅","Joulu"],["🌧️☂️","Sadepäivä"],["🍓🍰","Mansikkakakku"],["🐝🍯","Hunaja"],["🏖️🌊","Rantapäivä"],["🎂🎉","Syntymäpäivä"],["❄️⛄","Lumiukko"],["🍿🎬","Leffailta"],["🛒🥕","Kauppareissu"],["🧺🌳","Piknik"],["👰🤵💍","Häät"],["🎣🐟","Kalastus"],["🧘‍♀️🌅","Aamujooga"],["🍕🛋️","Pizzailta"],["🚲☀️","Pyöräretki"],["📚☕","Lukuhetki"],["🐣🌷","Pääsiäinen"],["🎤🎶","Karaoke"],["🧁👩‍🍳","Leipominen"],["🍂🍄","Sienimetsä"],["🔥🌭","Makkaranpaisto"],["💤🛏️","Päiväunet"],["🚗🗺️","Automatka"],["🎁🎀","Lahja"]];const qs=shuffle(Q.slice()).slice(0,10);let k=0;
+ const p=h("div","paper");p.style.fontSize="56px";const opts=h("div","choice");st.append(p,opts);
+ const nx=()=>{if(k>=10){c.after(300,c.end);return}const[e,a]=qs[k];c.info("Arvoitus "+(k+1)+"/10");p.textContent=e;opts.replaceChildren();shuffle([a,...shuffle(Q.filter(q=>q[1]!==a).map(q=>q[1])).slice(0,3)]).forEach(o=>{const b=h("button","btn",o);b.style.fontSize="15px";b.onclick=()=>{[...opts.children].forEach(x=>x.disabled=true);if(o===a){b.classList.add("mint");c.add(1,p)}else{b.classList.add("primary");sfx.bad();[...opts.children].find(x=>x.textContent===a).classList.add("mint")}k++;c.after(800,nx)};opts.append(b)})};nx()}
+
+function gSnake(st,c){c.info("Pyyhkäise tai käytä nuolia");const N=15;const{cv,g,W,H}=canvasIn(st,1);const sz=Math.min(W,H)/N;let sn=[{x:7,y:7},{x:6,y:7},{x:5,y:7}],dir={x:1,y:0},nd=dir,food,acc=0,tick=.17,dead=false;const F=["🍓","🍎","🍒","🧁","🍬"];let fe=pick(F);
+ const place=()=>{do{food={x:rnd(N),y:rnd(N)}}while(sn.some(s=>s.x===food.x&&s.y===food.y));fe=pick(F)};place();
+ const setD=d=>{const m={L:{x:-1,y:0},R:{x:1,y:0},U:{x:0,y:-1},D:{x:0,y:1}}[d];if(m&&(m.x!==-dir.x||m.y!==-dir.y))nd=m};swipe(cv,setD);c.key(e=>{const d=ARROWS[e.key];if(d){e.preventDefault();setD(d)}});
+ const pad=h("div","dpad");[["",""],["U","▲"],["",""],["L","◀"],["D","▼"],["R","▶"]].forEach(([d,t])=>{if(!d){pad.append(h("span"));return}const b=h("button",null,t);b.onpointerdown=e=>{e.preventDefault();setD(d)};pad.append(b)});st.append(pad);
+ const mint=css("--mint"),acn=css("--accent");
+ c.loop(dt=>{if(dead)return;acc+=dt;if(acc>=tick){acc=0;dir=nd;const hd={x:sn[0].x+dir.x,y:sn[0].y+dir.y};if(hd.x<0||hd.y<0||hd.x>=N||hd.y>=N||sn.some(s=>s.x===hd.x&&s.y===hd.y)){dead=true;sfx.bad();buzz(80);c.after(800,c.end);return}sn.unshift(hd);if(hd.x===food.x&&hd.y===food.y){c.add(1);tick=Math.max(.08,tick-.005);place()}else sn.pop()}
+  g.clearRect(0,0,W,H);sn.forEach((s,i)=>{g.fillStyle=i?mint:acn;g.beginPath();g.roundRect(s.x*sz+1,s.y*sz+1,sz-2,sz-2,sz*.35);g.fill()});g.font=(sz*.85)+"px serif";g.textAlign="center";g.textBaseline="middle";g.fillText(fe,food.x*sz+sz/2,food.y*sz+sz/2+1)})}
+
+const GAMES=[
+ {n:"Karkkirivi",e:"🍬",d:"Vaihda vierekkäiset herkut ja tee kolmen suoria. Ketjut tuplaavat pisteet!",t:[400,800,1300],run:gMatch3},
+ {n:"Muistipari",e:"🃏",d:"Käännä kortit ja löydä kaikki parit minuutissa.",t:[500,800,1050],run:gMemory},
+ {n:"Kuplapoksu",e:"🫧",d:"Poksauta nousevat kuplat. Kultainen tähti antaa 5 pistettä.",t:[25,40,55],run:gBubbles},
+ {n:"Salamasormi",e:"⚡",d:"Napauta heti kun ruutu muuttuu vihreäksi. Viisi kierrosta.",t:[500,900,1200],run:gReaction},
+ {n:"Värikäs",e:"🎨",d:"Täsmääkö sanan väri sen merkitykseen? Nopeat aivot voittavat.",t:[10,18,25],run:gStroop},
+ {n:"Päässälasku",e:"➗",d:"Oikein vai väärin? Vastaa niin moneen kuin ehdit.",t:[10,16,22],run:gMath},
+ {n:"Tuplaus",e:"🔢",d:"Yhdistä samat numerot pyyhkäisemällä. Kaksi minuuttia aikaa.",t:[600,1500,3000],run:g2048},
+ {n:"Myyräjahti",e:"🐹",d:"Napauta myyrät koloihinsa, mutta älä koske pommeihin.",t:[15,25,35],run:gWhack},
+ {n:"Muistisarja",e:"🔔",d:"Toista valojen sarja. Joka kierros se pitenee.",t:[4,7,10],run:gSimon},
+ {n:"Sanasoppa",e:"🔤",d:"Järjestä kirjaimet suomen kielen sanaksi.",t:[3,6,9],run:gWords},
+ {n:"Kakkutorni",e:"🎂",d:"Pinoa kerrokset tarkasti päällekkäin. Täydellinen osuma = 2.",t:[8,16,25],run:gStack},
+ {n:"Hedelmäkori",e:"🧺",d:"Ota herkut kiinni korilla, väistä pommit.",t:[20,35,50],run:gCatch},
+ {n:"Valot pois",e:"💡",d:"Napautus vaihtaa ruudun ja sen naapurit. Sammuta kaikki.",t:[300,550,750],run:gLights},
+ {n:"Liukupala",e:"🧩",d:"Liu'uta numerot järjestykseen 1–8.",t:[400,750,1000],run:gSlide},
+ {n:"Poikkeava",e:"🔍",d:"Löydä se yksi erilainen. Ruudukko kasvaa!",t:[8,14,20],run:gOdd},
+ {n:"Numerojahti",e:"🎯",d:"Napauta numerot 1–25 järjestyksessä mahdollisimman nopeasti.",t:[500,800,1000],run:gSchulte},
+ {n:"Lepatus",e:"🐤",d:"Napauta ja lennä tolppien välistä.",t:[3,8,15],run:gFlappy},
+ {n:"Miinaharava",e:"💣",d:"Avaa turvalliset ruudut. Numerot kertovat viereiset miinat.",t:[200,400,700],run:gMines},
+ {n:"Isompi vai pienempi",e:"🂡",d:"Arvaa onko seuraava kortti isompi vai pienempi.",t:[4,7,10],run:gHiLo},
+ {n:"Värivirta",e:"🌊",d:"Levitä väriä vasemmasta yläkulmasta koko ruutuun 22 siirrossa.",t:[200,350,500],run:gFlood},
+ {n:"Väistely",e:"🦄",d:"Raahaa yksisarvista ja väistä putoavat palikat.",t:[15,30,45],run:gDodge},
+ {n:"Ristinolla",e:"💗",d:"Viisi kierrosta donitsia vastaan. Voitto 3, tasapeli 1.",t:[3,6,9],run:gTTT},
+ {n:"Tasan viisi",e:"⏱️",d:"Pysäytä kello 5,00 sekunnissa. Numerot katoavat kesken!",t:[500,900,1200],run:gTimer},
+ {n:"Lajittelu",e:"🥕",d:"Hedelmä vai vihannes? Lajittele nopeasti.",t:[15,25,35],run:gSort},
+ {n:"Minisudoku",e:"🍋",d:"4×4-sudoku hedelmillä. Rento ja nopea.",t:[400,650,850],run:gSudoku},
+ {n:"Kuviomuisti",e:"🟩",d:"Muista välähtäneet ruudut. Kaksi elämää.",t:[3,5,7],run:gPattern},
+ {n:"Napakymppi",e:"🎯",d:"Osu kutistuviin tauluihin ennen kuin ne katoavat.",t:[15,25,35],run:gAim},
+ {n:"Kumpi enemmän",e:"⚖️",d:"Valitse puoli, jossa on enemmän pisteitä.",t:[12,20,28],run:gMore},
+ {n:"Emojiarvoitus",e:"🤔",d:"Mitä emojit tarkoittavat? Kymmenen arvoitusta.",t:[5,8,10],run:gEmoji},
+ {n:"Matonen",e:"🐛",d:"Syö herkut ja kasva. Älä törmää itseesi.",t:[5,12,20],run:gSnake}];
+
+/* ---------- käynnistys ---------- */
+function boot(data){load(data&&data.coins!=null?data:null);tToday();hud();show(location.hash==="#pyora"?"wheel":location.hash==="#kupongit"?"coupons":"home");checkDaily()}
+window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
+</script>
+</body>
+</html>
