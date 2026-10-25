@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!--APP-->
+<title>Herrasmieskoulu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: yksi näkymä. Yläpalkki, vierivä sisältö, välilehdet alhaalla (puhelin) tai yläpalkissa (työpöytä). */
+:root{
+  --bg:#eef2ee; --surface:#ffffff; --ink:#15251e; --muted:#5a6a62; --line:#d6ded8;
+  --green:#1f4d3a; --green-ink:#f4efe1; --brass:#9a6f1f; --brass-soft:#f3e8cf;
+  --good:#276f44; --good-soft:#dcefe3; --bad:#a83e35; --bad-soft:#f7e1dd;
+  --shadow:0 1px 2px rgb(21 37 30 / .06), 0 10px 28px rgb(21 37 30 / .10);
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1612; --surface:#17221d; --ink:#e4ebe6; --muted:#98a79f; --line:#2a3a32;
+    --green:#2f6a51; --green-ink:#f3ecd8; --brass:#dcae5a; --brass-soft:#352c1c;
+    --good:#74c793; --good-soft:#1b3427; --bad:#ec8e82; --bad-soft:#3e2522;
+    --shadow:0 1px 2px rgb(0 0 0 / .3), 0 12px 30px rgb(0 0 0 / .35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1612; --surface:#17221d; --ink:#e4ebe6; --muted:#98a79f; --line:#2a3a32;
+  --green:#2f6a51; --green-ink:#f3ecd8; --brass:#dcae5a; --brass-soft:#352c1c;
+  --good:#74c793; --good-soft:#1b3427; --bad:#ec8e82; --bad-soft:#3e2522;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 12px 30px rgb(0 0 0 / .35);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.15;text-wrap:balance;margin:0}
+.gutter{padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+
+.app{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto;height:100%}
+@media (max-width:520px){.brand span{display:none}}
+.top{background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:12px;padding-block:10px;max-width:1120px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:8px;margin-right:auto;min-width:0}
+.brand b{font-family:var(--f-display);font-weight:400;font-size:1.25rem}
+.brand span{color:var(--muted);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--brass-soft);color:var(--ink);font-variant-numeric:tabular-nums}
+.pill svg{width:14px;height:14px;color:var(--brass)}
+main{grid-row:2;overflow:auto;-webkit-overflow-scrolling:touch}
+nav.tabs{grid-row:3}
+.view{padding-block:16px 28px;max-width:1120px;margin:0 auto}
+
+nav.tabs{background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom, 0px)}
+.tabs-in{display:grid;grid-template-columns:repeat(3,1fr);max-width:560px;margin:0 auto}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;padding:8px 4px 10px;color:var(--muted);font-size:.78rem;font-weight:600;letter-spacing:.02em}
+.tab svg{width:22px;height:22px}
+.tab[aria-selected="true"]{color:var(--ink)}
+.tab[aria-selected="true"] svg{color:var(--brass)}
+@media (min-width:900px){
+  .app{grid-template-rows:auto 1fr}
+  nav.tabs{grid-row:1;grid-column:1;border:0;background:none;justify-self:center;align-self:center;padding:0;position:relative;z-index:2;pointer-events:none}
+  .top{grid-row:1;grid-column:1}
+  .tabs-in{display:flex;gap:4px;pointer-events:auto}
+  .tab{flex-direction:row;gap:8px;font-size:.9rem;padding:8px 14px;border-radius:99px}
+  .tab[aria-selected="true"]{background:var(--bg)}
+  .tab svg{width:18px;height:18px}
+  main{grid-row:2}
+}
+@media (min-width:900px) and (max-width:1239px){.brand span{display:none}}
+
+/* --- Opi --- */
+.opi{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:14px;min-height:100%}
+.goal{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted)}
+.bar{flex:1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--good);border-radius:99px;transition:width .4s}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:.85rem;font-weight:500;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+.stage{position:relative;height:min(62vh,500px);min-height:380px}
+.card{position:absolute;inset:0;touch-action:none;user-select:none;-webkit-user-select:none;perspective:1400px;will-change:transform}
+.card.under{transform:scale(.95) translateY(14px);opacity:.7;pointer-events:none}
+.card.fly{transition:transform .35s ease-in, opacity .35s}
+.card.snap{transition:transform .25s cubic-bezier(.2,.9,.3,1.3)}
+.inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.8,.3,1)}
+.card.flipped .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;background:var(--surface);box-shadow:var(--shadow);border:1px solid var(--line);padding:22px 22px 18px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.face::after{content:"";position:absolute;inset:8px;border:1px solid var(--line);border-radius:16px;pointer-events:none}
+.face.back{transform:rotateY(180deg);background:var(--green);color:var(--green-ink);border-color:var(--green)}
+.face.back::after{border-color:rgb(255 255 255 / .16)}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--brass)}
+.face.back .eyebrow{color:var(--green-ink);opacity:.75}
+.ctx{font-size:.9rem;color:var(--muted)}
+.face.back .ctx{color:var(--green-ink);opacity:.8}
+.say{font-family:var(--f-display);font-size:clamp(1.55rem,6.2vw,2rem);line-height:1.2;margin:auto 0;text-wrap:balance}
+.say.en{font-size:clamp(1.3rem,5.2vw,1.65rem)}
+.meaning{background:rgb(255 255 255 / .1);border-radius:12px;padding:10px 12px;font-size:.92rem}
+.meaning b{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:2px}
+.tech{align-self:flex-start;font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--brass-soft);color:var(--ink)}
+.face.back .tech{background:rgb(255 255 255 / .14);color:var(--green-ink)}
+.tapnote{font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{border:1px dashed var(--line);border-radius:12px;padding:8px 10px;font-size:.88rem;line-height:1.3;display:flex;gap:6px;align-items:flex-start}
+.opt.r{justify-content:flex-end;text-align:right}
+.opt i{font-style:normal;font-weight:700;color:var(--brass)}
+.stamp{position:absolute;top:26px;z-index:3;font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:.9rem;padding:6px 12px;border-radius:10px;border:3px solid;opacity:0;pointer-events:none;max-width:60%;line-height:1.2;background:var(--surface)}
+.stamp.l{left:24px;color:var(--bad);border-color:var(--bad);transform:rotate(-10deg)}
+.stamp.r{right:24px;color:var(--good);border-color:var(--good);transform:rotate(10deg);text-align:right}
+.stamp.q{color:var(--brass);border-color:var(--brass)}
+.ctrl{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
+.cbtn{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:12px 14px;font-weight:600;font-size:.92rem;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 1px 2px rgb(0 0 0 / .05);min-width:0}
+.cbtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cbtn.no{color:var(--bad)} .cbtn.yes{color:var(--good)}
+.cbtn.flip{width:52px;height:52px;padding:0;border-radius:50%;background:var(--green);color:var(--green-ink);border-color:var(--green)}
+.cbtn svg{width:18px;height:18px;flex:none}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:0}
+.done{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:24px;border:2px dashed var(--line);border-radius:22px}
+.done h2{font-size:1.8rem}
+.done p{color:var(--muted);margin:0;max-width:30ch}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px));padding-top:16px;box-shadow:0 -10px 30px rgb(0 0 0 / .15);animation:up .28s cubic-bezier(.2,.9,.3,1)}
+.sheet.ok{background:var(--good-soft)} .sheet.ko{background:var(--bad-soft)}
+.sheet-in{max-width:460px;margin:0 auto;display:grid;gap:8px}
+.sheet h3{font-size:1.3rem}
+.sheet.ok h3{color:var(--good)} .sheet.ko h3{color:var(--bad)}
+.sheet p{margin:0;font-size:.95rem}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.toast{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top, 0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:6px 14px;border-radius:99px;font-weight:700;font-size:.85rem;z-index:30;animation:fade 1.2s forwards;pointer-events:none}
+@keyframes fade{0%{opacity:0;transform:translate(-50%,6px)}15%,70%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+
+/* --- yhteiset --- */
+.vhead{display:grid;gap:6px;margin-bottom:16px;max-width:70ch}
+.vhead h1{font-size:clamp(1.7rem,5vw,2.3rem)}
+.vhead p{margin:0;color:var(--muted)}
+.seg{justify-self:start;display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:3px;gap:2px;max-width:100%}
+.seg button{border:0;background:none;border-radius:99px;padding:7px 14px;font-weight:600;font-size:.88rem;color:var(--muted);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--green);color:var(--green-ink)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.btn{border:0;border-radius:99px;padding:10px 18px;font-weight:700;background:var(--green);color:var(--green-ink);display:inline-flex;gap:8px;align-items:center}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink);font-weight:600}
+.btn:disabled{opacity:.55;cursor:default}
+.btn svg{width:16px;height:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.note{font-size:.84rem;color:var(--muted);margin:0}
+.badge{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--brass-soft);color:var(--ink)}
+
+/* --- Ratkaise --- */
+.split{display:grid;gap:16px}
+@media (min-width:860px){.split{grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:start}.letter{position:sticky;top:0}}
+form{display:grid;gap:14px}
+.f{display:grid;gap:5px}
+.f label{font-weight:600;font-size:.88rem}
+.f small{color:var(--muted);font-size:.78rem}
+.f input,.f textarea,.f select{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 11px;min-width:0}
+.f textarea{resize:vertical;min-height:70px;line-height:1.45}
+.f.raw textarea{background:var(--brass-soft);border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+.tone{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tone button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 4px;font-weight:600;font-size:.85rem;display:grid;gap:1px}
+.tone button small{font-weight:400;color:var(--muted);font-size:.72rem}
+.tone button[aria-pressed="true"]{border-color:var(--green);background:var(--green);color:var(--green-ink)}
+.tone button[aria-pressed="true"] small{color:var(--green-ink);opacity:.8}
+.letter{display:grid;gap:12px}
+.lhead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lhead h2{font-size:1.2rem;margin-right:auto}
+.paper{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px;white-space:pre-wrap;font-size:.95rem;line-height:1.6;overflow-wrap:anywhere;margin:0;font-family:var(--f-body);min-height:200px}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags span{font-size:.78rem;padding:3px 10px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.ai-box{border-radius:12px;padding:12px 14px;background:var(--brass-soft);display:grid;gap:6px;font-size:.9rem}
+.ai-box ul{margin:0;padding-left:18px}
+.thinking{display:inline-flex;gap:4px}
+.thinking i{width:6px;height:6px;border-radius:50%;background:currentColor;animation:b 1s infinite}
+.thinking i:nth-child(2){animation-delay:.15s}.thinking i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,100%{opacity:.25}50%{opacity:1}}
+
+.deep{display:grid;gap:16px}
+.deep-in{display:grid;gap:10px}
+.res{display:grid;gap:14px}
+.res-grid{display:grid;gap:14px}
+@media (min-width:860px){.res-grid{grid-template-columns:1fr 1fr}}
+.res h3{font-size:1.15rem;margin-bottom:8px}
+.res ul,.res ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.styles{display:grid;gap:10px}
+@media (min-width:700px){.styles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.style{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:6px;background:var(--bg);min-width:0}
+.style header{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.style b{font-size:.95rem}
+.style q{font-family:var(--f-display);font-size:1.05rem;quotes:"“" "”"}
+.style .ctx{font-size:.82rem}
+.lvl{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px}
+.lvl.l1{background:var(--good-soft);color:var(--good)}
+.lvl.l2{background:var(--brass-soft);color:var(--ink)}
+.lvl.l3{background:var(--bad-soft);color:var(--bad)}
+.avoid li span{color:var(--muted)}
+
+/* --- Kirjasto --- */
+.lib{display:grid;gap:12px}
+@media (min-width:720px){.lib{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1060px){.lib{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tq{display:grid;gap:10px;align-content:start}
+.tq h3{font-size:1.25rem}
+.tq .how{margin:0;color:var(--muted);font-size:.9rem}
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.ladder button{border:1px solid var(--line);background:none;border-radius:8px;padding:5px 2px;font-size:.75rem;font-weight:600;color:var(--muted)}
+.ladder button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.quote{font-family:var(--f-display);font-size:1.08rem;line-height:1.35;min-height:4.1em;margin:0;padding:12px 14px;border-radius:10px;background:var(--bg)}
+.quote.fi{font-family:var(--f-body);font-weight:600;font-size:1rem}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <header class="top gutter">
+    <div class="top-in">
+      <div class="brand"><b>Herrasmieskoulu</b><span>Sano suoraan. Kirjoita kuin herrasmies.</span></div>
+      <span class="pill" title="Kokemuspisteet"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1l2.1 4.4 4.9.6-3.6 3.3.9 4.8L8 11.8 3.7 14.1l.9-4.8L1 6l4.9-.6z"/></svg><span id="xp">0</span> XP</span>
+      <span class="pill" title="Oikein putkeen"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8.5 1c.5 2.6 4 4.4 4 8.2A4.6 4.6 0 0 1 8 14a4.6 4.6 0 0 1-4.5-4.8c0-2 1.2-3.2 2-4 .1 1.5.8 2.4 1.6 2.6C7 5.6 7.7 3 8.5 1z"/></svg><span id="streak">0</span></span>
+    </div>
+  </header>
+
+  <nav class="tabs gutter" aria-label="Näkymät">
+    <div class="tabs-in" role="tablist">
+      <button class="tab" role="tab" data-view="opi" id="t-opi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="12" height="16" rx="2.5" transform="rotate(8 13 11)"/><rect x="4" y="5" width="12" height="16" rx="2.5"/></svg>Opi</button>
+      <button class="tab" role="tab" data-view="ratkaise" id="t-ratkaise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 21h14M4 7h16"/><path d="M7 7l-3 7a3 3 0 0 0 6 0L7 7zM17 7l-3 7a3 3 0 0 0 6 0l-3-7z"/></svg>Ratkaise</button>
+      <button class="tab" role="tab" data-view="kirjasto" id="t-kirjasto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg>Tyylit</button>
+    </div>
+  </nav>
+
+  <main id="main">
+    <!-- OPI -->
+    <section class="view gutter" id="v-opi" hidden>
+      <div class="opi">
+        <div class="goal"><span>Päivän tavoite</span><div class="bar"><i id="goalbar"></i></div><span id="goaltxt">0/15</span></div>
+        <div class="chips" id="cats" aria-label="Aihe"></div>
+        <div class="stage" id="stage"></div>
+        <div class="ctrl" id="ctrl">
+          <button class="cbtn no" id="bL"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 4l-6 6 6 6"/></svg><span id="bLt">Kertaan</span></button>
+          <button class="cbtn flip" id="bF" aria-label="Käännä kortti"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a7 7 0 0 1 12-5l2 2M17 10a7 7 0 0 1-12 5l-2-2"/><path d="M17 3v4h-4M3 17v-4h4"/></svg></button>
+          <button class="cbtn yes" id="bR"><span id="bRt">Osasin</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M8 4l6 6-6 6"/></svg></button>
+        </div>
+        <p class="hint" id="hint">Pyyhkäise korttia tai käytä nuolinäppäimiä ← →. Välilyönti kääntää.</p>
+      </div>
+    </section>
+
+    <!-- RATKAISE -->
+    <section class="view gutter" id="v-ratkaise" hidden>
+      <div class="vhead">
+        <h1>Ratkaise hankala asia herrasmiehenä</h1>
+        <p>Kirjoita ensin suoraan, vaikka kiukkuisesti. Herrasmies muuttaa sen kohteliaaksi, faktoihin nojaavaksi ja terävästi perustelluksi viestiksi.</p>
+        <div class="seg" role="group" aria-label="Tila">
+          <button data-mode="kirje" aria-pressed="true">Muotoile kirje</button>
+          <button data-mode="tutki" aria-pressed="false">Tutki koko asia</button>
+        </div>
+      </div>
+
+      <div id="m-kirje" class="split">
+        <form class="panel" id="fK" autocomplete="off">
+          <div class="f raw">
+            <label for="k-raw">Mitä oikeasti haluaisit sanoa?</label>
+            <textarea id="k-raw" rows="3"></textarea>
+            <small>Suomeksi ja suoraan. Tätä käytetään vain Clauden hionnassa.</small>
+          </div>
+          <div class="two">
+            <div class="f"><label for="k-lang">Kirjeen kieli</label>
+              <select id="k-lang"><option value="en">Englanti</option><option value="fi">Suomi</option></select></div>
+            <div class="f"><label for="k-name">Vastaanottaja</label>
+              <input id="k-name" placeholder="tyhjä = Dear Sir or Madam"></div>
+          </div>
+          <div class="f"><span id="tone-l" style="font-weight:600;font-size:.88rem">Sävy</span>
+            <div class="tone" role="group" aria-labelledby="tone-l">
+              <button type="button" data-tone="1" aria-pressed="false">Lempeä<small>ystävällinen</small></button>
+              <button type="button" data-tone="2" aria-pressed="true">Herrasmies<small>kohtelias + tiukka</small></button>
+              <button type="button" data-tone="3" aria-pressed="false">Terävä<small>muodollinen</small></button>
+            </div></div>
+          <div class="f"><label for="k-subj">Aihe</label><input id="k-subj"></div>
+          <div class="f"><label for="k-facts">Faktat, yksi per rivi</label>
+            <textarea id="k-facts" rows="4"></textarea>
+            <small>Päivämäärät, summat, tilausnumerot. Ei tunteita, vain mitä tapahtui.</small></div>
+          <div class="f"><label for="k-ask">Mitä vaadit</label><input id="k-ask"><small id="k-ask-h">esim. a full refund of €549</small></div>
+          <div class="two">
+            <div class="f"><label for="k-date">Määräaika</label><input id="k-date" type="date"></div>
+            <div class="f"><label for="k-sign">Allekirjoitus</label><input id="k-sign"></div>
+          </div>
+          <div class="f"><label for="k-cons">Jos ei toteudu, aion…</label><input id="k-cons"><small id="k-cons-h">esim. refer the matter to the Consumer Disputes Board</small></div>
+          <div class="row"><button type="button" class="btn ghost" id="k-sample">Täytä esimerkki</button><button type="button" class="btn ghost" id="k-clear">Tyhjennä</button></div>
+        </form>
+
+        <div class="panel letter">
+          <div class="lhead">
+            <h2>Kirje</h2>
+            <span class="badge" id="k-badge">Pohja</span>
+          </div>
+          <pre class="paper" id="k-out"></pre>
+          <div class="tags" id="k-tags"></div>
+          <div class="row">
+            <button class="btn" id="k-copy" type="button"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M13 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/></svg>Kopioi kirje</button>
+            <button class="btn ghost" id="k-ai" type="button" hidden>Hio Claudella</button>
+            <button class="btn ghost" id="k-stop" type="button" hidden>Pysäytä</button>
+            <button class="btn ghost" id="k-back" type="button" hidden>Takaisin pohjaan</button>
+            <button class="btn ghost" id="k-prompt" type="button">Kopioi kehote ChatGPT:hen</button>
+          </div>
+          <div class="ai-box" id="k-ai-box" hidden></div>
+          <p class="note">Ei oikeudellista neuvontaa. Tarkista faktat, määräajat ja viittaamasi lait ennen lähettämistä.</p>
+        </div>
+      </div>
+
+      <div id="m-tutki" class="deep" hidden>
+        <div class="panel deep-in">
+          <div class="f raw">
+            <label for="d-in">Kuvaa koko tilanne</label>
+            <textarea id="d-in" rows="4"></textarea>
+            <small>Herrasmies käy asian läpi: faktat, oikeudellinen kulma, tyylit lempeästä terävään, mitä sanoa ja mitä välttää, eskalointi.</small>
+          </div>
+          <div class="row">
+            <button class="btn" id="d-go" type="button" hidden>Tutki Claudella</button>
+            <button class="btn ghost" id="d-stop" type="button" hidden>Pysäytä</button>
+            <button class="btn ghost" id="d-prompt" type="button">Kopioi kehote ChatGPT:hen</button>
+            <span class="note" id="d-status"></span>
+          </div>
+        </div>
+        <div class="res" id="d-res"></div>
+      </div>
+    </section>
+
+    <!-- KIRJASTO -->
+    <section class="view gutter" id="v-kirjasto" hidden>
+      <div class="vhead">
+        <h1>Tyylikirjasto</h1>
+        <p>Kaksitoista keinoa, joilla suora asia muuttuu kohteliaaksi ja silti terävämmäksi. Jokaisessa sama viesti kolmella tasolla: suomalainen suoruus, brittiläinen kohteliaisuus ja herrasmies, joka tuo faktat pöytään.</p>
+      </div>
+      <div class="chips" id="libcats" style="margin-bottom:14px"></div>
+      <div class="lib" id="lib"></div>
+    </section>
+  </main>
+</div>
+<div id="sheet" class="sheet gutter" hidden></div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("hm." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("hm." + k, JSON.stringify(v)); } catch {} }
+};
+
+const CATS = { arki: "Arki", tyo: "Työ", palaute: "Palaute", reklamaatio: "Reklamaatio", juridiikka: "Juridiikka", naapuri: "Naapurit" };
+
+// k = käännä (käännä kortti ja arvioi itse), d = dekoodaa (valitse tulkinta pyyhkäisemällä)
+const CARDS = [
+  {id:1,cat:"arki",t:"k",ctx:"Ystävän uudet kengät",fi:"Onpa rumat kengät.",en:"What an interesting colour. Very brave.",means:"En ikinä pukisi noita jalkaani.",tech:"Understatement"},
+  {id:2,cat:"arki",t:"k",ctx:"Illallisella tarjottu ruoka",fi:"Tää on pahaa.",en:"It's certainly different. I don't think I've had anything quite like it.",means:"En ota santsikierrosta.",tech:"Kierrellen kehuminen"},
+  {id:3,cat:"arki",t:"d",ctx:"Britti maistaa leipomaasi kakkua",en:"Not bad at all.",ok:"Kakku on oikeasti hyvä",no:"Kakku on huono",why:"‘Not bad’ on brittiläisessä vähättelyssä kehu, ja ‘not bad at all’ tarkoittaa selvästi hyvää."},
+  {id:4,cat:"arki",t:"d",ctx:"Kerrot irtisanoutuvasi ja muuttavasi Balille",en:"That's a very brave decision.",ok:"Hänen mielestään idea on hullu",no:"Hän ihailee rohkeuttasi",why:"‘Brave’ tarkoittaa brittiläisessä puheessa usein harkitsematonta. Kehu on kohtelias tapa sanoa ‘oletko varma?’"},
+  {id:5,cat:"arki",t:"k",ctx:"Tuttava myöhästyy taas",fi:"Sä oot aina myöhässä.",en:"No worries at all. I'd just started to wonder whether we'd got the time mixed up.",means:"Huomaan, että tämä toistuu.",tech:"Syy tilanteelle, ei ihmiselle"},
+  {id:6,cat:"arki",t:"d",ctx:"Ehdotat jotain tuttavallesi",en:"I'll bear it in mind.",ok:"Hän ei aio tehdä sille mitään",no:"Hän toteuttaa sen pian",why:"‘I'll bear it in mind’ on kohtelias tapa lopettaa aihe. Odota mieluummin ei-mitään."},
+  {id:7,cat:"arki",t:"d",ctx:"Juhlien lopussa uusi tuttava sanoo",en:"You must come round for dinner sometime.",ok:"Kohteliaisuus, ei oikea kutsu",no:"Oikea kutsu, sovi päivä",why:"Ilman päivämäärää tämä on ystävällinen hyvästi. Oikea kutsu sisältää ajan: ‘Are you free on Saturday?’"},
+  {id:8,cat:"tyo",t:"k",ctx:"Kollegan esitys oli sekava",fi:"Esityksesi oli sekava.",en:"Really useful. I wonder if we could make the key message a touch clearer for the board?",means:"Pääviesti hukkui. Korjaa se ennen hallitusta.",tech:"Kysymys käskyn sijaan"},
+  {id:9,cat:"tyo",t:"k",ctx:"Kokous venyy",fi:"Tää on ajanhukkaa.",en:"Shall we take the rest offline so we can keep to time?",means:"Lopetetaan tämä nyt.",tech:"Me-muoto"},
+  {id:10,cat:"tyo",t:"d",ctx:"Johtoryhmän jäsen aloittaa vastauksensa",en:"With the greatest respect…",ok:"Hän on jyrkästi eri mieltä",no:"Hän on samaa mieltä",why:"‘With the greatest respect’ ennakoi lähes aina kovaa erimielisyyttä. Mitä enemmän kunnioitusta, sitä kovempi isku."},
+  {id:11,cat:"tyo",t:"d",ctx:"Brittiesimies kommentoi raporttiasi",en:"Quite good.",ok:"Raportti on vähän pettymys",no:"Raportti on erinomainen",why:"Britille ‘quite good’ on laimea, jopa pettynyt. Amerikkalaiselle se kuulostaa kehulta, joten sekaannus on klassikko."},
+  {id:12,cat:"tyo",t:"k",ctx:"Kollega ei ole vastannut viikkoon",fi:"Miksi et vastaa?",en:"Just following up on my note from last week. Happy to jump on a call if that's easier.",means:"Odotan vastausta nyt.",tech:"Kevyt muistutus"},
+  {id:13,cat:"tyo",t:"k",ctx:"Kieltäydyt lisätyöstä",fi:"En ehdi.",en:"I'd love to help, but I couldn't give it the attention it deserves this week. Could we look at next Tuesday?",means:"Ei. Ehkä myöhemmin.",tech:"Kyllä, mutta, vaihtoehto"},
+  {id:14,cat:"tyo",t:"k",ctx:"Pomo ehdottaa mahdotonta aikataulua",fi:"Tää aikataulu ei ikinä toimi.",en:"That's ambitious. To hit it we'd need two more people or to drop the reporting module. Which would you prefer?",means:"Ei onnistu ilman lisäresursseja.",tech:"Ehdot valinnaksi"},
+  {id:15,cat:"palaute",t:"d",ctx:"Esität vastaväitteesi kokouksessa",en:"I hear what you say.",ok:"Hän on eri mieltä eikä halua jatkaa",no:"Hän on vakuuttunut",why:"‘I hear what you say’ kuittaa, että kuuli, ei sitä, että hyväksyy. Keskustelu on hänen puolestaan ohi."},
+  {id:16,cat:"palaute",t:"d",ctx:"Asiakas kommentoi virhettä",en:"I'm sure it's my fault.",ok:"Hän pitää sinua syyllisenä",no:"Hän ottaa syyn itselleen",why:"Itsensä syyttäminen on kohtelias tapa osoittaa, että vika on toisessa."},
+  {id:17,cat:"palaute",t:"k",ctx:"Työntekijän tekstissä on paljon virheitä",fi:"Tässä on paljon virheitä.",en:"Great start. A few small things to tidy up before it goes out. I've marked them.",means:"Korjaa kaikki merkityt kohdat.",tech:"Kehu, korjaus, kehu"},
+  {id:18,cat:"palaute",t:"d",ctx:"Esittelet ideasi",en:"Could we consider some other options?",ok:"Idea ei kelpaa",no:"Idea on hyvä, jatketaan",why:"Kun britti pyytää ‘other options’, sinun vaihtoehtosi on jo hylätty."},
+  {id:19,cat:"palaute",t:"d",ctx:"Kollega kommentoi suunnitelmaasi",en:"I only have a few minor comments.",ok:"Suunnitelma kirjoitetaan uusiksi",no:"Pari pilkkuvirhettä",why:"‘A few minor comments’ voi tarkoittaa koko suunnitelman uudelleen kirjoittamista. Lue kommentit huolella."},
+  {id:20,cat:"reklamaatio",t:"k",ctx:"Pesukone palautettu, rahat eivät tule",fi:"Palauttakaa rahani heti!",en:"I would be grateful if you could confirm the refund of €549 by 8 November.",means:"Vaadin rahat. Tässä summa ja päivä.",tech:"Kohtelias määräaika"},
+  {id:21,cat:"reklamaatio",t:"k",ctx:"Kolmas yhteydenotto samasta asiasta",fi:"Te ette ikinä vastaa mihinkään.",en:"For the record, this is my third message on the matter (12 and 19 October).",means:"Minulla on todisteet viivyttelystänne.",tech:"For the record"},
+  {id:22,cat:"reklamaatio",t:"d",ctx:"Asiakas kirjoittaa palautteessa",en:"I'm a little disappointed.",ok:"Hän on raivoissaan",no:"Hän on lievästi harmissaan",why:"Brittiläisessä asiakaspalautteessa ‘a little disappointed’ on usein lähes huippulukema. Reagoi vakavasti."},
+  {id:23,cat:"reklamaatio",t:"k",ctx:"Uhkaat jatkotoimilla",fi:"Mä vien teidät oikeuteen!",en:"Should I not hear from you by then, I will have no option but to refer the matter to the Consumer Disputes Board.",means:"Seuraava askel on virallinen, ja tiedän sen.",tech:"Seuraus neutraalisti"},
+  {id:24,cat:"reklamaatio",t:"d",ctx:"Saat vastauksen yhteyshenkilöltä",en:"As per my previous email…",ok:"Hän on ärsyyntynyt, ettet lukenut",no:"Hän muistuttaa ystävällisesti",why:"‘As per my previous email’ tarkoittaa: vastaus oli jo siellä. Se on sähköpostin kohteliain kulmakarva."},
+  {id:25,cat:"juridiikka",t:"k",ctx:"Vuokranantaja pidättää vakuuden",fi:"Pidätätte vakuutta laittomasti.",en:"I note the deposit has not been returned. Could you let me know the legal basis for retaining it?",means:"Mielestäni tämä on laitonta. Todista muuta.",tech:"Kysy perustetta"},
+  {id:26,cat:"juridiikka",t:"k",ctx:"Laskussa on virhe",fi:"Laskunne on väärin.",en:"It appears there may be an error on invoice 4471: the hours listed (32) differ from those agreed (24).",means:"Lasku on väärin. Tässä luvut.",tech:"Passiivi ja faktat"},
+  {id:27,cat:"juridiikka",t:"d",ctx:"Vastapuolen viestin otsikossa lukee",en:"Without prejudice",ok:"Sovintoehdotus, jota ei voi käyttää todisteena",no:"Hän lupaa kohdella sinua tasapuolisesti",why:"Englannin oikeudessa ‘without prejudice’ -viestit ovat yleensä sovintoneuvotteluja, joita ei voi esittää oikeudessa todisteena. Tarkista käytäntö aina oman maasi lainsäädännöstä."},
+  {id:28,cat:"juridiikka",t:"k",ctx:"Toimittaja ei noudata sopimusta",fi:"Ette noudata sopimusta.",en:"Under clause 6.2 of our agreement, delivery was due on 1 October. I would welcome your proposal for putting this right.",means:"Rikoitte sopimusta. Korjatkaa se.",tech:"Viittaa kohtaan"},
+  {id:29,cat:"juridiikka",t:"d",ctx:"Vastapuolen kirje päättyy",en:"We reserve all our rights.",ok:"He harkitsevat jatkotoimia",no:"Asia on heidän puolestaan loppuun käsitelty",why:"Oikeuksien pidättäminen tarkoittaa, ettei mistään ole luovuttu. Säilytä kaikki viestit."},
+  {id:30,cat:"naapuri",t:"k",ctx:"Naapurin bileet jatkuvat kello kahdelta",fi:"Lopettakaa se meteli!",en:"Sorry to bother you. The music carries more than you'd think. Would you mind turning it down after ten?",means:"Liian kovaa. Hiljemmalle.",tech:"Pahoittelu ensin"},
+  {id:31,cat:"naapuri",t:"d",ctx:"Naapuri katsoo kaatamaasi pensasaitaa",en:"It's a bit of a shame about the hedge.",ok:"Hän on todella harmissaan",no:"Hän ei juuri välitä",why:"‘A bit of a shame’ on vähättelyä. Mitä pienemmät sanat, sitä isompi tunne."},
+  {id:32,cat:"naapuri",t:"k",ctx:"Auto parkissa sinun paikallasi",fi:"Siirrä autos pois mun paikalta.",en:"I think there may have been a mix-up. That's my allocated space. Would you mind moving it when you get a moment?",means:"Siirrä se nyt.",tech:"Oleta väärinkäsitys"}
+];
+
+const STYLES = [
+  {name:"Understatement",how:"Vähättele, älä liioittele. Mitä pienemmät sanat, sitä vakavammin ne otetaan.",tags:["arki","tyo"],l:["Tää projekti on ihan katastrofi.","We seem to have hit a bit of a bump.","We have a significant problem: 40% of yesterday's orders failed. I propose we pause the release until Friday."]},
+  {name:"Pehmentimet",how:"Lisää ‘I wonder’, ‘perhaps’, ‘might’. Väite muuttuu ehdotukseksi, eikä vastapuolen tarvitse puolustautua.",tags:["tyo","palaute"],l:["Toi luku on väärin.","I might be wrong, but I wonder if that figure is quite right?","I may be missing something, but the figure (€12,400) doesn't match the contract (€10,400). Could you check?"]},
+  {name:"Kysymys käskyn sijaan",how:"Pyyntö kysymyksenä antaa toiselle kunnian päättää, vaikka vaihtoehtoja ei oikeasti ole.",tags:["tyo","arki"],l:["Lähetä se raportti.","Would you mind sending the report over when you get a chance?","Could you send the report by 3 pm today? The board meets at 4."]},
+  {name:"Kehu, korjaus, kehu",how:"Aloita siitä mikä toimii, sano korjattava täsmällisesti ja päätä eteenpäin katsoen.",tags:["palaute","tyo"],l:["Tekstissä on paljon virheitä.","Lovely start. A few things to tidy up and then it's ready.","The structure works well. Sections 2 and 4 need corrected figures before Thursday. Once that's done, it's ready to send."]},
+  {name:"Passiivi ja asia edellä",how:"Puhu asiasta, älä ihmisestä. ‘It appears’ antaa toiselle tilaa korjata ilman nöyryytystä.",tags:["tyo","reklamaatio","juridiikka"],l:["Sä unohdit laskuttaa.","It looks like the invoice may have slipped through.","It appears invoice 4471 was not sent on 1 October. Could it go out today so payment isn't delayed further?"]},
+  {name:"For the record",how:"Kirjaa päivämäärät ja tapahtumat rauhallisesti. Faktalista on kohteliain tapa näyttää, että sinulla on näyttöä.",tags:["reklamaatio","juridiikka"],l:["Te ette ikinä vastaa.","Just to recap where we are…","For the record, I wrote on 12 and 19 October and called on 22 October. I have not yet received a reply."]},
+  {name:"Viittaa sääntöön",how:"Älä väitä, vaan osoita kohta: sopimuksen pykälä, laki tai yrityksen oma lupaus.",tags:["juridiikka","reklamaatio"],l:["Ette noudata sopimusta.","I think the agreement may say something slightly different.","Clause 6.2 sets delivery for 1 October. It has not arrived. I would welcome your proposal for putting this right by Friday."]},
+  {name:"Kohtelias määräaika",how:"Kiitollisuus ja päivämäärä samassa lauseessa. Kohtelias muoto, tiukka sisältö.",tags:["reklamaatio","juridiikka","tyo"],l:["Hoitakaa tää heti.","It would be wonderful to have this sorted soon.","I would be grateful for your written confirmation by 8 November."]},
+  {name:"Seuraus neutraalisti",how:"Kerro seuraava askel kuin sääennuste. ‘No option but to’ siirtää vastuun vastapuolelle.",tags:["reklamaatio","juridiikka","naapuri"],l:["Mä vien teidät oikeuteen!","I'd really rather not take this any further.","Should I not hear from you by 8 November, I will have no option but to refer the matter to the Consumer Disputes Board."]},
+  {name:"Ehdot valinnaksi",how:"Älä sano ei. Kerro, mitä kyllä vaatisi, ja anna toisen valita.",tags:["tyo"],l:["Ei onnistu tässä aikataulussa.","That's rather ambitious.","To hit that date we'd need two more developers or to drop the reporting module. Which would you prefer?"]},
+  {name:"Kysy perustetta",how:"Syytöksen sijaan pyydä perustelu. Jos sitä ei ole, vastapuoli huomaa sen itse.",tags:["juridiikka","reklamaatio","naapuri"],l:["Pidätätte vakuutta laittomasti.","I was a little surprised the deposit hasn't come back.","Could you let me know the legal basis and an itemised list of costs for retaining the €1,200 deposit?"]},
+  {name:"Oleta väärinkäsitys",how:"Anna toiselle mahdollisuus säilyttää kasvonsa. Korjaaminen on helpompaa, kun sitä ei tarvitse myöntää.",tags:["naapuri","arki","tyo"],l:["Siirrä autos pois mun paikalta.","I think there might have been a mix-up with the parking.","I think there's been a mix-up: bay 14 is allocated to my flat. Could you move the car by this evening?"]}
+];
+
+const LEVELS = ["Suora", "Britti", "Herrasmies"];
+
+/* ---------- progress ---------- */
+const todayKey = () => new Date().toISOString().slice(0, 10);
+let P = store.get("prog", null);
+if (!P || typeof P !== "object") P = { xp: 0, streak: 0, day: "", done: 0, box: {} };
+if (P.day !== todayKey()) { P.day = todayKey(); P.done = 0; }
+const GOAL = 15;
+const saveP = () => store.set("prog", P);
+function paintStats() {
+  $("#xp").textContent = P.xp;
+  $("#streak").textContent = P.streak;
+  $("#goalbar").style.width = Math.min(100, P.done / GOAL * 100) + "%";
+  $("#goaltxt").textContent = Math.min(P.done, GOAL) + "/" + GOAL;
+}
+function toast(t) {
+  const el = document.createElement("div");
+  el.className = "toast"; el.textContent = t;
+  document.body.append(el); setTimeout(() => el.remove(), 1300);
+}
+
+/* ---------- Opi ---------- */
+let cat = store.get("cat", "all");
+let deck = [], cur = null, flipped = false, busy = false, sheetOpen = false;
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+function buildDeck() {
+  const pool = CARDS.filter(c => cat === "all" || c.cat === cat);
+  // vähiten osatut ensin, muuten satunnainen järjestys
+  deck = shuffle(pool.slice()).sort((a, b) => (P.box[a.id] || 0) - (P.box[b.id] || 0)).map(c => ({ c, side: Math.random() < .5 }));
+}
+function paintCats() {
+  const opts = [["all", "Kaikki"], ...Object.entries(CATS)];
+  $("#cats").innerHTML = opts.map(([k, v]) => {
+    const n = CARDS.filter(c => k === "all" || c.cat === k);
+    const m = n.filter(c => (P.box[c.id] || 0) >= 2).length;
+    return `<button class="chip" aria-pressed="${k === cat}" data-cat="${k}">${v} <span style="opacity:.7">${m}/${n.length}</span></button>`;
+  }).join("");
+}
+$("#cats").addEventListener("click", e => {
+  const b = e.target.closest("[data-cat]"); if (!b) return;
+  cat = b.dataset.cat; store.set("cat", cat); paintCats(); buildDeck(); paintStage();
+});
+
+function cardHTML(item, under) {
+  const c = item.c;
+  if (c.t === "k") {
+    return `<div class="card${under ? " under" : ""}"><div class="stamp l">Kertaan</div><div class="stamp r">Osasin</div><div class="stamp q" style="left:24px;transform:rotate(-6deg)">Käännä ensin</div>
+      <div class="inner">
+        <div class="face front">
+          <div class="eyebrow">${esc(CATS[c.cat])} · Suomalainen sanoo</div>
+          <div class="ctx">${esc(c.ctx)}</div>
+          <div class="say">“${esc(c.fi)}”</div>
+          <div class="tapnote"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 10a7 7 0 0 1 12-5l2 2M17 3v4h-4"/></svg>Miten britti sanoisi? Napauta kortti.</div>
+        </div>
+        <div class="face back">
+          <div class="eyebrow">Brittiläinen herrasmies sanoo</div>
+          <div class="say en">“${esc(c.en)}”</div>
+          <div class="meaning"><b>Oikeasti tarkoittaa</b>${esc(c.means)}</div>
+          <span class="tech">Keino: ${esc(c.tech)}</span>
+        </div>
+      </div></div>`;
+  }
+  const L = item.side ? c.ok : c.no, R = item.side ? c.no : c.ok;
+  return `<div class="card${under ? " under" : ""}"><div class="stamp l">${esc(L)}</div><div class="stamp r">${esc(R)}</div>
+    <div class="inner"><div class="face front">
+      <div class="eyebrow">${esc(CATS[c.cat])} · Dekoodaa britti</div>
+      <div class="ctx">${esc(c.ctx)}</div>
+      <div class="say en">“${esc(c.en)}”</div>
+      <div class="ctx" style="font-weight:600;color:var(--ink)">Mitä hän oikeasti tarkoittaa?</div>
+      <div class="opts"><div class="opt"><i>←</i>${esc(L)}</div><div class="opt r">${esc(R)}<i>→</i></div></div>
+    </div></div></div>`;
+}
+
+function paintStage() {
+  const st = $("#stage");
+  flipped = false; busy = false;
+  if (!deck.length) {
+    cur = null;
+    st.innerHTML = `<div class="done"><span class="badge">Pakka läpi</span><h2>Erinomaista, hyvä herra.</h2><p>Kävit kaikki kortit läpi. Kertaa uudelleen tai vaihda aihetta. Taitavimmat siirtyvät Ratkaise-välilehdelle.</p><button class="btn" id="again">Sekoita ja aloita alusta</button></div>`;
+    $("#again").onclick = () => { buildDeck(); paintStage(); };
+    $("#ctrl").style.visibility = "hidden";
+    return;
+  }
+  $("#ctrl").style.visibility = "";
+  cur = deck[0];
+  st.innerHTML = (deck[1] ? cardHTML(deck[1], true) : "") + cardHTML(cur, false);
+  const isK = cur.c.t === "k";
+  $("#bF").hidden = !isK;
+  if (isK) { $("#bLt").textContent = "Kertaan"; $("#bRt").textContent = "Osasin"; }
+  else { $("#bLt").textContent = cur.side ? cur.c.ok : cur.c.no; $("#bRt").textContent = cur.side ? cur.c.no : cur.c.ok; }
+  bindDrag(st.lastElementChild);
+}
+
+function flip() {
+  if (!cur || cur.c.t !== "k" || busy) return;
+  flipped = !flipped;
+  $("#stage .card:not(.under)").classList.toggle("flipped", flipped);
+}
+
+function bindDrag(card) {
+  let d = null;
+  const stamps = { l: $(".stamp.l", card), r: $(".stamp.r", card), q: $(".stamp.q", card) };
+  card.addEventListener("pointerdown", e => {
+    if (busy || sheetOpen) return;
+    d = { x: e.clientX, y: e.clientY, dx: 0, dy: 0, moved: false };
+    card.setPointerCapture(e.pointerId);
+    card.classList.remove("snap");
+  });
+  card.addEventListener("pointermove", e => {
+    if (!d) return;
+    d.dx = e.clientX - d.x; d.dy = e.clientY - d.y;
+    if (Math.abs(d.dx) > 6 || Math.abs(d.dy) > 6) d.moved = true;
+    card.style.transform = `translate(${d.dx}px, ${d.dy * .25}px) rotate(${d.dx / 16}deg)`;
+    const k = Math.min(1, Math.abs(d.dx) / 110);
+    const needFlip = cur.c.t === "k" && !flipped;
+    if (stamps.q) stamps.q.style.opacity = needFlip ? k : 0;
+    stamps.l.style.opacity = !needFlip && d.dx < 0 ? k : 0;
+    stamps.r.style.opacity = !needFlip && d.dx > 0 ? k : 0;
+  });
+  const end = () => {
+    if (!d) return;
+    const { dx, moved } = d; d = null;
+    Object.values(stamps).forEach(s => s && (s.style.opacity = 0));
+    if (Math.abs(dx) > 100) { decide(dx > 0 ? "r" : "l"); return; }
+    card.classList.add("snap"); card.style.transform = "";
+    if (!moved) flip();
+  };
+  card.addEventListener("pointerup", end);
+  card.addEventListener("pointercancel", end);
+}
+
+function fly(dir, then) {
+  const card = $("#stage .card:not(.under)");
+  busy = true;
+  card.classList.remove("snap"); card.classList.add("fly");
+  const w = window.innerWidth;
+  card.style.transform = `translate(${dir === "r" ? w : -w}px, 40px) rotate(${dir === "r" ? 30 : -30}deg)`;
+  card.style.opacity = "0";
+  setTimeout(then, 300);
+}
+
+function decide(dir) {
+  if (!cur || busy || sheetOpen) return;
+  const c = cur.c;
+  if (c.t === "k" && !flipped) {
+    const card = $("#stage .card:not(.under)");
+    card.classList.add("snap"); card.style.transform = "";
+    flip(); return;
+  }
+  let good;
+  if (c.t === "k") good = dir === "r";
+  else good = (dir === "l") === cur.side; // side=true: oikea vastaus vasemmalla
+  const box = P.box[c.id] || 0;
+  P.box[c.id] = good ? Math.min(3, box + 1) : 0;
+  P.done++;
+  if (good) { P.streak++; P.xp += c.t === "d" ? 10 : 5; } else { P.streak = 0; P.xp += c.t === "d" ? 0 : 2; }
+  saveP(); paintStats(); paintCats();
+  const item = deck.shift();
+  if (!good) deck.splice(Math.min(3, deck.length), 0, { c: item.c, side: Math.random() < .5 });
+  if (P.done === GOAL) setTimeout(() => toast("Päivän tavoite täynnä!"), 400);
+  fly(dir, () => {
+    if (c.t === "d") showSheet(good, c);
+    else { if (good) toast("+5 XP"); paintStage(); }
+  });
+}
+
+function showSheet(good, c) {
+  sheetOpen = true;
+  const s = $("#sheet");
+  s.className = "sheet gutter " + (good ? "ok" : "ko");
+  s.innerHTML = `<div class="sheet-in"><h3>${good ? "Oikein! +10 XP" : "Ei aivan."}</h3>
+    <p><b>“${esc(c.en)}”</b> = ${esc(c.ok)}.</p><p>${esc(c.why)}</p>
+    <div><button class="btn" id="cont">Jatka</button></div></div>`;
+  s.hidden = false;
+  paintStage();
+  const btn = $("#cont"); btn.focus({ preventScroll: true });
+  btn.onclick = closeSheet;
+}
+function closeSheet() { sheetOpen = false; $("#sheet").hidden = true; }
+
+$("#bL").onclick = () => decide("l");
+$("#bR").onclick = () => decide("r");
+$("#bF").onclick = flip;
+document.addEventListener("keydown", e => {
+  if (view !== "opi" || e.target.closest("input,textarea,select")) return;
+  if (sheetOpen) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); closeSheet(); } return; }
+  if (e.key === "ArrowLeft") decide("l");
+  else if (e.key === "ArrowRight") decide("r");
+  else if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); flip(); }
+});
+
+/* ---------- Kirjasto ---------- */
+let libCat = "all";
+const libLvl = STYLES.map(() => 2);
+function paintLib() {
+  const opts = [["all", "Kaikki"], ...Object.entries(CATS).filter(([k]) => STYLES.some(s => s.tags.includes(k)))];
+  $("#libcats").innerHTML = opts.map(([k, v]) => `<button class="chip" aria-pressed="${k === libCat}" data-c="${k}">${v}</button>`).join("");
+  $("#lib").innerHTML = STYLES.map((s, i) => (libCat === "all" || s.tags.includes(libCat)) ? `
+    <article class="panel tq">
+      <h3>${esc(s.name)}</h3>
+      <p class="how">${esc(s.how)}</p>
+      <div class="ladder" role="group" aria-label="Taso">${LEVELS.map((L, j) => `<button data-i="${i}" data-j="${j}" aria-pressed="${libLvl[i] === j}">${L}</button>`).join("")}</div>
+      <p class="quote${libLvl[i] === 0 ? " fi" : ""}">${esc(s.l[libLvl[i]])}</p>
+      <div class="tags">${s.tags.map(t => `<span>${CATS[t]}</span>`).join("")}</div>
+    </article>` : "").join("");
+}
+$("#libcats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (b) { libCat = b.dataset.c; paintLib(); } });
+$("#lib").addEventListener("click", e => { const b = e.target.closest("[data-j]"); if (b) { libLvl[+b.dataset.i] = +b.dataset.j; paintLib(); } });
+
+/* ---------- Ratkaise: kirje ---------- */
+const SAMPLE = {
+  en: { raw: "Ne ei vieläkään palauta mun rahoja siitä rikkinäisestä pesukoneesta. Oon soittanut kolme kertaa ja ne vaan lupailee. Ihan surkea firma.",
+    name: "", subj: "Refund for my faulty washing machine (order 88231)",
+    facts: "Ordered on 2 September 2026 (order 88231, €549)\nThe machine stopped working on 20 September\nReturned on 24 September; you confirmed receipt by email\nRefund promised on 1 October; not received as of today",
+    ask: "a full refund of €549", date: "2026-11-08", sign: "Matti Virtanen", cons: "refer the matter to the Finnish Consumer Disputes Board" },
+  fi: { raw: "Ne ei vieläkään palauta mun rahoja siitä rikkinäisestä pesukoneesta. Oon soittanut kolme kertaa ja ne vaan lupailee. Ihan surkea firma.",
+    name: "", subj: "Hyvitys viallisesta pesukoneesta, tilaus 88231",
+    facts: "Tilasin koneen 2.9.2026 (tilaus 88231, 549 €)\nKone lakkasi toimimasta 20.9.\nPalautin koneen 24.9., ja vahvistitte vastaanoton sähköpostilla\nLupasitte hyvityksen 1.10., mutta sitä ei ole tähän päivään mennessä tullut",
+    ask: "549 euron täyden hyvityksen", date: "2026-11-08", sign: "Matti Virtanen", cons: "viemään asian kuluttajariitalautakunnan käsiteltäväksi" }
+};
+const TPL = {
+  en: {
+    greet: n => n ? `Dear ${n},` : "Dear Sir or Madam,", subj: "Subject: ",
+    date: d => d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
+    1: { open: s => `I hope you are well. I am writing to follow up on ${s}.`, facts: "To recap briefly:", ask: (a, d) => `I would be very grateful if you could arrange ${a}${d ? ` by ${d}` : " as soon as possible"}.`, cons: c => `If that isn't possible, could you let me know when I can expect it? Otherwise I may need to ${c}.`, extra: "", close: "Many thanks for your help.\n\nKind regards,", tags: ["Pehmentimet", "Kysymys käskyn sijaan", "Kohtelias määräaika"] },
+    2: { open: s => `I am writing regarding ${s}.`, facts: "For the record:", ask: (a, d) => `I would be grateful if you could confirm ${a}${d ? ` by ${d}` : " at your earliest convenience"}.`, cons: c => `Should I not hear from you by then, I will have no option but to ${c}.`, extra: "", close: "Thank you in advance for your prompt attention to this matter.\n\nYours faithfully,", tags: ["For the record", "Kohtelias määräaika", "Seuraus neutraalisti"] },
+    3: { open: s => `I refer to ${s}, which remains unresolved.`, facts: "The facts are as follows:", ask: (a, d) => `I therefore request ${a}${d ? ` no later than ${d}` : " without further delay"}.`, cons: c => `Failing that, I will ${c} without further notice.`, extra: "I reserve all my rights in this matter.", close: "Yours faithfully,", tags: ["Faktat ensin", "Ehdoton määräaika", "Oikeudet pidätetään"] }
+  },
+  fi: {
+    greet: n => n ? `Hyvä ${n},` : "Hyvä vastaanottaja,", subj: "Aihe: ",
+    date: d => `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`,
+    1: { open: s => `Toivottavasti kaikki on hyvin. Kirjoitan koskien asiaa: ${s}.`, facts: "Lyhyesti tilanne:", ask: (a, d) => `Olisin kiitollinen, jos voisitte järjestää ${a}${d ? ` ${d} mennessä` : " mahdollisimman pian"}.`, cons: c => `Jos se ei ole mahdollista, kertoisitteko, milloin asia etenee? Muussa tapauksessa joudun ehkä ${c}.`, extra: "", close: "Kiitos avustanne.\n\nYstävällisin terveisin", tags: ["Pehmentimet", "Kysymys käskyn sijaan", "Kohtelias määräaika"] },
+    2: { open: s => `Kirjoitan koskien asiaa: ${s}.`, facts: "Kirjaan tähän tosiasiat:", ask: (a, d) => `Pyydän teitä vahvistamaan ${a}${d ? ` ${d} mennessä` : " mahdollisimman pian"}.`, cons: c => `Mikäli en saa teiltä vastausta siihen mennessä, joudun valitettavasti ${c}.`, extra: "", close: "Kiitos etukäteen asian ripeästä käsittelystä.\n\nYstävällisin terveisin", tags: ["For the record", "Kohtelias määräaika", "Seuraus neutraalisti"] },
+    3: { open: s => `Viittaan asiaan: ${s}. Asia on edelleen ratkaisematta.`, facts: "Tosiasiat ovat seuraavat:", ask: (a, d) => `Vaadin siksi ${a}${d ? ` viimeistään ${d}` : " viipymättä"}.`, cons: c => `Ellei näin tapahdu, joudun ilman erillistä ilmoitusta ${c}.`, extra: "Pidätän kaikki oikeuteni asiassa.", close: "Kunnioittavasti", tags: ["Faktat ensin", "Ehdoton määräaika", "Oikeudet pidätetään"] }
+  }
+};
+const HINTS = { en: ["esim. a full refund of €549", "esim. refer the matter to the Consumer Disputes Board"], fi: ["esim. 549 euron täyden hyvityksen", "esim. viemään asian kuluttajariitalautakuntaan"] };
+const KF = ["raw", "lang", "name", "subj", "facts", "ask", "date", "sign", "cons"];
+let tone = 2, aiLetter = null;
+const K = () => Object.fromEntries(KF.map(k => [k, $("#k-" + k).value.trim()]));
+function fillK(o) { KF.forEach(k => { if (k in o) $("#k-" + k).value = o[k]; }); }
+
+function buildLetter(f) {
+  const L = TPL[f.lang] || TPL.en, t = L[tone];
+  let d = "";
+  if (f.date) { const [y, m, dd] = f.date.split("-").map(Number); if (y && m && dd) d = L.date(new Date(y, m - 1, dd)); }
+  const facts = f.facts.split("\n").map(s => s.trim()).filter(Boolean);
+  const out = [];
+  if (f.subj) out.push(L.subj + f.subj, "");
+  out.push(L.greet(f.name), "");
+  out.push(t.open(f.subj ? (f.lang === "fi" ? f.subj.charAt(0).toLowerCase() + f.subj.slice(1) : "the " + f.subj.charAt(0).toLowerCase() + f.subj.slice(1)) : (f.lang === "fi" ? "[aihe]" : "[the matter]")), "");
+  if (facts.length) out.push(t.facts, ...facts.map(x => "• " + x), "");
+  if (f.ask) out.push(t.ask(f.ask, d));
+  if (f.cons) out.push(t.cons(f.cons));
+  if (t.extra) out.push(t.extra);
+  out.push("", t.close, f.sign || (f.lang === "fi" ? "[nimesi]" : "[your name]"));
+  return out.join("\n").replace(/\n{3,}/g, "\n\n");
+}
+function paintK() {
+  const f = K();
+  $("#k-ask-h").textContent = HINTS[f.lang][0];
+  $("#k-cons-h").textContent = HINTS[f.lang][1];
+  $$(".tone button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.tone === tone));
+  if (aiLetter) return;
+  $("#k-out").textContent = buildLetter(f);
+  $("#k-badge").textContent = "Pohja";
+  $("#k-tags").innerHTML = TPL[f.lang][tone].tags.map(t => `<span>${esc(t)}</span>`).join("");
+  store.set("kirje", { ...f, tone });
+}
+$("#fK").addEventListener("input", paintK);
+$("#fK").addEventListener("submit", e => e.preventDefault());
+$$(".tone button").forEach(b => b.onclick = () => { tone = +b.dataset.tone; paintK(); });
+$("#k-lang").addEventListener("change", () => {
+  const f = K(), other = f.lang === "en" ? "fi" : "en";
+  // jos lomakkeella on vielä toisen kielen esimerkki, vaihda esimerkkikin
+  if (f.subj === SAMPLE[other].subj) fillK({ ...SAMPLE[f.lang], lang: f.lang, name: f.name, sign: f.sign });
+  paintK();
+});
+$("#k-sample").onclick = () => { fillK({ ...SAMPLE[$("#k-lang").value], lang: $("#k-lang").value }); resetAI(); paintK(); };
+$("#k-clear").onclick = () => { fillK({ raw: "", name: "", subj: "", facts: "", ask: "", date: "", sign: "", cons: "" }); resetAI(); paintK(); };
+
+async function copyText(text, el, btn) {
+  const old = btn.innerHTML;
+  try { await navigator.clipboard.writeText(text); btn.textContent = "Kopioitu"; }
+  catch {
+    if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+    btn.textContent = "Valittu, kopioi Ctrl+C / pitkä painallus";
+  }
+  setTimeout(() => btn.innerHTML = old, 1800);
+}
+$("#k-copy").onclick = e => copyText($("#k-out").textContent, $("#k-out"), e.currentTarget);
+
+const TONE_NAMES = { 1: "lempeä ja ystävällinen", 2: "herrasmies: kohtelias mutta tiukka", 3: "terävä ja muodollinen" };
+function letterPrompt(f) {
+  return `Olet Herrasmies, kirjoitusapu, joka muuttaa suoran tai kiukkuisen suomalaisen viestin kohteliaaksi mutta faktoihin nojaavaksi ja terävästi perustelluksi kirjeeksi. Käytä brittiläisen herrasmiestyylin keinoja: understatement, pehmentimet, passiivi ja asia edellä, 'for the record' -faktalista, viittaus sääntöön tai sopimukseen, kohtelias määräaika ja seuraus neutraalisti. Ei tunteenpurkauksia, ei loukkauksia, ei uhkailua – mutta ei myöskään periksi antamista. Älä keksi faktoja: jos jotain olennaista puuttuu, käytä hakasulkeita kuten [tilausnumero] ja mainitse se.
+
+Kirjeen kieli: ${f.lang === "fi" ? "suomi" : "englanti (brittiläinen)"}
+Sävy: ${TONE_NAMES[tone]}
+Vastaanottaja: ${f.name || "ei tiedossa"}
+Mitä kirjoittaja oikeasti haluaa sanoa (suoraan): ${f.raw || "-"}
+Aihe: ${f.subj || "-"}
+Faktat:
+${f.facts || "-"}
+Vaatimus: ${f.ask || "-"}
+Määräaika: ${f.date || "-"}
+Jos ei toteudu: ${f.cons || "-"}
+Allekirjoitus: ${f.sign || "-"}`;
+}
+const LETTER_JSON = `\n\nVastaa vain JSON-oliona: {"letter": "koko kirje rivinvaihtoineen, aiherivi mukaan lukien", "techniques": ["käytetyt keinot lyhyesti suomeksi"], "missing": ["puuttuvat tai tarkistettavat faktat suomeksi"], "notes": ["enintään 3 lyhyttä huomiota suomeksi, esim. oikeudellinen seikka tai sävyriski"]}`;
+$("#k-prompt").onclick = e => copyText(letterPrompt(K()) + "\n\nKirjoita kirje ja listaa sen jälkeen lyhyesti käytetyt keinot ja puuttuvat faktat.", null, e.currentTarget);
+
+let sample = null, kCtl = null, dCtl = null;
+function resetAI() { aiLetter = null; $("#k-back").hidden = true; $("#k-ai-box").hidden = true; }
+$("#k-back").onclick = () => { resetAI(); paintK(); };
+const ERR = { not_granted: "Claude-käyttöä ei sallittu tälle sivulle.", rate_limited: "Liian monta pyyntöä. Yritä hetken päästä uudelleen.", session_expired: "Kirjaudu uudelleen sisään Claudeen.", refused: "Claude ei muotoillut tätä. Muokkaa sisältöä ja yritä uudelleen.", invalid_json: "Vastaus tuli väärässä muodossa. Yritä uudelleen.", prompt_too_large: "Teksti on liian pitkä. Lyhennä sitä." };
+const errText = e => ERR[e?.code] || "Yhteys katkesi. Yritä uudelleen.";
+const hideAICodes = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"];
+
+$("#k-ai").onclick = async () => {
+  if (!sample) return;
+  const f = K(), btn = $("#k-ai"), box = $("#k-ai-box");
+  kCtl = new AbortController();
+  btn.disabled = true; $("#k-stop").hidden = false;
+  box.hidden = false; box.innerHTML = `<span>Herrasmies hioo kirjettä <span class="thinking"><i></i><i></i><i></i></span></span>`;
+  try {
+    const r = await sample.json(letterPrompt(f) + LETTER_JSON, { signal: kCtl.signal, cache: false });
+    if (!r || typeof r.letter !== "string") throw { code: "invalid_json" };
+    aiLetter = r.letter;
+    $("#k-out").textContent = aiLetter;
+    $("#k-badge").textContent = "Clauden hioma";
+    $("#k-tags").innerHTML = (Array.isArray(r.techniques) ? r.techniques : []).map(t => `<span>${esc(t)}</span>`).join("");
+    const miss = Array.isArray(r.missing) ? r.missing : [], notes = Array.isArray(r.notes) ? r.notes : [];
+    box.innerHTML = (miss.length ? `<b>Tarkista tai täydennä</b><ul>${miss.map(m => `<li>${esc(m)}</li>`).join("")}</ul>` : "") +
+      (notes.length ? `<b>Huomiot</b><ul>${notes.map(m => `<li>${esc(m)}</li>`).join("")}</ul>` : "");
+    box.hidden = !miss.length && !notes.length;
+    $("#k-back").hidden = false;
+  } catch (e) {
+    if (e?.code === "cancelled") box.hidden = true;
+    else { box.textContent = errText(e); if (hideAICodes.includes(e?.code)) { btn.hidden = true; $("#d-go").hidden = true; } }
+  } finally { btn.disabled = false; $("#k-stop").hidden = true; }
+};
+$("#k-stop").onclick = () => kCtl?.abort();
+
+/* ---------- Ratkaise: tutki ---------- */
+const DEEP_SAMPLE_IN = "Ostin verkkokaupasta 549 euron pesukoneen, joka hajosi kolmessa viikossa. Palautin sen, he lupasivat hyvityksen 1.10. mutta rahoja ei ole tullut. Olen soittanut kolme kertaa. Miten hoidan tämän fiksusti mutta tiukasti?";
+const DEEP_SAMPLE = {
+  summary: "Kyseessä on kuluttajakaupan virhe: tuote on palautettu ja hyvitys luvattu, joten kiista koskee enää maksua. Vahvin asema syntyy, kun siirrät asian puhelimesta kirjalliseksi, kirjaat päivämäärät ja annat yhden selkeän määräajan.",
+  facts: ["Tilausvahvistus ja kuitti (tilausnumero, summa, päivä)", "Sähköposti, jossa palautus vahvistettiin", "Kirjallinen tai muistiin merkitty lupaus hyvityksestä 1.10.", "Puheluiden päivät ja kenen kanssa puhuit", "Maksutapa: kortilla maksetusta voi kysyä myös korttiyhtiöltä"],
+  legal: [{ p: "Kuluttajansuojalaki, tavaran virhe", n: "Virheellisestä tavarasta voi vaatia korjausta, vaihtoa, hinnanalennusta tai kaupan purkua. Purun jälkeen myyjän on palautettava kauppahinta." }, { p: "Kuluttajaneuvonta", n: "Maksuton apu kirjeen ja sovittelun kanssa. Ota yhteyttä ennen kuluttajariitalautakuntaa." }, { p: "Kuluttajariitalautakunta", n: "Maksuton käsittely, mutta kestää kuukausia. Toimii parhaiten uskottavana seuraavana askeleena." }],
+  styles: [
+    { lvl: 1, name: "Ystävällinen muistutus", when: "Ensimmäinen kirjallinen viesti", en: "I hope you're well. I'm just checking on the refund for order 88231, which I understood would be with me by 1 October.", fi: "Rahat ovat myöhässä. Huomasin sen." },
+    { lvl: 2, name: "For the record", when: "Kun puhelut eivät ole auttaneet", en: "For the record, I returned the machine on 24 September and was promised a refund on 1 October. I have called three times since.", fi: "Minulla on päivämäärät, et voi selitellä." },
+    { lvl: 2, name: "Kohtelias määräaika", when: "Aina, kun haluat lopputuloksen", en: "I would be grateful if you could confirm the refund of €549 by 8 November.", fi: "Tämä on viimeinen päivä." },
+    { lvl: 2, name: "Kysy syytä", when: "Jos he selittelevät", en: "Could you let me know what is preventing the refund from being processed?", fi: "Kerro miksi, tai myönnä ettei syytä ole." },
+    { lvl: 3, name: "Seuraus neutraalisti", when: "Viimeisessä viestissä ennen viranomaista", en: "Should I not hear from you by then, I will have no option but to refer the matter to the Consumer Disputes Board.", fi: "Seuraavaksi asia on virallinen." },
+    { lvl: 3, name: "Oikeudet pidätetään", when: "Muodollisen kirjeen loppuun", en: "I reserve all my rights in this matter, including the right to claim interest on the late payment.", fi: "En luovu mistään, korotkin voin vaatia." }
+  ],
+  use: ["For the record…", "I would be grateful if you could confirm… by [date]", "Could you let me know…", "I have no option but to…"],
+  avoid: [{ x: "You are a terrible company", w: "Loukkaus antaa heille syyn jättää viesti huomiotta." }, { x: "I will sue you", w: "Uhkaus ilman konkreettista askelta kuulostaa tyhjältä. Nimeä elin ja päivä." }, { x: "ASAP", w: "Ei ole määräaika. Anna päivämäärä." }, { x: "Pitkä tunnekuvaus", w: "Faktat painavat, adjektiivit eivät." }],
+  steps: ["Kirjallinen muistutus faktoineen ja määräaikoineen (sähköposti)", "Muodollinen vaatimus herrasmiessävyllä, uusi määräaika noin 14 vrk", "Yhteydenotto kuluttajaneuvontaan", "Valitus kuluttajariitalautakuntaan tai korttiyhtiön hyvityspyyntö"],
+  culture: "Englanninkielisessä viestinnässä kohteliaisuus ei ole heikkoutta. Mitä rauhallisempi ja täsmällisempi sävy, sitä vakavammin vastaanottaja tietää sinun olevan. Kiukku kuuluu suomalaiseen luonnokseen, ei lähetettyyn viestiin."
+};
+function deepPrompt(s) {
+  return `Olet Herrasmies, joka tutkii hankalan tilanteen kokonaan ja opettaa, miten siihen voi tarttua kohteliaasti mutta faktoihin nojaten ja terävästi. Pohjana on brittiläinen herrasmiestyyli (understatement, pehmentimet, passiivi, for the record, viittaus sääntöön, kohtelias määräaika, seuraus neutraalisti), käytettynä suomalaisen suoruuden hiomiseen. Jos tilanne on oikeudellinen, kerro yleisellä tasolla olennaiset Suomen lait, viranomaiset ja menettelyt, ja muistuta tarkistamaan. Älä keksi tapauskohtaisia faktoja.
+
+Tilanne:
+${s}`;
+}
+const DEEP_JSON = `\n\nVastaa vain JSON-oliona tässä muodossa (tekstit suomeksi paitsi kentät "en"): {"summary": "2-3 lausetta", "facts": ["kerättävä fakta tai todiste"], "legal": [{"p": "laki/elin/menettely", "n": "mitä se tarkoittaa tässä"}], "styles": [{"lvl": 1|2|3, "name": "keinon nimi", "when": "milloin käyttää", "en": "esimerkkilause englanniksi", "fi": "mitä se oikeasti tarkoittaa"}], "use": ["hyvä fraasi"], "avoid": [{"x": "vältettävä ilmaus", "w": "miksi"}], "steps": ["eskalointiaskel järjestyksessä"], "culture": "kulttuurivinkki"}. Anna 6-8 tyyliä tasoilla 1 (lempeä), 2 (herrasmies) ja 3 (terävä).`;
+
+function paintDeep(r, isSample) {
+  const A = v => Array.isArray(v) ? v : [];
+  const lv = { 1: "Lempeä", 2: "Herrasmies", 3: "Terävä" };
+  $("#d-res").innerHTML = `
+    <div class="panel" style="display:grid;gap:8px">
+      <div class="row">${isSample ? `<span class="badge">Esimerkki</span>` : `<span class="badge">Clauden analyysi</span>`}<h2 style="font-size:1.35rem">Tilannekuva</h2></div>
+      <p style="margin:0;max-width:70ch">${esc(r.summary)}</p>
+    </div>
+    <div class="panel"><h3>Tyylit lempeästä terävään</h3><div class="styles">${A(r.styles).map(s => `
+      <div class="style"><header><b>${esc(s.name)}</b><span class="lvl l${+s.lvl || 2}">${lv[+s.lvl] || "Herrasmies"}</span></header>
+        <span class="ctx">${esc(s.when)}</span><q>${esc(s.en)}</q><span class="ctx">Tarkoittaa: ${esc(s.fi)}</span></div>`).join("")}</div></div>
+    <div class="res-grid">
+      <div class="panel"><h3>Kerää nämä faktat</h3><ul>${A(r.facts).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+      <div class="panel"><h3>Oikeudellinen kulma</h3><ul>${A(r.legal).map(x => `<li><b>${esc(x.p)}.</b> ${esc(x.n)}</li>`).join("")}</ul><p class="note" style="margin-top:10px">Yleistä tietoa, ei oikeudellista neuvontaa.</p></div>
+      <div class="panel"><h3>Sano näin</h3><ul>${A(r.use).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+      <div class="panel"><h3>Vältä näitä</h3><ul class="avoid">${A(r.avoid).map(x => `<li><b>${esc(x.x)}</b> <span>${esc(x.w)}</span></li>`).join("")}</ul></div>
+      <div class="panel"><h3>Etene näin</h3><ol>${A(r.steps).map(x => `<li>${esc(x)}</li>`).join("")}</ol></div>
+      <div class="panel"><h3>Kulttuurivinkki</h3><p style="margin:0">${esc(r.culture)}</p></div>
+    </div>`;
+}
+$("#d-prompt").onclick = e => copyText(deepPrompt($("#d-in").value.trim() || DEEP_SAMPLE_IN) + "\n\nJäsennä vastaus otsikoilla: Tilannekuva, Kerää nämä faktat, Oikeudellinen kulma, Tyylit lempeästä terävään (6–8 esimerkkiä englanniksi ja mitä ne tarkoittavat), Sano näin, Vältä näitä, Etene näin, Kulttuurivinkki.", null, e.currentTarget);
+$("#d-go").onclick = async () => {
+  if (!sample) return;
+  const s = $("#d-in").value.trim();
+  if (!s) { $("#d-status").textContent = "Kuvaa ensin tilanne."; return; }
+  dCtl = new AbortController();
+  $("#d-go").disabled = true; $("#d-stop").hidden = false;
+  $("#d-status").innerHTML = `Tutkitaan, tämä voi kestää minuutin <span class="thinking"><i></i><i></i><i></i></span>`;
+  try {
+    const r = await sample.json(deepPrompt(s) + DEEP_JSON, { signal: dCtl.signal, cache: { gcTime: 3600000 } });
+    if (!r || typeof r !== "object") throw { code: "invalid_json" };
+    paintDeep(r, false); $("#d-status").textContent = "";
+  } catch (e) {
+    $("#d-status").textContent = e?.code === "cancelled" ? "" : errText(e);
+    if (hideAICodes.includes(e?.code)) { $("#d-go").hidden = true; $("#k-ai").hidden = true; }
+  } finally { $("#d-go").disabled = false; $("#d-stop").hidden = true; }
+};
+$("#d-stop").onclick = () => dCtl?.abort();
+
+$$(".seg [data-mode]").forEach(b => b.onclick = () => {
+  const m = b.dataset.mode;
+  $$(".seg [data-mode]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  $("#m-kirje").hidden = m !== "kirje"; $("#m-tutki").hidden = m !== "tutki";
+});
+
+/* ---------- näkymät ---------- */
+let view = "opi";
+function show(v) {
+  if (!["opi", "ratkaise", "kirjasto"].includes(v)) v = "opi";
+  view = v;
+  $$(".view").forEach(s => s.hidden = s.id !== "v-" + v);
+  $$(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === v));
+  if (v !== "opi") closeSheet();
+  $("#main").scrollTop = 0;
+}
+$$(".tab").forEach(t => t.onclick = () => { show(t.dataset.view); try { history.replaceState(null, "", "#" + t.dataset.view); } catch {} });
+
+/* ---------- käynnistys ---------- */
+const saved = store.get("kirje", null);
+if (saved && typeof saved === "object" && saved.lang) { fillK(saved); tone = [1, 2, 3].includes(saved.tone) ? saved.tone : 2; }
+else fillK({ ...SAMPLE.en, lang: "en" });
+$("#d-in").value = DEEP_SAMPLE_IN;
+paintDeep(DEEP_SAMPLE, true);
+paintStats(); paintCats(); buildDeck(); paintStage(); paintLib(); paintK();
+show((location.hash || "").slice(1));
+
+if (window.claude && typeof window.claude.use === "function") {
+  window.claude.use("sample").then(s => {
+    if (!s) return;
+    sample = s;
+    $("#k-ai").hidden = false; $("#d-go").hidden = false;
+  }).catch(() => {});
+}
+})();
+</script>
+<!--/APP-->
+</body></html>

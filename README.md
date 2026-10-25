@@ -204,6 +204,12 @@ Enterprise/Plus-käyttäjät voivat valita mallin:
 | **Marketing Strategist** | `Marketing-Strategist-GPT.md` | Go-to-market, growth hacking, brand positioning, AARRR-metriikat |
 | **HR Advisor** | `HR-Advisor-GPT.md` | Henkilöstöstrategia, suorituksen johtaminen, työlainsäädäntö, TES, organisaation kehittäminen |
 
+## Sovellukset
+
+| Sovellus | Tiedosto | Käyttötarkoitus |
+|----------|----------|-----------------|
+| **Herrasmieskoulu** | `herrasmies-app/index.html` | Pyyhkäistävät oppikortit brittiläisestä kohteliaisuudesta (suomalainen suoruus vs. englantilainen understatement), kirjeen muotoilija hankaliin asioihin (reklamaatiot, sopimukset, viranomaiset) ja 12 keinon tyylikirjasto. Avaa tiedosto selaimessa; toimii puhelimella ja tietokoneella. |
+
 ---
 
 ## Usein kysytyt kysymykset
