@@ -1,0 +1,794 @@
+<title>Myyntimentori</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: myyjän työpöytä – yläpalkissa asiakasvalitsin ja välilehdet, alla yksi työtila kerrallaan */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --sunk:#E8ECF2; --ink:#16203A; --muted:#566079;
+  --line:#D5DBE5; --accent:#1F45C8; --accent-ink:#FFFFFF; --gold:#B7791F; --gold-bg:#FBF1DE;
+  --good:#1E7A4C; --good-bg:#E3F3EA; --warn:#A15C07; --warn-bg:#FDF0DC; --bad:#B42318; --bad-bg:#FBE6E4;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1524; --surface:#172036; --sunk:#0B1020; --ink:#E7ECF6; --muted:#9AA6C0;
+  --line:#2A3654; --accent:#7D9BFF; --accent-ink:#0B1020; --gold:#F0B656; --gold-bg:#3A2C12;
+  --good:#5DD39E; --good-bg:#12321F; --warn:#F3B15A; --warn-bg:#3A2A10; --bad:#FF8A80; --bad-bg:#3A1714; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1524; --surface:#172036; --sunk:#0B1020; --ink:#E7ECF6; --muted:#9AA6C0;
+  --line:#2A3654; --accent:#7D9BFF; --accent-ink:#0B1020; --gold:#F0B656; --gold-bg:#3A2C12;
+  --good:#5DD39E; --good-bg:#12321F; --warn:#F3B15A; --warn-bg:#3A2A10; --bad:#FF8A80; --bad-bg:#3A1714; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding-block:12px}
+.brand{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em;margin-right:auto}
+.brand small{display:block;font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:0}
+.who{display:flex;gap:8px;align-items:center;min-width:0}
+.who label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin}
+nav button{border:0;background:none;color:var(--muted);font:600 14px var(--body);padding:8px 12px;border-radius:8px;white-space:nowrap;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+nav button:hover{color:var(--ink)}
+nav button[aria-selected="true"]:hover{color:var(--bg)}
+main{padding-block:20px 60px}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.015em;text-wrap:balance;margin:0}
+h1{font-size:28px;font-weight:800}
+h2{font-size:20px;font-weight:600}
+h3{font-size:16px;font-weight:600}
+p{margin:0}
+.lede{color:var(--muted);max-width:68ch}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stats .panel{padding:12px;gap:6px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.split{display:grid;grid-template-columns:280px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:820px){.split{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.eyebrow{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:500;min-width:0}
+input,select,textarea{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--body);padding:8px 12px;border-radius:8px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.sm{padding:4px 8px;font-size:13px}
+.btn.ghost{border-color:transparent;background:none;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font:500 12px var(--body);padding:2px 8px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.chip.good{background:var(--good-bg);color:var(--good)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.chip.gold{background:var(--gold-bg);color:var(--gold)}
+.list{display:flex;flex-direction:column;gap:6px}
+.citem{display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;cursor:pointer;font:inherit}
+.citem[aria-current="true"]{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.citem .sub{font-size:12px;color:var(--muted)}
+.meter{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;position:relative}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.meterlabels{display:flex;justify-content:space-between;font:500 11px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.big{font:800 34px var(--display);font-variant-numeric:tabular-nums;line-height:1}
+.ladder{display:flex;flex-direction:column;gap:6px;counter-reset:s}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.step .n{font:600 13px var(--mono);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--sunk);color:var(--muted)}
+.step.done .n{background:var(--good);color:var(--surface)}
+.step.now{border-color:var(--gold);background:var(--gold-bg)}
+.step.now .n{background:var(--gold);color:var(--surface)}
+.step p{font-size:13px;color:var(--muted)}
+.fact{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed var(--line)}
+.fact:last-child{border-bottom:0}
+.fact span.t{flex:1;min-width:0;overflow-wrap:anywhere}
+.disc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.disc button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 4px;cursor:pointer;font:600 13px var(--body);display:flex;flex-direction:column;align-items:center;gap:2px}
+.disc button b{font:800 20px var(--display)}
+.disc button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.out{white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:15px;overflow-wrap:anywhere}
+.why{border-left:3px solid var(--gold);padding:4px 0 4px 12px;font-size:14px;color:var(--muted)}
+.why b{color:var(--ink)}
+ul.clean{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.kv{display:grid;grid-template-columns:120px minmax(0,1fr);gap:4px 12px;font-size:14px}
+.kv dt{color:var(--muted);font-weight:500}
+.kv dd{margin:0}
+.act{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.act .dot{width:10px;height:10px;border-radius:50%;background:var(--gold)}
+.act .dot.bad{background:var(--bad)} .act .dot.good{background:var(--good)} .act .dot.blue{background:var(--accent)}
+@media (max-width:520px){.act{grid-template-columns:auto minmax(0,1fr)}.act .btn{grid-column:2;justify-self:start}}
+.vrow{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,.8fr) auto;gap:8px;align-items:center}
+@media (max-width:640px){.vrow{grid-template-columns:minmax(0,1fr) auto}.vrow input{grid-column:1/-1}}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;z-index:20}
+.note{font-size:13px;color:var(--muted)}
+.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+details summary{cursor:pointer;font-weight:600}
+.obj{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface)}
+.obj[open]{border-color:var(--accent)}
+.obj > div{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">Myyntimentori<small>Rakenna suhde ensin. Myy sitten. Perustele aina.</small></div>
+      <div class="who"><label for="curSel">Asiakas</label><select id="curSel"></select></div>
+    </div>
+    <nav id="tabs" role="tablist"></nav>
+  </div>
+</header>
+<main class="wrap" id="view"></main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ===================== TIETOPOHJA ===================== */
+const SEG = {
+  pienyrittaja:{name:"Pienyrittäjä (parturi, kahvila, kauppa)",label:"pienyrittäjä",
+    arvostaa:["Aikaa – hän tekee kaiken itse","Lisää asiakkaita ja kanta-asiakkuutta","Helppoutta ilman säätöä","Paikallista luottamusta"],
+    pelot:["Rahan menetys","Monimutkainen tekniikka","Pitkät sopimukset"],
+    kieli:"Arkikieli. Puhu hänen asiakkaistaan, tuoleistaan ja kassastaan – ei 'ratkaisuista' tai 'synergioista'.",
+    kanava:"WhatsApp, käynti paikan päällä hiljaiseen aikaan",
+    todiste:"Naapuriyrittäjän tarina, maksuton kokeilu, 'jos ei toimi, ei maksa'",
+    ala:"Älä tule ruuhka-aikaan. Älä esitä isoa firmaa. Älä myy ensimmäisellä käynnillä.",
+    paattaja:"Omistaja itse, usein puoliso tai kirjanpitäjä taustalla",
+    kulma:"Ei myydä mitään – autetaan häntä saamaan lisää asiakkaita. Ostaminen on hänen oma ideansa."},
+  johtaja:{name:"Toimitusjohtaja / johtoryhmä",label:"johtaja",
+    arvostaa:["Kasvua ja kannattavuutta","Ajan säästöä","Kilpailuetua","Riskien hallintaa"],
+    pelot:["Huono päätös näkyy hallitukselle","Hukka-aika","Imago"],
+    kieli:"Liiketoiminnan kieli: euroja, prosentteja, aikaa. Yksi sivu, ei viittäkymmentä kalvoa.",
+    kanava:"LinkedIn, suositeltu esittely, lyhyt sähköposti",
+    todiste:"Saman kokoluokan referenssi, ROI-laskelma, tunnettu nimi",
+    ala:"Älä kysy asioita, jotka löytyvät netistä. Älä delegoi häntä alaspäin liian aikaisin.",
+    paattaja:"Hän itse + talousjohtaja + hallitus isoissa summissa",
+    kulma:"Puhu hänen strategiastaan, ei tuotteestasi. Näytä miten tavoite toteutuu nopeammin."},
+  ketju:{name:"Iso ketju / konserni",label:"isoja organisaatioita",
+    arvostaa:["Skaalautuvuutta","Riskien ja maineen hallintaa","Vaatimustenmukaisuutta","Todistettua toimivuutta"],
+    pelot:["Tietovuoto, katko tai skandaali","Hankkeen epäonnistuminen omalla nimellä","Integraatiosotku"],
+    kieli:"Prosessit, standardit (esim. ISO 27001, NIS2, GDPR), SLA:t, riskit. Täsmällinen ja rauhallinen.",
+    kanava:"Esittely sisäpiiriläisen kautta, LinkedIn, tapahtumat, pilotti",
+    todiste:"Pilotti yhdessä yksikössä, auditoinnit, sertifikaatit, alan referenssit",
+    ala:"Älä oleta että yksi ihminen päättää. Älä ohita hankintaa tai IT:tä.",
+    paattaja:"Ostoryhmä 6–10 henkeä: käyttäjä, IT, hankinta, talous, johto. Etsi 'champion'.",
+    kulma:"Rakenna sisäinen puolestapuhuja ja anna hänelle valmiit argumentit omaa johtoaan varten."},
+  asiantuntija:{name:"Asiantuntijayritys (lakitoimisto, tilitoimisto, konsultit)",label:"asiantuntijaorganisaatio",
+    arvostaa:["Mainetta ja luottamuksellisuutta","Laskutettavia tunteja","Tarkkuutta ja virheettömyyttä","Statusta alalla"],
+    pelot:["Asiakastiedon vuoto","Ammattimaisuuden menetys","Turha hälinä"],
+    kieli:"Tarkka, faktapohjainen, hillitty. Viittaa lähteisiin. Ei liioittelua.",
+    kanava:"Sähköposti, LinkedIn, alan seminaarit, kollegan suositus",
+    todiste:"Toisen saman alan toimiston kokemus, tietosuoja-asiakirjat, laskelma säästetyistä tunneista",
+    ala:"Älä käytä myyntikliseitä. Älä lupaa mitään, mitä et voi näyttää toteen.",
+    paattaja:"Osakkaat, usein konsensus. Managing partner ratkaisee.",
+    kulma:"Muotoile kaikki 'riskin pienentämiseksi' ja 'laskutettavan ajan lisäämiseksi'."},
+  urheilu:{name:"Urheilu (seura, valmentaja, pelaaja)",label:"urheiluihminen",
+    arvostaa:["Tuloksia ja voittamista","Joukkuehenkeä","Kehittymistä","Yhteisöä ja faneja"],
+    pelot:["Häviäminen","Rahoituksen loppuminen","Loukkaantumiset"],
+    kieli:"Suora, energinen, tavoitteellinen. Kauden, pelien ja harjoittelun kieli.",
+    kanava:"WhatsApp, kentän laidalla, Instagram",
+    todiste:"Toisen joukkueen tai pelaajan tulos, mitattavat numerot",
+    ala:"Älä soita pelipäivänä. Älä puhu yleisesti – puhu heidän lajistaan.",
+    paattaja:"Puheenjohtaja / toiminnanjohtaja / valmentaja; pelaajalla usein agentti tai vanhemmat",
+    kulma:"Myy voittamista ja yhteisöä. Tuotteesi on keino päästä seuraavalle tasolle."},
+  julkinen:{name:"Julkinen sektori (kunta, hyvinvointialue)",label:"julkisen sektorin päättäjä",
+    arvostaa:["Kuntalaisten hyötyä","Lainmukaisuutta","Kustannustehokkuutta","Turvallisia valintoja"],
+    pelot:["Valitukset ja lehtijutut","Hankintavirheet","Budjetin ylitys"],
+    kieli:"Selkeä, perusteltu, vaikuttavuus ja mittarit.",
+    kanava:"Markkinavuoropuhelut, Hilma-ilmoitukset, seminaarit",
+    todiste:"Toinen kunta, vaikuttavuusdata, pilotit",
+    ala:"Älä yritä ohittaa hankintalakia. Ei lahjoja.",
+    paattaja:"Virkamiehet + luottamushenkilöt, kilpailutus",
+    kulma:"Auta heitä kirjoittamaan hyvä tarjouspyyntö – vaikuta kriteereihin avoimesti markkinavuoropuhelussa."},
+  kuluttaja:{name:"Yksityishenkilö / kuluttaja",label:"ihminen",
+    arvostaa:["Perhettä ja turvallisuutta","Elämyksiä","Statusta ja itsensä toteuttamista","Helppoutta"],
+    pelot:["Huijatuksi tuleminen","Katumus","Mitä muut ajattelevat"],
+    kieli:"Lämmin, henkilökohtainen, tunteisiin vetoava mutta rehellinen.",
+    kanava:"WhatsApp, puhelu, kasvokkain",
+    todiste:"Muiden kokemukset, arvostelut, takuu",
+    ala:"Älä painosta. Anna miettimisaikaa.",
+    paattaja:"Usein pariskunta yhdessä – puhu molemmille",
+    kulma:"Maalaa kuva elämästä tuotteen kanssa. Anna hänen kertoa oma unelmansa."},
+  matkailu:{name:"Matkailu ja elämykset",label:"matkailuyrittäjä",
+    arvostaa:["Täyttöastetta ja sesonkia","Arvosteluja","Kansainvälisiä asiakkaita","Tarinaa ja elämystä"],
+    pelot:["Hiljainen sesonki","Huonot arvostelut","Riippuvuus välittäjistä"],
+    kieli:"Elämyksellinen ja kaupallinen yhtä aikaa: yöpymiset, keskihinta, varaukset.",
+    kanava:"Sähköposti, messut, Instagram, WhatsApp",
+    todiste:"Varausmäärät, arvosanat ennen/jälkeen, toinen kohde",
+    ala:"Älä lähesty sesongin huipussa.",
+    paattaja:"Omistaja tai myyntijohtaja",
+    kulma:"Puhu matkailijan tarinasta – mitä hänen asiakkaansa kertoo kotona."},
+  sijoittaja:{name:"Sijoittaja / kiinteistö",label:"sijoittaja",
+    arvostaa:["Tuottoa","Riskin hallintaa","Potentiaalia ja ajoitusta","Exit-mahdollisuutta"],
+    pelot:["Pääoman menetys","Huono ajoitus","Piilevät virheet"],
+    kieli:"Luvut, skenaariot (huono / perus / hyvä), aikajana.",
+    kanava:"Henkilökohtainen tapaaminen, suositus",
+    todiste:"Kaavat, päätökset, vertailukaupat, laskelmat",
+    ala:"Älä liioittele. Sijoittaja tarkistaa kaiken.",
+    paattaja:"Hän itse, usein neuvonantaja taustalla",
+    kulma:"Visio + todisteet: mikä on päätetty, mikä on suunniteltu, mikä on mahdollisuus."}
+};
+
+const DISC = {
+  D:{name:"Hallitsija",tag:"tulos",color:"punainen",
+    tunnistat:"Puhuu nopeasti ja suoraan, keskeyttää, kysyy 'paljonko ja milloin'.",
+    puhu:"Suoraan asiaan. Tulokset, kilpailuetu, aika. Anna 2 vaihtoehtoa ja anna hänen päättää.",
+    valta:"Small talkia, epäröintiä, pitkiä selityksiä.",
+    sulje:"Vaihtoehtosulku: 'Aloitetaanko A:lla vai B:llä?'",
+    viesti:"Max 3 lausetta. Ei hymiöitä."},
+  I:{name:"Vaikuttaja",tag:"tunne",color:"keltainen",
+    tunnistat:"Innostuu, kertoo tarinoita, puhuu ihmisistä, käyttää hymiöitä.",
+    puhu:"Innostus, tarinat, ihmiset, uutuus. Anna hänen loistaa.",
+    valta:"Kuivaa dataa, pitkiä taulukoita, kylmyyttä.",
+    sulje:"Visiosulku: 'Kuvittele miltä tämä näyttää keväällä – lähdetäänkö?'",
+    viesti:"Lämmin ja eloisa, hymiö sallittu."},
+  S:{name:"Vakaa",tag:"turva",color:"vihreä",
+    tunnistat:"Rauhallinen, kuuntelee, kysyy muiden mielipidettä, varovainen muutoksissa.",
+    puhu:"Turvallisuus, luottamus, askel kerrallaan. Kerro mitä tapahtuu ja kuka auttaa.",
+    valta:"Painostusta, kiirettä, äkkimuutoksia.",
+    sulje:"Pieni askel: 'Aloitetaanko kokeilulla, niin näet rauhassa miten se toimii?'",
+    viesti:"Ystävällinen, ei kiirettä, korosta tukea."},
+  C:{name:"Analyytikko",tag:"data",color:"sininen",
+    tunnistat:"Kysyy yksityiskohtia, haluaa materiaalia, harkitsee pitkään.",
+    puhu:"Faktat, lähteet, laskelmat, vertailut. Vastaa jokaiseen kysymykseen tarkasti.",
+    valta:"Liioittelua, epätarkkuutta, tunteilla myymistä.",
+    sulje:"Loogisuussulku: 'Jos laskelma pitää, onko jotain muuta mikä estää aloittamisen?'",
+    viesti:"Täsmällinen, perustelut ja luvut mukaan."}
+};
+
+const CATS = {
+  perhe:"Perhe ja läheiset", harrastus:"Harrastukset ja intohimot", ura:"Ura ja tausta",
+  tavoite:"Tavoitteet ja unelmat", kipu:"Kipupisteet ja haasteet", yritys:"Yrityksen tilanne",
+  paatos:"Päätöksenteko ja budjetti", arvot:"Arvot ja asenteet", merkkipaiva:"Merkkipäivät",
+  tyyli:"Viestintätyyli", kilpailija:"Nykyinen toimittaja / kilpailijat", verkosto:"Yhteiset tuttavat"
+};
+const ASK = {
+  perhe:["Miten kesä/loma meni perheen kanssa?","Mitä lapset tekevät nykyään?"],
+  harrastus:["Mitä teet kun et ole töissä?","Mistä saat energiaa arjen ulkopuolella?"],
+  ura:["Miten päädyit tälle alalle?","Mikä on ollut urasi paras päätös?"],
+  tavoite:["Missä haluaisit olla kolmen vuoden päästä?","Jos kaikki menisi nappiin tänä vuonna, mitä olisi tapahtunut?"],
+  kipu:["Mikä vie eniten aikaa, joka ei tuota mitään?","Mikä asia valvottaa sinua joskus öisin?"],
+  yritys:["Miten vuosi on lähtenyt käyntiin?","Mitä uutta teillä on tulossa?"],
+  paatos:["Kuka muu osallistuu tällaisiin päätöksiin?","Miten tällaiset hankinnat yleensä etenevät teillä?"],
+  arvot:["Mikä on teille tärkeintä kumppanissa?","Mistä et koskaan tinkisi?"],
+  merkkipaiva:["Milloin yritys täyttää vuosia?","(Katso syntymäpäivä LinkedInistä / Facebookista)"],
+  tyyli:["Mieluummin lyhyt viesti vai puhelu?","Haluatko materiaalin etukäteen vai jutellaanko suoraan?"],
+  kilpailija:["Mitä käytätte nyt ja mikä siinä toimii hyvin?","Mitä muuttaisit nykyisessä ratkaisussa?"],
+  verkosto:["Keitä tunnet alalta, joita minunkin pitäisi tavata?","Kuka sinut alun perin esitteli tälle alalle?"]
+};
+
+const STEPS = [
+  {n:"Kartoitus",min:0,goal:"Tutki hänet ja yritys netistä. Ei vielä yhteydenottoa.",p:null},
+  {n:"Ensikosketus",min:1,goal:"Anna jotain arvokasta ilman mitään pyyntöä.",p:"tutustu"},
+  {n:"Kiinnostus",min:3,goal:"Kysy ja kuuntele. Hänen pitää puhua 70 % ajasta.",p:"kysy"},
+  {n:"Arvo",min:6,goal:"Lähetä hyödyllinen vinkki, joka liittyy hänen omaan haasteeseensa.",p:"arvo"},
+  {n:"Huomio",min:9,goal:"Henkilökohtainen huomionosoitus: onnittelu, spesifi kehu.",p:"kehu"},
+  {n:"Verkosto",min:12,goal:"Auta häntä: esittele hänet jollekin hyödylliselle ihmiselle.",p:"esittely"},
+  {n:"Tarina",min:15,goal:"Kerro tarina asiakkaasta, joka oli samassa tilanteessa.",p:"tarina"},
+  {n:"Diagnoosi",min:20,goal:"Tapaaminen: tunnistakaa ongelma ja sen hinta yhdessä.",p:"tapaaminen"},
+  {n:"Ehdotus",min:25,goal:"Perusteltu ratkaisu juuri hänen tilanteeseensa. Jokainen väite perustellaan.",p:"ehdotus"},
+  {n:"Päätös ja kumppanuus",min:30,goal:"Sulje kauppa, kiitä, toimita yli odotusten, pyydä suositus.",p:"kiitos"}
+];
+
+const PURP = {
+  tutustu:{n:"Ensikontakti (ei myyntiä)",ask:false,why:"<b>Vastavuoroisuus.</b> Kun annat jotain ilman pyyntöä, syntyy halu antaa takaisin. Koska et pyydä mitään, hänen puolustuksensa ei nouse."},
+  kysy:{n:"Kysymys – kuuntele",ask:false,why:"<b>Itsestä kertominen palkitsee.</b> Ihmiset pitävät eniten keskusteluista, joissa he itse saavat puhua. Jokainen vastaus on uusi fakta tietopankkiin."},
+  arvo:{n:"Arvovinkki",ask:false,why:"<b>Auktoriteetti + vastavuoroisuus.</b> Hyödyllinen vinkki tekee sinusta asiantuntijan hänen silmissään ennen kuin olet myynyt mitään."},
+  onnittelu:{n:"Syntymäpäivä / merkkipäivä",ask:false,why:"<b>Pidetyksi tuleminen.</b> Ihmiset muistavat, kuka muisti heidät. Mainitse jotain henkilökohtaista, niin viesti ei näytä automaatilta."},
+  kehu:{n:"Huomionosoitus / kehu",ask:false,why:"<b>Spesifi kehu on uskottava.</b> Yleinen kehu kuulostaa myyntitempulta, tarkka havainto osoittaa että oikeasti seuraat häntä."},
+  esittely:{n:"Esittele hänet jollekin",ask:false,why:"<b>Vahvin vastavuoroisuuden muoto.</b> Kun tuot hänelle asiakkaan tai kumppanin, sinusta tulee arvon lähde, et kustannus."},
+  tarina:{n:"Tarina / asiakascase",ask:false,why:"<b>Tarina ohittaa vastaväitteet.</b> Kuulija eläytyy eikä väittele. Toisen asiakkaan kokemus on sosiaalinen todiste."},
+  tapaaminen:{n:"Tapaamispyyntö",ask:true,why:"<b>Pieni pyyntö ensin.</b> 15–20 minuuttia on helppo sanoa kyllä. Kytke pyyntö hänen omaan tavoitteeseensa, ei tuotteeseesi."},
+  ehdotus:{n:"Ratkaisuehdotus",ask:true,why:"<b>'Koska' toimii.</b> Perusteltu pyyntö hyväksytään selvästi useammin kuin perustelematon. Kytke ehdotus hänen omin sanoin kertomaansa kipuun."},
+  seuranta:{n:"Seuranta tarjouksen jälkeen",ask:true,why:"<b>Johdonmukaisuus.</b> Muistuta mitä hän itse sanoi tavoitteekseen. Tarjoa uutta tietoa, älä vain 'tarkista tilannetta'."},
+  kiitos:{n:"Kiitos ja suosittelupyyntö",ask:false,why:"<b>Huippuhetki.</b> Pyydä suositusta, kun tyytyväisyys on korkeimmillaan, eli heti onnistumisen jälkeen."}
+};
+
+const CLOSE = {
+  D:"Sopisiko 15 minuuttia tiistaina tai torstaina?",
+  I:"Olisi tosi kiva jutella tästä kahvin äärellä – milloin sinulle sopisi?",
+  S:"Jos tuntuu hyvältä, voitaisiin jutella rauhassa ilman mitään sitoumuksia. Sinun aikataulusi mukaan.",
+  C:"Voin lähettää laskelman ja taustamateriaalin etukäteen, niin voit arvioida sen rauhassa. Sopiiko?"
+};
+
+function T(v){ // viestipohjat: palauttaa versiot
+  const k = v.kipu, t = v.tavoite, h = v.harrastus;
+  return {
+    tutustu:[
+      `Hei ${v.n}! Olen ${v.me}. Huomasin ${v.aihe||"mitä "+v.yritys+" tekee"} ja halusin vain sanoa, että arvostan sitä. Ei myyntiasiaa, ihan aidosti. Hyvää viikkoa!`,
+      `Moi ${v.n}, ${v.me} täällä. Törmäsin juttuun ${v.aihe?"("+v.aihe+")":"joka liittyy teidän alaanne"} ja tuli mieleen sinä. Laitan linkin, jos kiinnostaa 🙂`
+    ],
+    kysy:[
+      `Hei ${v.n}, kysyisin yhtä asiaa sinulta, kun tunnet alan: ${v.aihe||"mikä on tällä hetkellä isoin muutos teidän alalla?"} Kiinnostaisi aidosti kuulla näkemyksesi.`,
+      `${v.n}, jäin miettimään mitä sanoit${k?" ("+k+")":""}. Miten olette hoitaneet sen tähän asti?`
+    ],
+    arvo:[
+      `Hei ${v.n}! Näin tämän ja tuli heti mieleen ${k?"se mitä mainitsit: "+k:v.yritys}. ${v.aihe||"[liitä vinkki tai linkki]"}. Ehkä tästä on hyötyä.`,
+      `${v.n}, pieni vinkki: ${v.aihe||"[vinkki]"}. Moni ${v.seg} on saanut tällä ${v.hyoty||"aikaa säästettyä"}. Ei tarvitse vastata.`
+    ],
+    onnittelu:[
+      `Hyvää syntymäpäivää ${v.n}! 🎉 Toivottavasti tänään jää aikaa myös sille, mistä nautit eniten${h?" – "+h:""}. Upeaa päivää!`,
+      `Onnea ${v.n}! Uusi vuosi ja uudet askeleet${t?" kohti tavoitetta: "+t:""}. Nauti päivästä!`
+    ],
+    kehu:[
+      `Hei ${v.n}, pakko sanoa: ${v.aihe||"[mitä huomasit – uusi palvelu, lehtijuttu, some-päivitys]"} oli todella hienosti tehty. Näkee, että ${v.yritys||"teillä"} tehdään asiat tosissaan.`,
+      `${v.n}, onnittelut: ${v.aihe||"[saavutus]"}! Tiedän, ettei sellainen tapahdu itsestään. Iso työ takana.`
+    ],
+    esittely:[
+      `Hei ${v.n}! Tunnen ${v.aihe||"[nimi, mitä hän tekee]"}. Teillä voisi olla paljon yhteistä${t?", varsinkin kun tavoitteenasi on "+t:""}. Saanko esitellä teidät toisillenne?`
+    ],
+    tarina:[
+      `${v.n}, kerron lyhyen tarinan. ${v.aihe||"[Asiakas X]"} oli vähän aikaa sitten samassa tilanteessa kuin moni ${v.seg}: ${k||"[haaste]"}. Hän otti käyttöön ${v.tuote||"[ratkaisu]"}, ja nyt ${v.hyoty||"[tulos numeroina]"}. Tuli mieleen sinä, ei sen kummempaa.`,
+      `Muistatko kun puhuit${k?" siitä, että "+k:" haasteistanne"}? Yksi asiakkaani ratkaisi saman näin: ${v.aihe||"[mitä hän teki]"}. Tulos: ${v.hyoty||"[tulos]"}.`
+    ],
+    tapaaminen:[
+      `Hei ${v.n}! Olen kuunnellut tarkkaan mitä olet kertonut${k?", erityisesti tuota: "+k:""}. Minulla on ajatus, joka voisi auttaa${t?" tavoitteessasi ("+t+")":""}.`
+    ],
+    ehdotus:[
+      `${v.n}, kokosin ehdotuksen juuri teille. Lyhyesti: ${v.tuote||"[ratkaisu]"} ratkaisee ${k||"[haaste]"}, koska ${v.aihe||"[perustelu – miksi juuri tämä toimii teillä]"}. Tuloksena ${v.hyoty||"[mitattava hyöty]"}.`
+    ],
+    seuranta:[
+      `Hei ${v.n}, heräsikö ehdotuksesta kysymyksiä? Jos jokin mietityttää, kerro suoraan. Parannan mieluummin ehdotusta kuin arvailen.`,
+      `${v.n}, lisätieto päätöksen tueksi: ${v.aihe||"[uusi fakta, referenssi tai laskelma]"}. Sanoit itse, että ${t||"[hänen tavoitteensa omin sanoin]"} – tämä vie sinne nopeammin.`
+    ],
+    kiitos:[
+      `${v.n}, kiitos luottamuksesta! Teen kaikkeni, että ${v.hyoty||"tämä onnistuu"}. Jos tiedät jonkun, jolle tästä olisi yhtä paljon hyötyä, olisin kiitollinen vinkistä.`
+    ]
+  };
+}
+
+const OBJ = [
+  {q:"Liian kallis",tech:"Uudelleenkehystys: hinta vs. hinta olla tekemättä",
+   r:"Ymmärrän, raha on aina tärkeä asia. Saanko kysyä: verrattuna mihin? Lasketaan yhdessä, paljonko nykytilanne maksaa kuukaudessa. Jos se on enemmän kuin tämä, kysymys on oikeastaan siitä, paljonko odottaminen maksaa.",
+   ask:"Mikä summa tuntuisi järkevältä, kun tulos on se mistä puhuimme?"},
+  {q:"Ei nyt, ehkä myöhemmin",tech:"Ajoitus ja syy esiin",
+   r:"Ymmärrän täysin. Mikä muuttuisi siihen mennessä? Jos syy on kiire, juuri siksi tämä kannattaa nyt: se vapauttaa aikaa. Jos syy on budjetti, katsotaan aloitus pienemmästä.",
+   ask:"Mitä pitäisi tapahtua, että tämä olisi ajankohtainen?"},
+  {q:"Pitää miettiä",tech:"Selvitä mitä mietitään",
+   r:"Totta kai, iso päätös. Jotta saat kaiken tarvittavan: mikä kohta mietityttää eniten? Hinta, aikataulu vai se, toimiiko tämä juuri teillä?",
+   ask:"Jos asteikolla 1–10 olet nyt seitsemän, mitä tarvitaan kymppiin?"},
+  {q:"Meillä on jo toimittaja",tech:"Kunnioita ja löydä aukko",
+   r:"Hienoa, se kertoo että asia on teille tärkeä. En pyydä vaihtamaan. Moni asiakkaistani käytti ensin toista ja otti meidät rinnalle siihen osaan, jossa nykyinen ei riittänyt.",
+   ask:"Jos voisit muuttaa yhden asian nykyisessä ratkaisussa, mikä se olisi?"},
+  {q:"Lähetä materiaalia",tech:"Tee materiaalista henkilökohtainen",
+   r:"Lähetän mielelläni. Jotta en hukuta sinua yleisiin esitteisiin: mikä yksi asia on sinulle tärkein, niin räätälöin juuri siihen? Voinko soittaa torstaina ja käydä sen läpi viidessä minuutissa?",
+   ask:"Mikä asia materiaalissa olisi sinulle tärkein?"},
+  {q:"En ole päättäjä",tech:"Tee hänestä sisäinen puolestapuhuja",
+   r:"Kiitos kun kerroit. Sinä tunnet talon parhaiten. Mitä päättäjä haluaa nähdä ennen kuin sanoo kyllä? Teen sinulle valmiin yhteenvedon, jonka voit viedä eteenpäin.",
+   ask:"Kuka muu osallistuu päätökseen, ja mikä hänelle on tärkeintä?"},
+  {q:"En luota tähän / liian hyvää ollakseen totta",tech:"Todisteet ja riskin poisto",
+   r:"Hyvä että kysyt, terve skeptisyys on fiksua. Älä usko minua, katso todisteet: tässä on referenssi, jolle voit soittaa itse, ja tässä on mitä tapahtuu, jos tulos ei toteudu.",
+   ask:"Mikä todiste vakuuttaisi sinut?"},
+  {q:"Ei tarvetta",tech:"Kipu esiin kysymyksillä",
+   r:"Voi hyvin olla, ja silloin en halua viedä aikaasi. Saanko kysyä kaksi kysymystä, niin tiedämme kumpikin varmasti?",
+   ask:"Mikä nykyisessä tavassa vie eniten aikaa tai rahaa?"}
+];
+
+/* ===================== TILA ===================== */
+const KEY = "myyntimentori.v1";
+const uid = () => Math.random().toString(36).slice(2,10);
+const today = () => new Date().toISOString().slice(0,10);
+function sample(){
+  const d = n => { const x = new Date(); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); };
+  const bd = n => { const x = new Date(); x.setDate(x.getDate()+n); x.setFullYear(1981); return x.toISOString().slice(0,10); };
+  return {
+    me:{name:"",company:"",product:""},
+    current:"c1",
+    contacts:[
+      {id:"c1",example:true,name:"Liisa Mäkelä",company:"Parturi Liisa",role:"Omistaja",seg:"pienyrittaja",size:"2 henkeä",industry:"Parturi-kampaamo",
+       phone:"",email:"",birthday:bd(6),disc:"I",stage:3,product:"Ajanvaraus- ja kanta-asiakasjärjestelmä",benefit:"10 lisävarausta viikossa ilman lisätyötä",notes:"",
+       facts:[{c:"harrastus",t:"Juoksee puolimaratonia, tavoite Helsinki City Run"},{c:"kipu",t:"Puhelin soi kesken leikkauksen, varaukset unohtuvat"},{c:"tavoite",t:"Haluaa palkata toisen kampaajan ensi vuonna"},{c:"perhe",t:"Kaksi teiniä, poika pelaa jalkapalloa"},{c:"yritys",t:"Toiminut 9 vuotta samassa paikassa"},{c:"tyyli",t:"Vastaa WhatsAppiin illalla, käyttää paljon hymiöitä"},{c:"kilpailija",t:"Varaukset paperikalenterissa"}],
+       log:[{d:d(-24),ch:"Käynti",t:"Kävin leikkauttamassa, juteltiin juoksusta"}]},
+      {id:"c2",example:true,name:"Markku Laine",company:"Laine & Co Asianajotoimisto",role:"Managing partner",seg:"asiantuntija",size:"35 henkeä",industry:"Asianajo",
+       phone:"",email:"",birthday:"",disc:"C",stage:1,product:"Tietoturvapalvelu ja henkilöstön koulutus",benefit:"Asiakastietojen suojaus ja NIS2-valmius dokumentoituna",notes:"",
+       facts:[{c:"ura",t:"Ollut talossa 20 vuotta, partneri vuodesta 2012"},{c:"kipu",t:"Kilpailevassa toimistossa oli tietomurto keväällä"}],
+       log:[]},
+      {id:"c3",example:true,name:"Jukka Virtanen",company:"FC Kotiseutu",role:"Päävalmentaja",seg:"urheilu",size:"Seura, 400 junioria",industry:"Jalkapallo",
+       phone:"",email:"",birthday:"",disc:"D",stage:6,product:"Pelaajien kuntoseuranta-sovellus",benefit:"Vähemmän loukkaantumisia ja parempi kausi",notes:"",
+       facts:[{c:"tavoite",t:"Nousu Kakkoseen kahden kauden sisällä"},{c:"kipu",t:"Kolme avainpelaajaa loukkaantui viime kaudella"},{c:"paatos",t:"Hallitus päättää yli 2000 € hankinnat"},{c:"harrastus",t:"Kalastaa kesällä Lapissa"},{c:"verkosto",t:"Tuntee liiton valmennuspäällikön"},{c:"arvot",t:"Junioreiden kehittyminen ennen tuloksia"},{c:"tyyli",t:"Haluaa lyhyet viestit, soittaa mieluummin"},{c:"yritys",t:"Uusi tekonurmi valmistuu keväällä"},{c:"perhe",t:"Tytär pelaa seuran tyttöjoukkueessa"},{c:"kilpailija",t:"Seuranta Excelillä"},{c:"ura",t:"Pelasi itse Veikkausliigaa 90-luvulla"},{c:"merkkipaiva",t:"Seura täyttää 50 vuotta ensi vuonna"},{c:"paatos",t:"Budjetti päätetään marraskuussa"},{c:"kipu",t:"Valmentajien aika menee paperitöihin"}],
+       log:[{d:d(-5),ch:"WhatsApp",t:"Lähetin artikkelin loukkaantumisten ennaltaehkäisystä"}]}
+    ]
+  };
+}
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)); } catch(e) { S = null; }
+if(!S || !Array.isArray(S.contacts)) S = sample();
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }
+const cur = () => S.contacts.find(c => c.id === S.current) || S.contacts[0];
+let tab = "tanaan";
+try { tab = localStorage.getItem(KEY+".tab") || "tanaan"; } catch(e) {}
+const ui = {purpose:null, channel:"whatsapp", aihe:"", variant:0, prompt:"strategia",
+  vt:{kohde:"Omakotitalotontti, 1 800 m², Suonsivu",nyky:"kosteaa rämettä ja vanhaa metsätyöroskaa, ei vielä kunnallistekniikkaa",
+     rows:[{k:"F",t:"Kunnanvaltuusto hyväksyi alueen asemakaavan",s:"Kunnan pöytäkirja 3/2026"},{k:"S",t:"Uusi lähijunaseisake noin 900 metrin päähän",s:"Väyläviraston suunnitelma, valmis arviolta 2029"},{k:"F",t:"Alue rajautuu luonnonsuojelualueeseen – naapuriin ei voi rakentaa",s:"Kaavakartta"},{k:"M",t:"Suon reunaan voi tehdä pitkospuut ja oman lampimaiseman",s:""}],
+     hyoty:"rauhallinen koti luonnon keskellä, mutta 25 minuutin junamatka keskustaan",askel:"Kävellään tontti yhdessä lauantaina ja katsotaan kaavakartta paikan päällä"}};
+
+/* ===================== APU ===================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+const first = n => (n||"").trim().split(/\s+/)[0] || "";
+const lc = t => t && !/^[A-ZÅÄÖ]{2}/.test(t) ? t.charAt(0).toLowerCase()+t.slice(1) : t;
+const factOf = (c,cat) => (c.facts.find(f => f.c === cat)||{}).t || "";
+function toast(m){ const t=$("#toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,2200); }
+function copy(text){
+  const done = () => toast("Kopioitu leikepöydälle");
+  try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+  function fallback(){ const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); done();}catch(e){toast("Valitse teksti ja kopioi käsin");} ta.remove(); }
+}
+function daysToBirthday(b){
+  if(!b) return null; const p=b.split("-"); if(p.length<3) return null;
+  const now=new Date(); now.setHours(0,0,0,0);
+  let nx=new Date(now.getFullYear(), +p[1]-1, +p[2]); if(nx<now) nx.setFullYear(now.getFullYear()+1);
+  return Math.round((nx-now)/864e5);
+}
+const daysSince = d => d ? Math.round((Date.now()-new Date(d).getTime())/864e5) : null;
+const lastTouch = c => c.log.length ? c.log.map(l=>l.d).sort().at(-1) : null;
+function vars(c){
+  return {n:first(c.name)||"[nimi]", yritys:c.company||"", me:first(S.me.name)||"[oma nimesi]", seg:(SEG[c.seg]||{}).label||"asiakas",
+    kipu:lc(factOf(c,"kipu")), tavoite:lc(factOf(c,"tavoite")), harrastus:lc(factOf(c,"harrastus")),
+    tuote:c.product||S.me.product||"", hyoty:c.benefit||"", aihe:ui.aihe.trim()};
+}
+
+/* ===================== VÄLILEHDET ===================== */
+const TABS = [["tanaan","Tänään"],["asiakas","Asiakasprofiili"],["viestit","Viestit"],["visio","Visiotarina"],["vastavaitteet","Vastaväitteet"],["mentori","AI-mentori"],["opas","Opas"]];
+function renderTabs(){
+  $("#tabs").innerHTML = TABS.map(([k,l]) => `<button role="tab" data-tab="${k}" aria-selected="${tab===k}">${l}</button>`).join("");
+  $("#curSel").innerHTML = S.contacts.map(c => `<option value="${c.id}" ${c.id===S.current?"selected":""}>${esc(c.name||"Nimetön")}${c.example?" (esim.)":""}</option>`).join("");
+}
+function render(){ renderTabs(); $("#view").innerHTML = VIEWS[tab](); }
+
+/* ---------- Tänään ---------- */
+function actions(){
+  const out=[];
+  S.contacts.forEach(c=>{
+    const nm=esc(c.name), st=STEPS[Math.min(c.stage,9)], nf=c.facts.length;
+    const b=daysToBirthday(c.birthday);
+    if(b!==null && b<=14) out.push({pri:b<=2?0:1,dot:"good",t:`${nm}: syntymäpäivä ${b===0?"tänään":b+" päivän päästä"}`,s:"Henkilökohtainen onnittelu rakentaa suhdetta enemmän kuin kymmenen myyntiviestiä.",go:["viestit",c.id,"onnittelu"],btn:"Kirjoita onnittelu"});
+    const ds=daysSince(lastTouch(c));
+    if(ds===null || ds>21) out.push({pri:2,dot:"bad",t:`${nm}: ${ds===null?"ei vielä yhtään kontaktia":"edellisestä kontaktista "+ds+" päivää"}`,s:"Pidä suhde lämpimänä: lähetä arvoa ilman pyyntöä.",go:["viestit",c.id,ds===null?"tutustu":"arvo"],btn:"Lähetä arvoviesti"});
+    const next=STEPS[Math.min(c.stage+1,9)];
+    if(nf<next.min) out.push({pri:3,dot:"blue",t:`${nm}: ${nf} tietoa, seuraava vaihe vaatii ${next.min}`,s:`Kerää vielä ${next.min-nf} tietoa ennen vaihetta "${next.n}". Kysymysehdotukset löytyvät profiilista.`,go:["asiakas",c.id],btn:"Kerää tietoja"});
+    else if(c.stage<9) out.push({pri:2,dot:"",t:`${nm}: valmis vaiheeseen ${c.stage+2} – ${next.n}`,s:next.goal,go:next.p?["viestit",c.id,next.p]:["asiakas",c.id],btn:"Tee seuraava askel"});
+  });
+  return out.sort((a,b)=>a.pri-b.pri);
+}
+const VIEWS = {};
+VIEWS.tanaan = () => {
+  const a=actions(), tot=S.contacts.reduce((s,c)=>s+c.facts.length,0);
+  const ex=S.contacts.some(c=>c.example);
+  return `<div class="stack">
+    <div class="stack" style="gap:6px"><h1>Tänään</h1><p class="lede">Älä myy. Rakenna suhde askel kerrallaan, kerää tietoa ja anna arvoa. Kun tiedät hänestä 30 asiaa, ehdotus myy itsensä.</p></div>
+    ${ex?`<p class="note"><span class="chip gold">Esimerkkidata</span> Liisa, Markku ja Jukka ovat esimerkkiasiakkaita. Poista ne Opas-välilehdeltä, kun lisäät omasi.</p>`:""}
+    ${!S.me.name?`<div class="panel"><h3>Kerro ensin kuka olet</h3><div class="fgrid">
+      <label class="f">Oma nimi<input id="me_name" data-me="name" placeholder="esim. Jarno"></label>
+      <label class="f">Oma yritys<input id="me_company" data-me="company"></label>
+      <label class="f">Mitä myyt yleensä<input id="me_product" data-me="product"></label></div></div>`:""}
+    <div class="stats">
+      <div class="panel"><span class="eyebrow">Asiakkaita</span><span class="big">${S.contacts.length}</span></div>
+      <div class="panel"><span class="eyebrow">Tietoja kerätty</span><span class="big">${tot}</span></div>
+      <div class="panel"><span class="eyebrow">Ehdotusvalmiina (25+)</span><span class="big">${S.contacts.filter(c=>c.facts.length>=25).length}</span></div>
+    </div>
+    <div class="stack" style="gap:8px"><h2>Seuraavat askeleet</h2>
+      ${a.length?a.map(x=>`<div class="act"><span class="dot ${x.dot}"></span><div style="min-width:0"><b>${x.t}</b><div class="note">${esc(x.s)}</div></div><button class="btn sm" data-go='${JSON.stringify(x.go)}'>${x.btn}</button></div>`).join(""):`<div class="empty">Ei avoimia tehtäviä. Lisää asiakas Asiakasprofiili-välilehdellä.</div>`}
+    </div></div>`;
+};
+
+/* ---------- Asiakasprofiili ---------- */
+VIEWS.asiakas = () => {
+  const c=cur();
+  const list=S.contacts.map(x=>`<button class="citem" data-pick="${x.id}" aria-current="${x.id===c.id}"><b>${esc(x.name||"Nimetön")}</b><span class="sub">${esc(x.company||"")} · vaihe ${x.stage+1}/10 · ${x.facts.length} tietoa</span></button>`).join("");
+  if(!c) return `<div class="empty"><button class="btn pri" data-new>Lisää ensimmäinen asiakas</button></div>`;
+  const seg=SEG[c.seg]||SEG.pienyrittaja, d=DISC[c.disc];
+  const nf=c.facts.length, pct=Math.min(100,nf/30*100);
+  const missing=Object.keys(CATS).filter(k=>!c.facts.some(f=>f.c===k));
+  const enc=encodeURIComponent, q=enc([c.name,c.company].filter(Boolean).join(" "));
+  const field=(k,l,type="text")=>`<label class="f">${l}<input id="c_${k}" type="${type}" data-c="${k}" value="${esc(c[k])}"></label>`;
+  return `<div class="split">
+  <aside class="stack" style="gap:8px"><button class="btn pri" data-new>+ Uusi asiakas</button><div class="list">${list}</div></aside>
+  <div class="stack">
+    <div class="row" style="justify-content:space-between"><h1>${esc(c.name||"Uusi asiakas")}</h1><span class="chip gold">Vaihe ${c.stage+1}/10: ${STEPS[c.stage].n}</span></div>
+    <div class="panel"><span class="eyebrow">Perustiedot</span>
+      <div class="fgrid">${field("name","Nimi")}${field("company","Yritys / organisaatio")}${field("role","Rooli")}
+        <label class="f">Ostajatyyppi<select id="c_seg" data-c="seg">${Object.entries(SEG).map(([k,v])=>`<option value="${k}" ${c.seg===k?"selected":""}>${v.name}</option>`).join("")}</select></label>
+        ${field("size","Koko")}${field("industry","Toimiala")}${field("phone","Puhelin","tel")}${field("email","Sähköposti","email")}${field("birthday","Syntymäpäivä","date")}</div>
+      <div class="fgrid">${field("product","Mitä hänelle myydään")}${field("benefit","Päähyöty hänelle (numeroina jos voi)")}</div>
+      <div class="row"><span class="note">Tutki netistä:</span>
+        <a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/search?q=${q}">Google</a>
+        <a class="btn sm" target="_blank" rel="noopener" href="https://news.google.com/search?q=${q}&hl=fi">Uutiset</a>
+        <a class="btn sm" target="_blank" rel="noopener" href="https://www.linkedin.com/search/results/all/?keywords=${q}">LinkedIn</a>
+        <a class="btn sm" target="_blank" rel="noopener" href="https://www.finder.fi/search?what=${enc(c.company||c.name)}">Finder (talousluvut)</a>
+        <a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/search?q=${enc((c.company||"")+" rekrytointi OR investointi OR laajentaa")}">Kasvusignaalit</a></div>
+      <div class="row"><button class="btn sm ghost" data-del="${c.id}">Poista asiakas</button></div>
+    </div>
+
+    <div class="grid2">
+      <div class="panel"><span class="eyebrow">Tietopankki · tavoite 30</span>
+        <div class="row" style="align-items:baseline;gap:6px"><span class="big">${nf}</span><span class="note">/ 30 tietoa</span></div>
+        <div class="meter"><i style="width:${pct}%"></i></div>
+        <div class="meterlabels"><span>0</span><span>10 suhde</span><span>20 diagnoosi</span><span>30 ehdotus</span></div>
+        <div class="row" style="flex-wrap:nowrap"><select id="f_cat" aria-label="Kategoria" style="max-width:45%">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select>
+          <input id="f_txt" placeholder="esim. Juoksee maratonia" aria-label="Uusi tieto"><button class="btn pri" data-addfact>Lisää</button></div>
+        <div>${nf?c.facts.map((f,i)=>`<div class="fact"><span class="chip">${CATS[f.c]||f.c}</span><span class="t">${esc(f.t)}</span><button class="btn sm ghost" data-delfact="${i}" aria-label="Poista">✕</button></div>`).join(""):`<p class="note">Ei vielä tietoja. Aloita siitä, mitä jo tiedät.</p>`}</div>
+        ${missing.length?`<details><summary>Puuttuu ${missing.length} aluetta – kysymysehdotukset</summary><ul class="clean" style="margin-top:8px">${missing.map(k=>`<li><b>${CATS[k]}:</b> ${ASK[k].map(esc).join(" / ")}</li>`).join("")}</ul></details>`:""}
+      </div>
+
+      <div class="panel"><span class="eyebrow">Persoona (DISC)</span>
+        <div class="disc">${Object.entries(DISC).map(([k,v])=>`<button data-disc="${k}" aria-pressed="${c.disc===k}"><b>${k}</b>${v.name}</button>`).join("")}</div>
+        ${d?`<dl class="kv"><dt>Tunnistat</dt><dd>${d.tunnistat}</dd><dt>Puhu näin</dt><dd>${d.puhu}</dd><dt>Vältä</dt><dd>${d.valta}</dd><dt>Sulkeminen</dt><dd>${d.sulje}</dd><dt>Viestit</dt><dd>${d.viesti}</dd></dl>`
+          :`<p class="note">Valitse persoona. Vihje: nopea ja suora = D, innostuva ja sosiaalinen = I, rauhallinen ja harkitseva = S, tarkka ja dataa kysyvä = C.</p>`}
+      </div>
+    </div>
+
+    <div class="panel"><span class="eyebrow">Pelikirja: ${seg.name}</span>
+      <div class="grid2">
+        <dl class="kv"><dt>Arvostaa</dt><dd>${seg.arvostaa.join(", ")}</dd><dt>Pelkää</dt><dd>${seg.pelot.join(", ")}</dd><dt>Kieli</dt><dd>${seg.kieli}</dd><dt>Päättäjä</dt><dd>${seg.paattaja}</dd></dl>
+        <dl class="kv"><dt>Kanava</dt><dd>${seg.kanava}</dd><dt>Todiste</dt><dd>${seg.todiste}</dd><dt>Älä</dt><dd>${seg.ala}</dd><dt>Kulma</dt><dd><b>${seg.kulma}</b></dd></dl>
+      </div>
+    </div>
+
+    <div class="panel"><span class="eyebrow">Arvoportaat · 10 vaihetta, myynti vasta lopussa</span>
+      <div class="ladder">${STEPS.map((s,i)=>{const cls=i<c.stage?"done":i===c.stage?"now":"";const lack=nf<s.min&&i>c.stage;
+        return `<div class="step ${cls}"><span class="n">${i<c.stage?"✓":i+1}</span><div><b>${s.n}</b> ${lack?`<span class="chip warn">tarvitsee ${s.min} tietoa</span>`:""}<p>${s.goal}</p></div>
+        ${i===c.stage+1?`<button class="btn sm" data-stage="${i}">Siirry tähän</button>`:i===c.stage&&s.p?`<button class="btn sm" data-go='["viestit","${c.id}","${s.p}"]'>Tee viesti</button>`:"<span></span>"}</div>`}).join("")}</div>
+      ${c.stage>0?`<div><button class="btn sm ghost" data-stage="${c.stage-1}">Palaa edelliseen vaiheeseen</button></div>`:""}
+    </div>
+
+    <div class="panel"><span class="eyebrow">Historia</span>
+      <div class="row" style="flex-wrap:nowrap"><select id="l_ch" style="max-width:35%" aria-label="Kanava"><option>WhatsApp</option><option>Sähköposti</option><option>Puhelu</option><option>Tapaaminen</option><option>Käynti</option><option>LinkedIn</option></select><input id="l_txt" placeholder="Mitä tapahtui?" aria-label="Merkintä"><button class="btn" data-addlog>Kirjaa</button></div>
+      ${c.log.length?`<div>${[...c.log].reverse().map(l=>`<div class="fact"><span class="chip">${esc(l.d)}</span><span class="chip">${esc(l.ch)}</span><span class="t">${esc(l.t)}</span></div>`).join("")}</div>`:`<p class="note">Ei kirjauksia.</p>`}
+      <label class="f">Muistiinpanot<textarea id="c_notes" data-c="notes">${esc(c.notes)}</textarea></label>
+    </div>
+  </div></div>`;
+};
+
+/* ---------- Viestit ---------- */
+function buildMessage(c){
+  const v=vars(c), p=ui.purpose||STEPS[Math.min(c.stage,9)].p||"tutustu";
+  ui.purpose=p;
+  const vs=T(v)[p], i=ui.variant%vs.length;
+  let body=vs[i];
+  const disc=c.disc||"S";
+  if(PURP[p].ask) body+=" "+CLOSE[disc];
+  if(disc==="D"||disc==="C"||ui.channel==="email"||ui.channel==="linkedin") body=body.replace(/\s?[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,"");
+  let text=body;
+  if(ui.channel==="email"){
+    const subj={tutustu:"Pieni huomio",kysy:"Kysymys sinulle",arvo:"Tästä voisi olla hyötyä",onnittelu:"Hyvää syntymäpäivää!",kehu:"Hienoa työtä",esittely:"Esittely",tarina:"Lyhyt tarina",tapaaminen:"Ajatus "+(v.tavoite?"tavoitteeseenne":"teille"),ehdotus:"Ehdotus: "+(v.tuote||c.company),seuranta:"Ehdotuksen jatko",kiitos:"Kiitos!"}[p];
+    text=`Aihe: ${subj}\n\n${body}\n\nTerveisin\n${S.me.name||"[nimesi]"}${S.me.company?"\n"+S.me.company:""}`;
+  }
+  if(ui.channel==="sms") text=body.length>300?body.slice(0,body.lastIndexOf(".",300)+1)||body:body;
+  const holes=(text.match(/\[[^\]]+\]/g)||[]);
+  return {text,p,holes,count:vs.length,i};
+}
+VIEWS.viestit = () => {
+  const c=cur(); if(!c) return `<div class="empty">Lisää ensin asiakas.</div>`;
+  const m=buildMessage(c), d=DISC[c.disc], st=STEPS[c.stage];
+  const ph=(c.phone||"").replace(/[^\d+]/g,"").replace(/^0/,"+358").replace(/^\+/,"");
+  const wa=`https://wa.me/${ph}?text=${encodeURIComponent(m.text)}`;
+  const early=PURP[m.p].ask && c.facts.length<20;
+  return `<div class="stack">
+    <div class="stack" style="gap:6px"><h1>Viestit: ${esc(first(c.name))}</h1><p class="lede">Valmiit viestit hänen persoonansa, ostajatyyppinsä ja keräämiesi tietojen pohjalta. Muokkaa aina omaksesi – paras viesti kuulostaa sinulta.</p></div>
+    <div class="grid2">
+      <div class="panel">
+        <label class="f">Tarkoitus<select id="m_p" data-ui="purpose">${Object.entries(PURP).map(([k,v])=>`<option value="${k}" ${m.p===k?"selected":""}>${v.n}${st.p===k?" ← suositus nyt":""}</option>`).join("")}</select></label>
+        <label class="f">Kanava<select id="m_ch" data-ui="channel">${[["whatsapp","WhatsApp"],["sms","Tekstiviesti"],["email","Sähköposti"],["linkedin","LinkedIn"]].map(([k,l])=>`<option value="${k}" ${ui.channel===k?"selected":""}>${l}</option>`).join("")}</select></label>
+        <label class="f">Aihe / konteksti (linkki, havainto, tarina, perustelu)<textarea id="m_aihe" data-ui="aihe" placeholder="esim. luin että avasitte uuden toimipisteen Tampereelle">${esc(ui.aihe)}</textarea></label>
+        <p class="note">Persoona: <b>${d?c.disc+" – "+d.name:"ei valittu (oletus S)"}</b> · Vaihe: <b>${st.n}</b></p>
+      </div>
+      <div class="panel">
+        <div class="row" style="justify-content:space-between"><span class="eyebrow">Versio ${m.i+1}/${m.count}</span>${m.count>1?`<button class="btn sm" data-variant>Toinen versio</button>`:""}</div>
+        ${early?`<p class="chip warn" style="white-space:normal">Vasta ${c.facts.length} tietoa. Pyyntö näin aikaisin voi tuntua myynniltä – harkitse ensin arvoviestiä.</p>`:""}
+        <textarea id="m_out" style="min-height:190px">${esc(m.text)}</textarea>
+        ${m.holes.length?`<p class="note">Täydennä hakasulkeet: ${m.holes.map(esc).join(", ")}</p>`:""}
+        <div class="row">
+          <button class="btn pri" data-copyout>Kopioi</button>
+          ${ui.channel==="whatsapp"?`<a class="btn" target="_blank" rel="noopener" id="waLink" href="${esc(wa)}">Avaa WhatsApp</a>`:""}
+          <button class="btn" data-logmsg>Kirjaa lähetetyksi</button>
+        </div>
+        ${ui.channel==="whatsapp"&&!ph?`<p class="note">Lisää puhelinnumero profiiliin, niin WhatsApp aukeaa suoraan hänen keskusteluunsa.</p>`:""}
+        ${c.email&&ui.channel==="email"?`<p class="note">Vastaanottaja: <b style="user-select:all">${esc(c.email)}</b></p>`:""}
+      </div>
+    </div>
+    <div class="panel"><span class="eyebrow">Miksi tämä toimii</span>
+      <p class="why">${PURP[m.p].why}</p>
+      ${d?`<p class="why"><b>Persoona ${c.disc}:</b> ${d.viesti} ${d.puhu}</p>`:""}
+      <p class="why"><b>Ostajatyyppi:</b> ${(SEG[c.seg]||SEG.pienyrittaja).kulma}</p>
+    </div></div>`;
+};
+
+/* ---------- Visiotarina ---------- */
+function vision(){
+  const v=ui.vt, c=cur(), d=c&&c.disc||"I";
+  const F=v.rows.filter(r=>r.k==="F"&&r.t), Sx=v.rows.filter(r=>r.k==="S"&&r.t), M=v.rows.filter(r=>r.k==="M"&&r.t);
+  const src=r=>r.s?` (${r.s})`:"";
+  const y=new Date().getFullYear()+3;
+  const parts=[];
+  parts.push(`1 · REHELLINEN LÄHTÖKOHTA\nKerron suoraan: tänään ${v.kohde||"kohde"} on ${v.nyky||"[nykytila]"}. Juuri siksi hinta on nyt tämä – ja juuri siksi tässä on mahdollisuus.`);
+  if(F.length) parts.push(`2 · MITÄ TIEDETÄÄN VARMASTI\n${F.map(r=>"• "+r.t+src(r)).join("\n")}`);
+  if(Sx.length) parts.push(`3 · MITÄ ON SUUNNITTEILLA\n${Sx.map(r=>"• "+r.t+src(r)+" – tämä on suunnitelma, ei vielä valmis").join("\n")}`);
+  if(M.length) parts.push(`4 · MITÄ TÄSTÄ VOI TEHDÄ\n${M.map(r=>"• "+r.t).join("\n")}`);
+  parts.push(`5 · KUVITTELE VUOSI ${y}\nKuvittele, että ${[...Sx,...M].map(r=>r.t.charAt(0).toLowerCase()+r.t.slice(1)).join(", ")||"[muutokset]"}. ${v.hyoty?"Sinulla on "+v.hyoty+".":""} Muut näkevät tänään vain ${v.nyky?v.nyky.split(",")[0]:"nykytilan"}. Sinä näet sen, mitä tästä tulee.`);
+  const disc={D:`Lyhyesti: ostat ennen kuin muut huomaavat muutoksen. Riski on hinnassa jo nyt, potentiaali ei ole.`,
+    I:`Ajattele, millainen tarina tästä tulee – sinä olit se, joka näki tämän ensimmäisenä.`,
+    S:`Edetään rauhassa: tarkistetaan jokainen kohta yhdessä, ja saat kaikki asiakirjat kotiin luettavaksi.`,
+    C:`Kaikki yllä olevat faktat löytyvät lähteistä. Laaditaan kolme skenaariota (huono / perus / hyvä), niin näet riskin ja tuoton numeroina.`}[d];
+  parts.push(`6 · SINULLE (${d})\n${disc}`);
+  parts.push(`7 · ENSIMMÄINEN PIENI ASKEL\n${v.askel||"[pieni, helppo seuraava askel]"}`);
+  const warn=[];
+  if(!F.length) warn.push(["bad","Tarinasta puuttuu todistettava fakta. Ilman faktaa visio on pelkkä lupaus – lisää ainakin yksi."]);
+  if(M.length>F.length) warn.push(["warn","Mahdollisuuksia on enemmän kuin faktoja. Vahvista tarinaa todisteilla."]);
+  Sx.filter(r=>!r.s).forEach(r=>warn.push(["warn",`Suunnitelmalle "${r.t}" ei ole lähdettä. Kerro mistä tieto on, tai merkitse se mahdollisuudeksi.`]));
+  if(!warn.length) warn.push(["good","Tarina erottelee faktat, suunnitelmat ja mahdollisuudet. Voit perustella jokaisen väitteen."]);
+  return {text:parts.join("\n\n"),warn};
+}
+const warnHtml = w => w.map(([k,t])=>`<p class="chip ${k}" style="white-space:normal;padding:6px 10px">${esc(t)}</p>`).join("");
+VIEWS.visio = () => {
+  const v=ui.vt, o=vision();
+  return `<div class="stack">
+    <div class="stack" style="gap:6px"><h1>Visiotarina</h1><p class="lede">"Myy jäätä eskimolle" toimii vain, jos et valehtele. Kuvaile suotontin rautatie ja arkkitehtuuri – mutta erota aina mikä on totta, mikä suunniteltu ja mikä mahdollista. Rehellinen visio myy paremmin, koska ostaja voi tarkistaa sen ja luottaa sinuun vielä kaupan jälkeen.</p></div>
+    <div class="grid2">
+      <div class="panel">
+        <label class="f">Mitä myyt (kohde, tuote, palvelu)<input id="vt_kohde" data-vt="kohde" value="${esc(v.kohde)}"></label>
+        <label class="f">Nykytila rehellisesti – myös huonot puolet<input id="vt_nyky" data-vt="nyky" value="${esc(v.nyky)}"></label>
+        <span class="eyebrow">Muutosvoimat</span>
+        <div class="stack" style="gap:8px">${v.rows.map((r,i)=>`<div class="vrow">
+          <select id="vt_k${i}" data-vrow="${i}" data-k="k" aria-label="Tyyppi"><option value="F" ${r.k==="F"?"selected":""}>Fakta</option><option value="S" ${r.k==="S"?"selected":""}>Suunnitelma</option><option value="M" ${r.k==="M"?"selected":""}>Mahdollisuus</option></select>
+          <input id="vt_t${i}" data-vrow="${i}" data-k="t" value="${esc(r.t)}" placeholder="Mitä" aria-label="Muutosvoima">
+          <input id="vt_s${i}" data-vrow="${i}" data-k="s" value="${esc(r.s)}" placeholder="Lähde" aria-label="Lähde">
+          <button class="btn sm ghost" data-delrow="${i}" aria-label="Poista rivi">✕</button></div>`).join("")}</div>
+        <div><button class="btn sm" data-addrow>+ Lisää rivi</button></div>
+        <label class="f">Mitä tämä tarkoittaa ostajalle<input id="vt_hyoty" data-vt="hyoty" value="${esc(v.hyoty)}"></label>
+        <label class="f">Ensimmäinen pieni askel<input id="vt_askel" data-vt="askel" value="${esc(v.askel)}"></label>
+        <p class="note">Sävy sovitetaan valitun asiakkaan persoonaan (${esc(cur()?.name||"")}: ${cur()?.disc||"I"}).</p>
+      </div>
+      <div class="panel"><span class="eyebrow">Rehellisyysvahti</span>
+        <div class="stack" style="gap:6px" id="vt_warn">${warnHtml(o.warn)}</div>
+        <div class="out" id="vt_out">${esc(o.text)}</div>
+        <div class="row"><button class="btn pri" data-copyvt>Kopioi tarina</button></div>
+      </div>
+    </div></div>`;
+};
+
+/* ---------- Vastaväitteet ---------- */
+VIEWS.vastavaitteet = () => {
+  const c=cur(), d=c&&DISC[c.disc];
+  return `<div class="stack">
+    <div class="stack" style="gap:6px"><h1>Vastaväitteet</h1><p class="lede">Vastaväite on kysymys, ei kielto. Kaava jokaiseen: <b>hyväksy</b> ("ymmärrän") → <b>selvitä</b> (kysy mitä oikeasti tarkoittaa) → <b>perustele</b> (fakta tai tarina) → <b>kysy</b> (palauta keskustelu hänelle).</p></div>
+    ${d?`<p class="why"><b>${esc(c.name)} on ${c.disc} – ${d.name}:</b> ${d.puhu} Sulkeminen: ${d.sulje}</p>`:""}
+    <div class="stack" style="gap:8px">${OBJ.map((o,i)=>`<details class="obj" ${i===0?"open":""}><summary>"${o.q}"</summary><div>
+      <span class="chip">${o.tech}</span><p>${o.r}</p><p class="why"><b>Kysy:</b> ${o.ask}</p>
+      <div><button class="btn sm" data-copyobj="${i}">Kopioi vastaus</button></div></div></details>`).join("")}</div></div>`;
+};
+
+/* ---------- AI-mentori ---------- */
+const PROMPTS = {
+  strategia:"Laadi kokonaisstrategia tämän asiakkaan lähestymiseen: psykologinen profiili, mitä hän oikeasti haluaa, oikea tarina ja 10 seuraavaa askelta. Perustele jokainen suositus.",
+  seuraava:"Mikä on paras SEURAAVA askel juuri nyt tämän asiakkaan kanssa? Anna yksi suositus, perustelu ja valmis viesti.",
+  viesti:"Kirjoita 3 eri viestiversiota (WhatsApp, sähköposti, LinkedIn) seuraavaan vaiheeseen. Sovita sävy persoonaan.",
+  tapaaminen:"Valmistele minut tapaamiseen: avauslause, 7 diagnoosikysymystä, todennäköisimmät vastaväitteet vastauksineen ja sulkeminen.",
+  tutki:"Tutki tämä yritys/henkilö verkosta (uutiset, taloustiedot, rekrytoinnit, some). Listaa 10 uutta faktaa, 3 kasvusignaalia ja 3 keskustelun avausta.",
+  visio:"Rakenna visiotarina siitä, mitä tämä asiakas voi saavuttaa. Erottele selvästi fakta, suunnitelma ja mahdollisuus."
+};
+function bigPrompt(c){
+  const seg=SEG[c.seg]||SEG.pienyrittaja, d=DISC[c.disc];
+  const facts=c.facts.map(f=>`- [${CATS[f.c]||f.c}] ${f.t}`).join("\n")||"- (ei vielä tietoja)";
+  const log=c.log.map(l=>`- ${l.d} ${l.ch}: ${l.t}`).join("\n")||"- (ei vielä kontakteja)";
+  return `Toimi myyntimentorinani. Olet huippumyyjä, jolla on syvä ymmärrys ostopsykologiasta (Cialdini, DISC, SPIN, Challenger, tarinankerronta). Olet taitava ja vakuuttava mutta rehellinen: perustelet jokaisen väitteen etkä koskaan keksi faktoja. Erottele aina fakta, suunnitelma ja mahdollisuus.
+
+TEHTÄVÄ: ${PROMPTS[ui.prompt]}
+
+MINÄ: ${S.me.name||"-"}, ${S.me.company||"-"}. Myyn: ${c.product||S.me.product||"-"}.
+
+ASIAKAS: ${c.name} | ${c.role||"-"} | ${c.company||"-"} | ${c.industry||"-"} | koko ${c.size||"-"}
+Ostajatyyppi: ${seg.name}
+Persoona (DISC): ${d?c.disc+" – "+d.name+". "+d.puhu:"ei tiedossa – arvioi tietojen perusteella"}
+Päähyöty hänelle: ${c.benefit||"-"}
+Suhteen vaihe: ${c.stage+1}/10 – ${STEPS[c.stage].n} (${STEPS[c.stage].goal})
+
+TIEDOT HÄNESTÄ (${c.facts.length}/30):
+${facts}
+
+YHTEYDENPIDOT:
+${log}
+
+MUISTIINPANOT: ${c.notes||"-"}
+
+Vastaa suomeksi. Kerro lopuksi, mitkä 3 tietoa puuttuvat ja millä kysymyksillä saan ne luontevasti.`;
+}
+VIEWS.mentori = () => {
+  const c=cur(); if(!c) return `<div class="empty">Lisää ensin asiakas.</div>`;
+  return `<div class="stack">
+    <div class="stack" style="gap:6px"><h1>AI-mentori</h1><p class="lede">Kokoaa kaiken mitä tiedät asiakkaasta yhdeksi ohjeeksi. Liitä se ChatGPT:hen, Claudeen tai Myyntimentori-GPT:hen, niin saat strategian, joka perustuu sinun omaan dataasi. Tekoäly voi myös hakea netistä lisää tietoa.</p></div>
+    <div class="panel">
+      <div class="row">${Object.entries({strategia:"Kokonaisstrategia",seuraava:"Seuraava askel",viesti:"Kirjoita viestit",tapaaminen:"Valmistaudu tapaamiseen",tutki:"Tutki netistä",visio:"Visiotarina"}).map(([k,l])=>`<button class="btn ${ui.prompt===k?"pri":""}" data-prompt="${k}">${l}</button>`).join("")}</div>
+      <textarea id="p_out" style="min-height:320px;font-family:var(--mono);font-size:13px">${esc(bigPrompt(c))}</textarea>
+      <div class="row"><button class="btn pri" data-copyprompt>Kopioi ohje</button>
+        <a class="btn" target="_blank" rel="noopener" href="https://chatgpt.com/">Avaa ChatGPT</a>
+        <a class="btn" target="_blank" rel="noopener" href="https://claude.ai/new">Avaa Claude</a></div>
+      <p class="note">Tekoälyn vastauksesta: lisää uudet faktat tietopankkiin, niin seuraava ohje on vielä tarkempi.</p>
+    </div></div>`;
+};
+
+/* ---------- Opas ---------- */
+VIEWS.opas = () => `<div class="stack">
+  <div class="stack" style="gap:6px"><h1>Opas</h1><p class="lede">Myyntimentori perustuu yhteen ajatukseen: ihmiset eivät halua tulla myydyiksi, mutta he rakastavat ostaa. Sinun tehtäväsi on ymmärtää heitä niin hyvin, että ostaminen on heidän oma ideansa.</p></div>
+  <div class="grid2">
+    <div class="panel"><h3>Työtapa</h3><ul class="clean">
+      <li><b>Kerää 30 tietoa</b> ennen ehdotusta: perhe, harrastukset, tavoitteet, kipupisteet, päätöksenteko.</li>
+      <li><b>Kulje arvoportaat:</b> anna, kysy, auta, muista, kerro tarina – ja vasta sitten ehdota.</li>
+      <li><b>Tunnista persoona</b> (DISC) ja puhu hänen kieltään, älä omaasi.</li>
+      <li><b>Perustele kaikki.</b> Jokaisen väitteen takana on fakta, lähde tai tarina.</li>
+      <li><b>Kirjaa jokainen kontakti</b>, niin Tänään-näkymä kertoo kenelle ottaa yhteyttä.</li></ul></div>
+    <div class="panel"><h3>Rehellisyys on kilpailuetu</h3><ul class="clean">
+      <li>Visio on sallittu, valhe ei. Erota fakta, suunnitelma ja mahdollisuus.</li>
+      <li>Älä painosta haavoittuvassa asemassa olevia ihmisiä.</li>
+      <li>Kerää vain tietoja, joita hän itse jakaa tai jotka ovat julkisia. Asiakastiedot ovat henkilötietoja (GDPR).</li>
+      <li>Huippumyyjän paras myyntikanava on tyytyväinen asiakas, joka suosittelee.</li></ul></div>
+  </div>
+  <div class="panel"><h3>Omat tiedot</h3><div class="fgrid">
+    <label class="f">Oma nimi<input id="me_name2" data-me="name" value="${esc(S.me.name)}"></label>
+    <label class="f">Oma yritys<input id="me_company2" data-me="company" value="${esc(S.me.company)}"></label>
+    <label class="f">Mitä myyt yleensä<input id="me_product2" data-me="product" value="${esc(S.me.product)}"></label></div></div>
+  <div class="panel"><h3>Varmuuskopio</h3>
+    <p class="note">Tiedot tallentuvat vain tähän selaimeen. Kopioi varmuuskopio talteen tai siirrä toiselle laitteelle liittämällä se tähän kenttään.</p>
+    <textarea id="backup" style="font-family:var(--mono);font-size:12px" placeholder="Liitä varmuuskopio tähän ja paina Palauta"></textarea>
+    <div class="row"><button class="btn" data-export>Näytä ja kopioi varmuuskopio</button><button class="btn" data-import>Palauta varmuuskopiosta</button>
+      ${S.contacts.some(c=>c.example)?`<button class="btn" data-clearex>Poista esimerkkiasiakkaat</button>`:""}</div></div>
+</div>`;
+
+/* ===================== TAPAHTUMAT ===================== */
+function go(t,id,p){ tab=t; if(id) S.current=id; if(p){ui.purpose=p;ui.variant=0;} try{localStorage.setItem(KEY+".tab",t);}catch(e){} save(); render(); window.scrollTo(0,0); }
+document.addEventListener("click", e => {
+  const b=e.target.closest("button"); if(!b) return;
+  const c=cur(), ds=b.dataset;
+  if(ds.tab) return go(ds.tab);
+  if(ds.go){ const g=JSON.parse(ds.go); return go(g[0],g[1],g[2]); }
+  if(ds.pick){ S.current=ds.pick; save(); return render(); }
+  if("new" in ds){ const n={id:uid(),name:"Uusi asiakas",company:"",role:"",seg:"pienyrittaja",size:"",industry:"",phone:"",email:"",birthday:"",disc:"",stage:0,product:S.me.product||"",benefit:"",notes:"",facts:[],log:[]};
+    S.contacts.push(n); S.current=n.id; tab="asiakas"; save(); render(); setTimeout(()=>{const i=$("#c_name"); i&&(i.focus(),i.select());},0); return; }
+  if(ds.del){ if(b.dataset.confirm!=="1"){ b.dataset.confirm="1"; b.textContent="Vahvista poisto"; b.classList.remove("ghost"); return; }
+    S.contacts=S.contacts.filter(x=>x.id!==ds.del); S.current=S.contacts[0]?.id; save(); return render(); }
+  if("addfact" in ds){ const t=$("#f_txt").value.trim(); if(!t) return; c.facts.push({c:$("#f_cat").value,t}); save(); render(); $("#f_txt").focus(); return; }
+  if(ds.delfact){ c.facts.splice(+ds.delfact,1); save(); return render(); }
+  if(ds.disc){ c.disc=ds.disc; save(); return render(); }
+  if(ds.stage!==undefined){ c.stage=+ds.stage; save(); return render(); }
+  if("addlog" in ds){ const t=$("#l_txt").value.trim(); if(!t) return; c.log.push({d:today(),ch:$("#l_ch").value,t}); save(); return render(); }
+  if("variant" in ds){ ui.variant++; return render(); }
+  if("copyout" in ds) return copy($("#m_out").value);
+  if("logmsg" in ds){ const ch={whatsapp:"WhatsApp",sms:"Tekstiviesti",email:"Sähköposti",linkedin:"LinkedIn"}[ui.channel];
+    c.log.push({d:today(),ch,t:PURP[ui.purpose].n+": "+$("#m_out").value.slice(0,120)}); save(); toast("Kirjattu historiaan"); return render(); }
+  if("addrow" in ds){ ui.vt.rows.push({k:"M",t:"",s:""}); return render(); }
+  if(ds.delrow){ ui.vt.rows.splice(+ds.delrow,1); return render(); }
+  if("copyvt" in ds) return copy(vision().text);
+  if(ds.copyobj) return copy(OBJ[+ds.copyobj].r+"\n\n"+OBJ[+ds.copyobj].ask);
+  if(ds.prompt){ ui.prompt=ds.prompt; return render(); }
+  if("copyprompt" in ds) return copy($("#p_out").value);
+  if("export" in ds){ const j=JSON.stringify(S); $("#backup").value=j; copy(j); return; }
+  if("import" in ds){ try{ const n=JSON.parse($("#backup").value); if(!Array.isArray(n.contacts)) throw 0; S=n; save(); toast("Palautettu"); render(); }catch(err){ toast("Varmuuskopio ei kelpaa – tarkista että liitit koko tekstin"); } return; }
+  if("clearex" in ds){ S.contacts=S.contacts.filter(x=>!x.example); S.current=S.contacts[0]?.id; save(); toast("Esimerkit poistettu"); return render(); }
+});
+document.addEventListener("input", e => {
+  const el=e.target, ds=el.dataset, c=cur();
+  if(ds.c && c){ c[ds.c]=el.value; save();
+    if(ds.c==="name"){ const o=$(`#curSel option[value="${c.id}"]`); if(o) o.textContent=el.value; } return; }
+  if(ds.me){ S.me[ds.me]=el.value; save(); return; }
+  if(ds.ui==="aihe"){ ui.aihe=el.value; const m=buildMessage(c); $("#m_out").value=m.text; const w=$("#waLink"); if(w){ const ph=(c.phone||"").replace(/[^\d+]/g,"").replace(/^0/,"+358").replace(/^\+/,""); w.href=`https://wa.me/${ph}?text=${encodeURIComponent(m.text)}`; } return; }
+  if(ds.vt){ ui.vt[ds.vt]=el.value; refreshVision(); return; }
+  if(ds.vrow!==undefined){ ui.vt.rows[+ds.vrow][ds.k]=el.value; refreshVision(); return; }
+});
+function refreshVision(){ const o=vision(); $("#vt_out").textContent=o.text; $("#vt_warn").innerHTML=warnHtml(o.warn); }
+document.addEventListener("change", e => {
+  const el=e.target, ds=el.dataset, c=cur();
+  if(el.id==="curSel"){ S.current=el.value; save(); return render(); }
+  if(ds.c==="seg"||ds.c==="birthday"||ds.c==="phone"){ c[ds.c]=el.value; save(); return render(); }
+  if(ds.ui==="purpose"){ ui.purpose=el.value; ui.variant=0; return render(); }
+  if(ds.ui==="channel"){ ui.channel=el.value; return render(); }
+  if(ds.vrow!==undefined && el.tagName==="SELECT"){ ui.vt.rows[+ds.vrow].k=el.value; return refreshVision(); }
+  if(ds.me && tab==="tanaan" && S.me.name){ render(); }
+});
+document.addEventListener("keydown", e => {
+  if(e.key!=="Enter") return;
+  if(e.target.id==="f_txt"){ e.preventDefault(); document.querySelector("[data-addfact]").click(); }
+  if(e.target.id==="l_txt"){ e.preventDefault(); document.querySelector("[data-addlog]").click(); }
+});
+render();
+</script>

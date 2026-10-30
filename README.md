@@ -99,6 +99,7 @@ Enterprise/Plus-käyttäjät voivat valita mallin:
 | **Financial Analyst** | Suositeltu | **KRIITTINEN** | - | **KRIITTINEN** |
 | **Marketing Strategist** | **KRIITTINEN** | Suositeltu | **KRIITTINEN** | Suositeltu |
 | **HR Advisor** | **KRIITTINEN** | Suositeltu | - | **KRIITTINEN** |
+| **Myyntimentori** | **KRIITTINEN** | Suositeltu | Valinnainen | Suositeltu |
 
 ### Miksi nämä valinnat?
 
@@ -203,6 +204,7 @@ Enterprise/Plus-käyttäjät voivat valita mallin:
 | **Financial Analyst** | `Financial-Analyst-GPT.md` | Talousennusteet, arvonmääritys, unit economics, ROI-analyysi |
 | **Marketing Strategist** | `Marketing-Strategist-GPT.md` | Go-to-market, growth hacking, brand positioning, AARRR-metriikat |
 | **HR Advisor** | `HR-Advisor-GPT.md` | Henkilöstöstrategia, suorituksen johtaminen, työlainsäädäntö, TES, organisaation kehittäminen |
+| **Myyntimentori** | `Myyntimentori-GPT.md` + `myyntimentori/index.html` | Asiakassuhteen rakentaminen 10 vaiheessa, DISC-persoonat, valmiit WhatsApp-/sähköpostiviestit, visiotarinat, vastaväitteet. Mukana selainsovellus. |
 
 ---
 
