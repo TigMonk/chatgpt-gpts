@@ -1,0 +1,344 @@
+<title>Varaukset omiin käsiin</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: salongin vastaanottotiski – yksi kapea lukupalsta, välissä leveämmät "peili"-paneelit: kaavio, laskuri, polut */
+:root{
+  --paper:#F5F7F6; --card:#FFFFFF; --ink:#13241F; --muted:#56655F; --line:#D3DCD8;
+  --pine:#1D5C4B; --pine-ink:#FFFFFF; --mint:#DDF1E8; --steel:#E6ECEA;
+  --brass:#9A6A12; --brass-bg:#FAF0DA; --red:#B3261E; --red-bg:#FBE7E5; --ok:#1E7A4C;
+  --display:"Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E1715; --card:#15211E; --ink:#E6EFEB; --muted:#9DB0A8; --line:#29403A;
+  --pine:#6FD1AE; --pine-ink:#0B1412; --mint:#173A30; --steel:#1B2A26;
+  --brass:#E6B65A; --brass-bg:#3A2D12; --red:#FF8F86; --red-bg:#3D1A17; --ok:#6FD1AE; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1715; --card:#15211E; --ink:#E6EFEB; --muted:#9DB0A8; --line:#29403A;
+  --pine:#6FD1AE; --pine-ink:#0B1412; --mint:#173A30; --steel:#1B2A26;
+  --brass:#E6B65A; --brass-bg:#3A2D12; --red:#FF8F86; --red-bg:#3D1A17; --ok:#6FD1AE; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:17px/1.6 var(--body)}
+.wrap{max-width:1060px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.col{max-width:68ch}
+section{padding-block:40px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(34px,6vw,60px);font-weight:900;font-stretch:80%;line-height:1}
+h2{font-size:clamp(24px,3.4vw,32px);font-weight:800;font-stretch:85%;line-height:1.1}
+h3{font-size:19px;font-weight:700}
+p{margin:0}
+.lede{font-size:20px;color:var(--muted)}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--pine)}
+.note{font-size:14px;color:var(--muted)}
+a{color:var(--pine)}
+/* hero: parturintuolin raitapylväs */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:28px;align-items:stretch;padding-block:48px 36px}
+.pole{border-radius:60px;background:repeating-linear-gradient(135deg,var(--pine) 0 18px,var(--card) 18px 36px,var(--red) 36px 54px,var(--card) 54px 72px);border:3px solid var(--ink);min-height:220px;background-size:100% 102px;animation:spin 6s linear infinite}
+@keyframes spin{to{background-position:0 102px}}
+@media (prefers-reduced-motion:reduce){.pole{animation:none}}
+@media (max-width:640px){.hero{grid-template-columns:minmax(0,1fr)}.pole{min-height:22px;border-radius:12px;background-size:102px 100%;animation:none}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 13px var(--body);padding:3px 10px;border-radius:99px;background:var(--steel);color:var(--ink);white-space:nowrap}
+.chip.p{background:var(--mint);color:var(--pine)} .chip.b{background:var(--brass-bg);color:var(--brass)} .chip.r{background:var(--red-bg);color:var(--red)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px}
+ul.l{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+/* reittikaavio */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;align-self:flex-start}
+.seg button{border:0;background:var(--card);color:var(--muted);font:700 15px var(--body);padding:8px 16px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--pine);outline-offset:2px}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative}
+@media (max-width:760px){.flow{grid-template-columns:minmax(0,1fr)}}
+.stage{display:flex;flex-direction:column;gap:8px;min-width:0}
+.stage .h{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+.stage .h b{color:var(--ink)}
+.node{border:2px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);font-weight:600;line-height:1.3;transition:border-color .2s,background .2s}
+.node small{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:2px}
+.node.own{border-color:var(--pine);background:var(--mint)}
+.node.mid{border-color:var(--brass);background:var(--brass-bg)}
+.node.off{opacity:.45;border-style:dashed}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:2px solid}
+.verdict{border-left:4px solid var(--pine);padding:4px 0 4px 14px;font-size:18px}
+/* laskuri */
+.calc{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:24px}
+@media (max-width:760px){.calc{grid-template-columns:minmax(0,1fr)}}
+label.f{display:flex;flex-direction:column;gap:2px;font-size:14px;color:var(--muted);font-weight:600}
+label.f span.v{font:500 15px var(--mono);color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--pine)}
+.bars{display:flex;flex-direction:column;gap:14px}
+.bar .t{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-variant-numeric:tabular-nums}
+.bar .track{height:26px;background:var(--steel);border-radius:6px;overflow:hidden;display:flex}
+.bar .track i{display:block;height:100%}
+.k1{background:var(--brass)} .k2{background:var(--red)} .k3{background:var(--muted)} .k4{background:var(--pine)}
+.big{font:900 40px var(--display);font-stretch:80%;font-variant-numeric:tabular-nums;line-height:1}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}
+.kpi{border-top:3px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:4px}
+.kpi.pos{border-color:var(--pine)} .kpi.neg{border-color:var(--red)}
+/* polut */
+.path{border-top:6px solid var(--line)}
+.path.rec{border-top-color:var(--pine)}
+.path .tag{align-self:flex-start}
+dl.pc{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;margin:0;font-size:15px}
+dl.pc dt{font-weight:700} dl.pc dd{margin:0}
+/* moottori */
+.loop{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;counter-reset:n}
+@media (max-width:760px){.loop{grid-template-columns:minmax(0,1fr)}}
+.loop div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;position:relative}
+.loop div::before{counter-increment:n;content:counter(n);font:800 28px var(--display);color:var(--pine);line-height:1}
+.loop div::after{content:"→";position:absolute;right:-14px;top:14px;font-weight:800;color:var(--muted)}
+.loop div:last-child::after{content:"↺";right:10px}
+@media (max-width:760px){.loop div::after{content:"↓";right:14px;top:auto;bottom:-6px}.loop div:last-child::after{content:"↺"}}
+.loop p{font-size:15px;color:var(--muted)}
+/* aikajana */
+.weeks{display:flex;flex-direction:column;gap:0}
+.wk{display:grid;grid-template-columns:90px minmax(0,1fr);gap:16px;padding-block:14px;border-bottom:1px dashed var(--line)}
+.wk b.w{font:800 18px var(--display);color:var(--pine)}
+.msg{white-space:pre-wrap;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:16px}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);font:700 14px var(--body);padding:8px 14px;border-radius:8px;cursor:pointer;align-self:flex-start}
+table{border-collapse:collapse;width:100%;font-size:15px}
+.tbl{overflow-x:auto}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-weight:700}
+footer{padding-block:30px 60px;border-top:1px solid var(--line)}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <span class="eyebrow">Myyntimentori · case parturi-kampaamot</span>
+      <h1>Varaukset omiin käsiin</h1>
+      <p class="lede col">Timma tuo uusia asiakkaita ja hoitaa varaukset hyvin. Mutta asiakas varaa Timman kautta, kirjautuu Timmaan ja löytää samalla kilpailijat. Tämä case näyttää, miten parturi rakentaa oman varauskanavan ja oman näkyvyyden – ja milloin Timma kannattaa silti pitää.</p>
+      <div class="chips"><span class="chip p">Wix-sivut jo olemassa</span><span class="chip b">Timma-varaus</span><span class="chip">1–5 tuolia</span><span class="chip">Suomi</span></div>
+    </div>
+    <div class="pole" role="img" aria-label="Parturin raitapylväs"></div>
+  </header>
+
+  <section>
+    <span class="eyebrow">Lähtötilanne · esimerkkisalonki</span>
+    <h2>Mitä BuiltWith kertoo salongista parturiogeli.fi</h2>
+    <p class="col">Julkinen tekniikkaprofiili näyttää, miten sivut on rakennettu. Tästä profiilista näkee yhdellä silmäyksellä salongin tilanteen, joka on Suomessa tavallinen: kaikki on vuokrattu valmiina palveluina.</p>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Mitä sivuilla on</h3>
+        <ul class="l">
+          <li><b>Wix</b> sivut, palvelin, nimipalvelu ja kuvat. Lisäksi Wix Stores (verkkokauppa), Wix Chat, Wix Forms, Wix Video, Instagram-syöte ja hinnastotaulukko.</li>
+          <li><b>Timma</b> ajanvaraus upotettuna sivuille.</li>
+          <li><b>PayPal</b> ja euromaksut verkkokaupassa.</li>
+          <li>Mobiilisovitus, https ja llms.txt-tiedosto tekoälyhakuja varten.</li>
+          <li>BuiltWith arvioi, että sivujen teksti on 40 %:n todennäköisyydellä tekoälyn kirjoittamaa.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Mitä se tarkoittaa myyjälle</h3>
+        <ul class="l">
+          <li><b>Salonki maksaa jo Wixistä.</b> Wixin yrityspaketteihin kuuluu oma ajanvaraus (Wix Bookings). Verkkokaupan perusteella heillä on todennäköisesti varauksiin riittävä paketti. Tarkista paketti ennen kuin otat sen puheeksi.</li>
+          <li><b>Sivut eivät ole ongelma.</b> Uusia sivuja ei kannata tarjota. Tarjoa sitä, mikä puuttuu: varausten ohjaus omaan kanavaan ja näkyvyys Googlessa.</li>
+          <li><b>Joku on jo panostanut.</b> llms.txt ja tekoälyteksti kertovat omistajasta, joka kokeilee uutta. Hän on hyvä ensimmäinen asiakas.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Johtopäätös siihen, kannattaako Wix-salongille tarjota mitään: kannattaa, kun tarjous on palvelu eikä uudet sivut.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Kuva · asiakkaan reitti</span>
+    <h2>Kuka omistaa asiakkaan?</h2>
+    <div class="seg" role="group" aria-label="Näytä reitti"><button id="v_now" aria-pressed="true" data-view="now">Nyt</button><button id="v_goal" aria-pressed="false" data-view="goal">Tavoite</button></div>
+    <div class="flow" id="flow"></div>
+    <div class="legend"><span><i style="border-color:var(--pine);background:var(--mint)"></i>Salonki omistaa</span><span><i style="border-color:var(--brass);background:var(--brass-bg)"></i>Välikäsi omistaa</span><span><i style="border-color:var(--line)"></i>Neutraali</span></div>
+    <p class="verdict col" id="verdict"></p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Laskuri · arvioi omilla luvuilla</span>
+    <h2>Paljonko Timma maksaa vuodessa – ja mitä se tuo</h2>
+    <div class="calc">
+      <div class="stack" style="display:flex;flex-direction:column;gap:14px">
+        <label class="f">Kalenterin käyttäjiä (tuoleja) <span class="v" id="o_users"></span><input type="range" id="i_users" min="1" max="8" value="2"></label>
+        <label class="f">Timman kuukausimaksu / käyttäjä <span class="v" id="o_sub"></span><input type="range" id="i_sub" min="10" max="60" value="20"></label>
+        <label class="f">Uusia asiakkaita Timman markkinapaikalta / kk <span class="v" id="o_new"></span><input type="range" id="i_new" min="0" max="40" value="6"></label>
+        <label class="f">Keskiostos <span class="v" id="o_avg"></span><input type="range" id="i_avg" min="15" max="150" step="5" value="40"></label>
+        <label class="f">Provisio ensimmäisestä varauksesta <span class="v" id="o_pct"></span><input type="range" id="i_pct" min="0" max="30" value="20"></label>
+        <label class="f">Tekstiviestimuistutuksia / kk <span class="v" id="o_sms"></span><input type="range" id="i_sms" min="0" max="600" step="10" value="150"></label>
+        <label class="f">Käyntejä / asiakas / vuosi <span class="v" id="o_vis"></span><input type="range" id="i_vis" min="1" max="12" value="6"></label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <div class="bars" id="bars"></div>
+        <div class="kpis" id="kpis"></div>
+        <p class="note">Oletukset: Timma Pro alkaen 20 €/käyttäjä/kk, tekstiviesti 0,08 € ja provisio 20 % uuden asiakkaan ensimmäisestä markkinapaikkavarauksesta (Timman hinnasto ja Yle). Hinnat ilman alv:tä, tarkista ajantasaiset luvut. Oman kanavan muistutukset oletetaan tehtäväksi sähköpostilla tai WhatsAppilla ilman viestikohtaista maksua.</p>
+      </div>
+    </div>
+    <p class="verdict col" id="calcVerdict"></p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Kolme polkua</span>
+    <h2>Miten ajanvaraus rakennetaan</h2>
+    <p class="col">Asiakkaan ei pidä joutua luomaan tunnusta jokaiselle parturille erikseen. Siksi jokainen polku arvioidaan myös sen mukaan, voiko asiakas varata pelkällä nimellä ja puhelinnumerolla.</p>
+    <div class="grid3">
+      <div class="panel path rec">
+        <span class="chip p tag">Suositus useimmille</span>
+        <h3>A · Hybridi: Timma jää, asiakkaat omiin kanaviin</h3>
+        <p>Timma pysyy kalenterina ja markkinapaikkana uusille asiakkaille. Kaikki omat kanavat – Google-profiili, Instagram, omat sivut ja kanta-asiakasviestit – ohjataan salongin omalle varaussivulle.</p>
+        <dl class="pc"><dt>+</dt><dd>Ei riskiä, uusien asiakkaiden virta jatkuu</dd><dt>+</dt><dd>Henkilökunta ei opettele uutta kalenteria</dd><dt>+</dt><dd>Provisiota maksetaan vain markkinapaikan uusista asiakkaista</dd><dt>–</dt><dd>Kuukausimaksu jää</dd><dt>?</dt><dd>Tarkista Timmalta, peritäänkö provisiota varauksista, jotka tulevat salongin omalta varauslinkiltä</dd></dl>
+      </div>
+      <div class="panel path">
+        <span class="chip tag">Wix-salongeille</span>
+        <h3>B · Varaus omille Wix-sivuille</h3>
+        <p>Wix Bookings otetaan käyttöön sivuilla, joista salonki jo maksaa. Palvelut, työntekijät, työajat, hinnat ja muistutukset määritellään kerran, ja Google-profiilin varauslinkki osoittaa omille sivuille.</p>
+        <dl class="pc"><dt>+</dt><dd>Ei uutta kuukausimaksua, jos paketti sisältää varaukset</dd><dt>+</dt><dd>Asiakasrekisteri on salongin oma</dd><dt>–</dt><dd>Markkinapaikan uudet asiakkaat jäävät pois, joten ne pitää korvata Googlella</dd><dt>?</dt><dd>Tarkista, vaatiiko Wix asiakkaalta jäsentilin. Jos vaatii, asiakas joutuu taas rekisteröitymään.</dd></dl>
+      </div>
+      <div class="panel path">
+        <span class="chip tag">Yhden tuolin parturille</span>
+        <h3>C · Kevyt: Googlen varaussivu</h3>
+        <p>Google-kalenterin ajanvaraussivu on maksuton, kun käyttäjällä on yksi varaussivu. Linkki laitetaan Google-profiiliin, Instagramiin ja omille sivuille.</p>
+        <dl class="pc"><dt>+</dt><dd>0 € ja käyttöön tunnissa</dd><dt>+</dt><dd>Varaussivu on julkinen linkki, jota avatessa ei tarvitse tunnusta</dd><dt>–</dt><dd>Ei sovellu useammalle työntekijälle eikä monelle palvelulle</dd><dt>–</dt><dd>Ei salongin asiakasrekisteriä eikä tekstiviestimuistutuksia</dd></dl>
+      </div>
+    </div>
+    <p class="note">Neljäs vaihtoehto on toinen salonkijärjestelmä (Fresha, Vello, Aikaly, Booksy…). Se ratkaisee hinnan, mutta riippuvuus välikädestä jää ennalleen, vain logo vaihtuu. Hinnat ja ehdot vaihtelevat, joten vertaa niitä samalla laskurilla.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Näkyvyys ilman Timmaa</span>
+    <h2>Kuka tuo asiakkaat omille sivuille?</h2>
+    <p class="col">Timman markkinapaikka korvataan koneella, joka pyörii itsestään. Valtaosa uusista asiakkaista hakee "parturi + kaupunginosa" Googlen kartasta. Siellä ratkaisevat Google-profiili ja arvostelut, eivät sivujen ulkoasu.</p>
+    <div class="loop">
+      <div><h3>Löydy</h3><p>Google-yritysprofiili kuntoon: oikea kategoria, palvelut hintoineen, aukioloajat, kuvat joka kuukausi ja varauslinkki omalle varaussivulle.</p></div>
+      <div><h3>Varaa</h3><p>Varaus yhdellä linkillä nimellä ja puhelinnumerolla. Sama linkki Instagramin biossa, Googlessa ja sivujen yläreunassa.</p></div>
+      <div><h3>Palvele</h3><p>Hyvä käynti on paras mainos. Kysy tuolissa luontevasti: "Kenet tunnet, joka tarvitsisi hyvän parturin?"</p></div>
+      <div><h3>Pyydä arvio</h3><p>Kahden tunnin päästä kiitosviesti ja suora linkki Google-arvioon. Arvioiden määrä ja tuoreus nostavat salonkia kartalla.</p></div>
+      <div><h3>Muistuta</h3><p>Viiden viikon päästä viesti: "Hiukset alkavat kasvaa yli korvien – varataanko seuraava?" ja varauslinkki. Tämä tuo kanta-asiakkaat takaisin ilman välikättä.</p></div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h3>Omat sivut hakukoneille</h3><ul class="l"><li>Sivun otsikkoon kaupunki tai kaupunginosa: "Parturi Kallio – varaa aika netissä".</li><li>Jokaiselle palvelulle oma hinta ja kuvaus, koska ihmiset hakevat palvelun nimellä ("skin fade", "lasten hiustenleikkuu").</li><li>Osoite, kartta ja aukioloajat tekstinä, ei pelkkänä kuvana.</li><li>llms.txt on jo olemassa, joten pidä siinä palvelut ja hinnat ajan tasalla, niin tekoälyhaut löytävät ne.</li></ul></div>
+      <div class="panel"><h3>Mittarit, joita seurataan kuukausittain</h3><ul class="l"><li>Varauksia omasta kanavasta vs. Timmasta (%)</li><li>Google-profiilin katselut, soitot ja reittihaut</li><li>Uudet arviot / kk ja keskiarvo</li><li>Palaavien asiakkaiden osuus</li><li>Peruutukset ja saapumatta jättäneet</li></ul></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Toteutus · 30 päivää</span>
+    <h2>Siirtymä ilman katkoa</h2>
+    <div class="weeks">
+      <div class="wk"><b class="w">Viikko 1</b><div><b>Kartoitus ja Google.</b> Tarkista Wix-paketti, Timman sopimusehdot, irtisanomisaika ja asiakastietojen vienti. Laita Google-profiili kuntoon ja ota mittarien lähtötaso talteen.</div></div>
+      <div class="wk"><b class="w">Viikko 2</b><div><b>Oma varaus rinnalle.</b> Palvelut, työajat ja muistutukset määritellään omaan varaukseen. Henkilökunta tekee testivaraukset. Timma pysyy päällä.</div></div>
+      <div class="wk"><b class="w">Viikko 3</b><div><b>Kanavat uuteen linkkiin.</b> Google-profiili, Instagram, sivujen varausnappi ja tiskin QR-koodi vaihdetaan. Kanta-asiakkaille lähtee viesti uudesta, helpommasta varaustavasta.</div></div>
+      <div class="wk"><b class="w">Viikko 4</b><div><b>Päätös luvuilla.</b> Kuinka suuri osa varauksista tuli omasta kanavasta, ja montako uutta asiakasta Timma toi? Valitaan polku A tai B. Timman voi irtisanoa vasta, kun Google tuo uusia asiakkaita.</div></div>
+    </div>
+    <div class="panel" style="border-color:var(--brass)"><h3>Riskit ja miten ne hoidetaan</h3><ul class="l">
+      <li><b>Asiakasrekisteri:</b> asiakastiedot ovat henkilötietoja. Siirrä vain tarpeelliset tiedot ja päivitä salongin tietosuojaseloste.</li>
+      <li><b>Päällekkäiset varaukset:</b> rinnakkaisvaiheessa kalentereita ei saa pitää erillään. Joko Timma pysyy ainoana kalenterina (polku A) tai siirtyminen tehdään tiettynä päivänä.</li>
+      <li><b>Saapumatta jättäneet:</b> muistutus päivää ennen ja tarvittaessa ennakkomaksu uusilta asiakkailta.</li>
+      <li><b>Uusien asiakkaiden virta:</b> se on Timman todellinen arvo. Älä luovu siitä ennen kuin Google-profiili korvaa sen.</li></ul></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Myyjälle · miten tämä tarjotaan</span>
+    <h2>Tarjous, joka ei näytä myynniltä</h2>
+    <div class="grid2">
+      <div class="panel"><h3>Kenelle</h3><ul class="l"><li>BuiltWithin "Timma"-listan salongit, joilla on Wix-, WordPress- tai Squarespace-sivut.</li><li>Salongit, joiden Google-profiilissa on vähän arvosteluja tai varauslinkki vie Timmaan.</li><li>Omistajat, jotka ovat julkisesti valittaneet Timman hinnankorotuksesta.</li></ul></div>
+      <div class="panel"><h3>Mitä tarjotaan (esimerkkihinnoittelu)</h3><ul class="l"><li><b>Ilmainen:</b> 10 minuutin näkyvyysarvio (Myyntimentorin pikahaku + Google-profiili).</li><li><b>Käyttöönotto:</b> oma varaus, Google-profiili, linkit ja QR-koodi kiinteällä hinnalla.</li><li><b>Kuukausihuolto:</b> arvostelupyynnöt, muistutusviestit, kuukausiraportti ja Google-päivitykset.</li><li>Hinnat sinä päätät. Perustele ne laskurin säästöllä.</li></ul></div>
+    </div>
+    <div class="panel">
+      <h3>Ensimmäinen viesti (havaintoviesti, ei myyntiä)</h3>
+      <div class="msg" id="m1">Hei [nimi]! Kävin katsomassa salonkinne sivuja ja Google-profiilia. Sivut ovat tosi hyvät, ja näkee että ne on tehty huolella.
+
+Yksi asia jäi mieleen: varausnappi vie Timmaan. Siellä asiakas näkee samalla muut lähialueen parturit, ja uusista asiakkaista menee provisio. Kanta-asiakkaat voisi ohjata varaamaan suoraan teiltä, eikä heidän tarvitsisi luoda tunnusta mihinkään.
+
+Teen tällaisia pieniä tarkistuksia paikallisille salongeille ilmaiseksi. Lähetänkö lyhyen yhteenvedon?</div>
+      <button class="btn" data-copy="m1">Kopioi viesti</button>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Vastaväite</th><th>Vastaus</th></tr></thead>
+      <tbody>
+        <tr><td>"Timma tuo meille asiakkaita."</td><td>"Juuri siksi en ehdota Timmasta luopumista. Ehdotan, että kanta-asiakkaat varaavat suoraan teiltä ja Timma hoitaa vain uudet. Katsotaan kuukauden päästä luvuista, kumpi kannattaa."</td></tr>
+        <tr><td>"Ei ole aikaa opetella uutta."</td><td>"Teen käyttöönoton puolestanne, ja kalenteri voi pysyä samana. Teidän osuutenne on yksi puolen tunnin palaveri."</td></tr>
+        <tr><td>"Asiakkaat ovat tottuneet Timmaan."</td><td>"Molemmat toimivat rinnakkain. Moni asiakas pitää siitä, ettei tarvitse kirjautua mihinkään."</td></tr>
+        <tr><td>"Paljonko tämä maksaa?"</td><td>"Lasketaan ensin, paljonko nykyinen tapa maksaa vuodessa. Jos säästö ei ole suurempi kuin minun hintani, en suosittele tätä."</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Tarkista ennen tarjousta</span>
+    <h2>Mikä on varmaa ja mikä ei</h2>
+    <div class="grid2">
+      <div class="panel"><h3 style="color:var(--ok)">Lähteillä varmistettu</h3><ul class="l">
+        <li>Timma Pro alkaen 20 €/käyttäjä/kk, tekstiviesti 0,08 € (<a href="https://timma.fi/pro/pricing" target="_blank" rel="noopener">Timman hinnasto</a>)</li>
+        <li>Provisio uuden asiakkaan ensimmäisestä markkinapaikkavarauksesta nousi 15 %:sta 20 %:iin, eikä seuraavista varauksista peritä maksua (<a href="https://yle.fi/a/74-20158967" target="_blank" rel="noopener">Yle</a>)</li>
+        <li>Google-kalenterissa yksi maksuton varaussivu henkilökohtaisella tilillä (<a href="https://support.google.com/calendar/answer/10729749" target="_blank" rel="noopener">Google-tuki</a>)</li>
+        <li>Verkkomaksut Wix Bookingsissa vaativat yrityspaketin (<a href="https://support.wix.com/en/article/upgrading-wix-bookings" target="_blank" rel="noopener">Wix-tuki</a>)</li></ul></div>
+      <div class="panel"><h3 style="color:var(--brass)">Tarkistettava tapauskohtaisesti</h3><ul class="l">
+        <li>Onko salongin Wix-paketissa varaukset mukana?</li>
+        <li>Vaatiiko Wix Bookings asiakkaalta jäsentilin? Wixin omat ohjeet ovat tästä ristiriitaisia (<a href="https://support.wix.com/en/article/wix-bookings-request-requiring-login-or-registration-before-booking-a-service" target="_blank" rel="noopener">Wix-tuki</a>).</li>
+        <li>Perii Timma provisiota salongin oman varauslinkin kautta tulevista uusista asiakkaista?</li>
+        <li>Toimiiko Googlen "Varaa verkossa" -nappi Suomessa valitulla järjestelmällä?</li>
+        <li>Haluaako juuri tämä salonki pois Timmasta? Kysy, älä oleta.</li></ul></div>
+    </div>
+  </section>
+
+  <footer class="note">Myyntimentori · case-esimerkki. Salongin tekniset tiedot perustuvat BuiltWithin julkiseen profiiliin. Hinnat ovat tilanne lokakuussa 2026 lähteiden mukaan. Laskurin luvut ovat esimerkkejä, eivät salongin todellisia lukuja.</footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const VIEWS={
+  now:{verdict:"Nyt Timma on asiakkaan ja salongin välissä. Asiakas kirjautuu Timmaan, näkee kilpailijat ja saa muistutukset Timman nimissä. Kanta-asiakkuus on salongin, mutta asiakassuhde on Timman.",
+    cols:[["Löytää",[["Google-haku","vie Timmaan tai sivuille","neu"],["Timma-sovellus","näyttää myös kilpailijat","mid"],["Instagram","linkki biossa","neu"]]],
+          ["Varaa",[["Timma-varaus","asiakas luo Timma-tunnuksen","mid"],["Wix-sivut","upotettu Timma","mid"]]],
+          ["Muistutus",[["Timman tekstiviesti","0,08 € / viesti","mid"]]],
+          ["Asiakastieto",[["Timman rekisteri","salonki vuokraa pääsyn","mid"],["Uusi asiakas","20 % ensimmäisestä","mid"]]]]},
+  goal:{verdict:"Tavoitteessa jokainen oma kanava vie salongin omaan varaukseen ilman kirjautumista. Timma voi jäädä tuomaan uusia asiakkaita, mutta kanta-asiakkuus ja viestit ovat salongin omia.",
+    cols:[["Löytää",[["Google-profiili","varauslinkki omaan varaukseen","own"],["Instagram","sama linkki","own"],["Timma-sovellus","vain uudet asiakkaat","mid"]]],
+          ["Varaa",[["Oma varaussivu","nimi + puhelin, ei tunnusta","own"],["Wix-sivut","varausnappi yläreunassa","own"]]],
+          ["Muistutus",[["Oma viesti","sähköposti tai WhatsApp","own"],["Paluumuistutus","5 viikon päästä","own"]]],
+          ["Asiakastieto",[["Salongin rekisteri","oma ja siirrettävä","own"],["Google-arvio","pyydetään joka käynnin jälkeen","own"]]]]}
+};
+function drawFlow(v){
+  const d=VIEWS[v];
+  document.getElementById("flow").innerHTML=d.cols.map(([h,nodes],i)=>`<div class="stage"><div class="h"><b>${h}</b><span>${i<3?"→":""}</span></div>${nodes.map(([t,s,k])=>`<div class="node ${k==="own"?"own":k==="mid"?"mid":""}">${t}<small>${s}</small></div>`).join("")}</div>`).join("");
+  document.getElementById("verdict").textContent=d.verdict;
+  document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.view===v));
+}
+const eur=n=>Math.round(n).toLocaleString("fi-FI")+" €";
+function calc(){
+  const g=id=>+document.getElementById("i_"+id).value;
+  const u=g("users"),sub=g("sub"),nw=g("new"),avg=g("avg"),pct=g("pct"),sms=g("sms"),vis=g("vis");
+  const set=(id,t)=>document.getElementById("o_"+id).textContent=t;
+  set("users",u);set("sub",sub+" €");set("new",nw);set("avg",avg+" €");set("pct",pct+" %");set("sms",sms);set("vis",vis);
+  const yS=u*sub*12, yC=nw*avg*pct/100*12, ySms=sms*0.08*12, tot=yS+yC+ySms;
+  const hybrid=yS+yC;
+  const rows=[["Timma nyt",[[yS,"k1","kuukausimaksut"],[yC,"k2","provisiot"],[ySms,"k3","tekstiviestit"]]],
+              ["A · Hybridi",[[yS,"k1","kuukausimaksut"],[yC,"k2","provisiot"]]],
+              ["B · Oma Wix-varaus",[[0,"k4",""]]],["C · Googlen varaussivu",[[0,"k4",""]]]];
+  const mx=Math.max(tot,1);
+  document.getElementById("bars").innerHTML=rows.map(([n,parts])=>{const s=parts.reduce((a,p)=>a+p[0],0);
+    return `<div class="bar"><div class="t"><span>${n}</span><span>${eur(s)} / v</span></div><div class="track" role="img" aria-label="${n} ${eur(s)} vuodessa">${parts.map(([v,k,l])=>`<i class="${k}" style="width:${v/mx*100}%" title="${l} ${eur(v)}"></i>`).join("")}</div></div>`}).join("")+
+    `<div class="legend"><span><i style="border-color:var(--brass);background:var(--brass)"></i>Kuukausimaksut ${eur(yS)}</span><span><i style="border-color:var(--red);background:var(--red)"></i>Provisiot ${eur(yC)}</span><span><i style="border-color:var(--muted);background:var(--muted)"></i>Tekstiviestit ${eur(ySms)}</span></div>`;
+  const perNew=avg*pct/100, life=avg*vis*2;
+  document.getElementById("kpis").innerHTML=`
+    <div class="kpi neg"><span class="note">Timma yhteensä / vuosi</span><span class="big">${eur(tot)}</span></div>
+    <div class="kpi"><span class="note">Uusia asiakkaita Timmasta / vuosi</span><span class="big">${nw*12}</span></div>
+    <div class="kpi pos"><span class="note">Yksi uusi asiakas maksaa provisiona</span><span class="big">${eur(perNew)}</span></div>
+    <div class="kpi pos"><span class="note">Asiakkaan arvo 2 vuodessa</span><span class="big">${eur(life)}</span></div>`;
+  const ratio=life?perNew/life*100:0;
+  document.getElementById("calcVerdict").innerHTML = nw===0
+    ? `Jos Timma ei tuo uusia asiakkaita, salonki maksaa ${eur(yS+ySms)} vuodessa pelkästä kalenterista. Tällöin polku B tai C on selvä säästö.`
+    : `Provisio on ${ratio.toFixed(1).replace(".",",")} % asiakkaan kahden vuoden arvosta, joten uusien asiakkaiden hankinta Timmasta on edullista. Kallis osa on kalenterin ${eur(yS)} ja viestien ${eur(ySms)} vuodessa. <b>Siksi ensin oma kanava kanta-asiakkaille (polku A), ja Timmasta luovutaan vasta, kun Google tuo ${nw} uutta asiakasta kuukaudessa.</b>`;
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.view) drawFlow(b.dataset.view);
+  if(b.dataset.copy){ const t=document.getElementById(b.dataset.copy).textContent;
+    const ok=()=>{const x=document.getElementById("toast");x.textContent="Kopioitu";x.hidden=false;setTimeout(()=>x.hidden=true,1800);};
+    try{navigator.clipboard.writeText(t).then(ok,()=>{});}catch(err){} }
+});
+document.addEventListener("input",e=>{ if(e.target.id&&e.target.id.startsWith("i_")) calc(); });
+drawFlow("now"); calc();
+</script>
