@@ -99,6 +99,7 @@ Enterprise/Plus-käyttäjät voivat valita mallin:
 | **Financial Analyst** | Suositeltu | **KRIITTINEN** | - | **KRIITTINEN** |
 | **Marketing Strategist** | **KRIITTINEN** | Suositeltu | **KRIITTINEN** | Suositeltu |
 | **HR Advisor** | **KRIITTINEN** | Suositeltu | - | **KRIITTINEN** |
+| **AI-Hallitushuone** | **KRIITTINEN** | **KRIITTINEN** | - | **KRIITTINEN** |
 
 ### Miksi nämä valinnat?
 
@@ -203,6 +204,9 @@ Enterprise/Plus-käyttäjät voivat valita mallin:
 | **Financial Analyst** | `Financial-Analyst-GPT.md` | Talousennusteet, arvonmääritys, unit economics, ROI-analyysi |
 | **Marketing Strategist** | `Marketing-Strategist-GPT.md` | Go-to-market, growth hacking, brand positioning, AARRR-metriikat |
 | **HR Advisor** | `HR-Advisor-GPT.md` | Henkilöstöstrategia, suorituksen johtaminen, työlainsäädäntö, TES, organisaation kehittäminen |
+| **AI-Hallitushuone** | `AI-Hallitushuone-GPT.md` | Hallitustyön AI-tilannehuone: viisi virtaa, varjohallitus, skenaariot, 1000 päivän strategia, päätöspäiväkirja |
+
+Katso myös: [`AI-Hallitus-Ideat.md`](AI-Hallitus-Ideat.md) – 5 innovatiivista ideaa AI-avusteiseen hallitustyöhön.
 
 ---
 
