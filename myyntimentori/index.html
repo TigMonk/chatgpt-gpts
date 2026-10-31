@@ -282,6 +282,7 @@ const PURP = {
   tapaaminen:{n:"Tapaamispyyntö",ask:true,why:"<b>Pieni pyyntö ensin.</b> 15–20 minuuttia on helppo sanoa kyllä. Kytke pyyntö hänen omaan tavoitteeseensa, ei tuotteeseesi."},
   ehdotus:{n:"Ratkaisuehdotus",ask:true,why:"<b>'Koska' toimii.</b> Perusteltu pyyntö hyväksytään selvästi useammin kuin perustelematon. Kytke ehdotus hänen omin sanoin kertomaansa kipuun."},
   seuranta:{n:"Seuranta tarjouksen jälkeen",ask:true,why:"<b>Johdonmukaisuus.</b> Muistuta mitä hän itse sanoi tavoitteekseen. Tarjoa uutta tietoa, älä vain 'tarkista tilannetta'."},
+  havainto:{n:"Havainto hänen sivuistaan / somesta",ask:false,why:"<b>Ilmainen diagnoosi.</b> Konkreettinen havainto hänen omista sivuistaan osoittaa, että olet tehnyt kotiläksysi. Annat arvoa heti, ja hän näkee itse ongelman – sinun ei tarvitse väittää mitään."},
   kiitos:{n:"Kiitos ja suosittelupyyntö",ask:false,why:"<b>Huippuhetki.</b> Pyydä suositusta, kun tyytyväisyys on korkeimmillaan, eli heti onnistumisen jälkeen."}
 };
 
@@ -331,6 +332,10 @@ function T(v){ // viestipohjat: palauttaa versiot
     seuranta:[
       `Hei ${v.n}, heräsikö ehdotuksesta kysymyksiä? Jos jokin mietityttää, kerro suoraan. Parannan mieluummin ehdotusta kuin arvailen.`,
       `${v.n}, lisätieto päätöksen tueksi: ${v.aihe||"[uusi fakta, referenssi tai laskelma]"}. Sanoit itse, että ${t||"[hänen tavoitteensa omin sanoin]"} – tämä vie sinne nopeammin.`
+    ],
+    havainto:[
+      `Hei ${v.n}! Kävin katsomassa verkkosivujanne${v.domain?" ("+v.domain+")":""} ja huomasin yhden pienen asian. ${v.havainto||"[havainto sivuista tai somesta]"} Korjaus on yleensä nopea, ja vaikutus näkyy suoraan asiakasmäärissä. Kerronko miten sen voi korjata? Ei maksa mitään.`,
+      `${v.n}, pieni vinkki kollegalta. ${v.havainto||"[havainto]"} Moni ${v.seg} ei huomaa tätä itse, koska omia sivuja katsoo harvoin asiakkaan silmin.`
     ],
     kiitos:[
       `${v.n}, kiitos luottamuksesta! Teen kaikkeni, että ${v.hyoty||"tämä onnistuu"}. Jos tiedät jonkun, jolle tästä olisi yhtä paljon hyötyä, olisin kiitollinen vinkistä.`
@@ -424,9 +429,10 @@ function daysToBirthday(b){
 const daysSince = d => d ? Math.round((Date.now()-new Date(d).getTime())/864e5) : null;
 const lastTouch = c => c.log.length ? c.log.map(l=>l.d).sort().at(-1) : null;
 function vars(c){
-  return {n:first(c.name)||"[nimi]", yritys:c.company||"", me:first(S.me.name)||"[oma nimesi]", seg:(SEG[c.seg]||{}).label||"asiakas",
+  const dom=((c.web||"").match(/^(?:https?:\/\/)?(?:www\.)?([^/]+)/)||[])[1]||"";
+  return {n:c.nameAuto?"[yhteyshenkilön nimi]":first(c.name)||"[nimi]", domain:dom, yritys:c.company||"", me:first(S.me.name)||"[oma nimesi]", seg:(SEG[c.seg]||{}).label||"asiakas",
     kipu:lc(factOf(c,"kipu")), tavoite:lc(factOf(c,"tavoite")), harrastus:lc(factOf(c,"harrastus")),
-    tuote:c.product||S.me.product||"", hyoty:c.benefit||"", aihe:ui.aihe.trim()};
+    tuote:c.product||S.me.product||"", hyoty:c.benefit||"", aihe:ui.aihe.trim(), havainto:(c.lookup?.web?.hooks||[])[0]||""};
 }
 
 /* ===================== VÄLILEHDET ===================== */
@@ -487,17 +493,15 @@ VIEWS.asiakas = () => {
   <aside class="stack" style="gap:8px"><button class="btn pri" data-new>+ Uusi asiakas</button><div class="list">${list}</div></aside>
   <div class="stack">
     <div class="row" style="justify-content:space-between"><h1>${esc(c.name||"Uusi asiakas")}</h1><span class="chip gold">Vaihe ${c.stage+1}/10: ${STEPS[c.stage].n}</span></div>
+    ${lookupPanel(c)}
     <div class="panel"><span class="eyebrow">Perustiedot</span>
       <div class="fgrid">${field("name","Nimi")}${field("company","Yritys / organisaatio")}${field("role","Rooli")}
         <label class="f">Ostajatyyppi<select id="c_seg" data-c="seg">${Object.entries(SEG).map(([k,v])=>`<option value="${k}" ${c.seg===k?"selected":""}>${v.name}</option>`).join("")}</select></label>
         ${field("size","Koko")}${field("industry","Toimiala")}${field("phone","Puhelin","tel")}${field("email","Sähköposti","email")}${field("birthday","Syntymäpäivä","date")}</div>
       <div class="fgrid">${field("product","Mitä hänelle myydään")}${field("benefit","Päähyöty hänelle (numeroina jos voi)")}</div>
-      <div class="row"><span class="note">Tutki netistä:</span>
-        <a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/search?q=${q}">Google</a>
-        <a class="btn sm" target="_blank" rel="noopener" href="https://news.google.com/search?q=${q}&hl=fi">Uutiset</a>
-        <a class="btn sm" target="_blank" rel="noopener" href="https://www.linkedin.com/search/results/all/?keywords=${q}">LinkedIn</a>
-        <a class="btn sm" target="_blank" rel="noopener" href="https://www.finder.fi/search?what=${enc(c.company||c.name)}">Finder (talousluvut)</a>
-        <a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/search?q=${enc((c.company||"")+" rekrytointi OR investointi OR laajentaa")}">Kasvusignaalit</a></div>
+      <span class="eyebrow">Yritystiedot ja näkyvyys</span>
+      <div class="fgrid">${field("ytunnus","Y-tunnus")}${field("web","Verkkosivu","url")}${field("address","Osoite")}
+        ${NETS.map(([k,l])=>field(k,l,"url")).join("")}</div>
       <div class="row"><button class="btn sm ghost" data-del="${c.id}">Poista asiakas</button></div>
     </div>
 
@@ -519,6 +523,7 @@ VIEWS.asiakas = () => {
       </div>
     </div>
 
+    ${presencePanel(c)}
     <div class="panel"><span class="eyebrow">Pelikirja: ${seg.name}</span>
       <div class="grid2">
         <dl class="kv"><dt>Arvostaa</dt><dd>${seg.arvostaa.join(", ")}</dd><dt>Pelkää</dt><dd>${seg.pelot.join(", ")}</dd><dt>Kieli</dt><dd>${seg.kieli}</dd><dt>Päättäjä</dt><dd>${seg.paattaja}</dd></dl>
@@ -541,6 +546,92 @@ VIEWS.asiakas = () => {
   </div></div>`;
 };
 
+/* ---------- Pikahaku ja näkyvyys ---------- */
+const NETS=[["instagram","Instagram"],["facebook","Facebook"],["linkedin","LinkedIn"],["tiktok","TikTok"],["youtube","YouTube"],["x","X / Twitter"]];
+let api=null; // null = tarkistamatta, true/false = hakupalvelu käytössä
+async function checkApi(){
+  try{ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),4000);
+    const r=await fetch("api/lookup?ping=1",{signal:ctrl.signal}); clearTimeout(t); api=r.ok&&(await r.json()).ok===true; }
+  catch(e){ api=false; }
+  if(tab==="asiakas") render();
+}
+function searchLinks(c,q){
+  const e=encodeURIComponent, name=q||c.company||c.name||"", n=e(name);
+  const handle=((c.instagram||"").match(/instagram\.com\/([^/?#]+)/)||[])[1]||(q&&q.startsWith("@")?q.slice(1):"");
+  const dom=((c.web||"").match(/^(?:https?:\/\/)?([^/]+)/)||[])[1]||"";
+  const L=[["Y-tunnus (Google)",`https://www.google.com/search?q=${e(name+" y-tunnus")}`],["Kaupparekisteri",`https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=${e(c.company||name)}`],
+    ["Finder",`https://www.finder.fi/search?what=${n}`],["Instagram",handle?`https://www.instagram.com/${e(handle)}/`:`https://www.google.com/search?q=${e("site:instagram.com "+name)}`],
+    ["Facebook",`https://www.facebook.com/search/top?q=${n}`],["LinkedIn",`https://www.linkedin.com/search/results/all/?keywords=${n}`],["TikTok",`https://www.tiktok.com/search?q=${n}`],
+    ["Uutiset",`https://news.google.com/search?q=${e('"'+name+'"')}&hl=fi`],["Kasvusignaalit",`https://www.google.com/search?q=${e('"'+name+'" rekrytoi OR investoi OR laajentaa OR avaa')}`]];
+  if(dom) L.push(["Sivuston nopeus",`https://pagespeed.web.dev/analysis?url=${e("https://"+dom)}`],["Sivuston tekniikka",`https://builtwith.com/${e(dom)}`]);
+  return L.map(([l,u])=>`<a class="btn sm" target="_blank" rel="noopener" href="${esc(u)}">${l}</a>`).join("");
+}
+function lookupPanel(c){
+  const busy=ui.lkBusy, res=ui.lkMsg;
+  return `<div class="panel" style="border-color:var(--accent)"><span class="eyebrow">Pikahaku · täyttää tiedot puolestasi</span>
+    <div class="row" style="flex-wrap:nowrap"><input id="lk_q" placeholder="Yrityksen nimi, Y-tunnus, verkkosivu, @instagram tai some-linkki" value="${esc(ui.lkQ||"")}" aria-label="Hakusana">
+      <button class="btn pri" data-lookup ${busy?"disabled":""}>${busy?"Haetaan…":"Hae ja täytä"}</button></div>
+    ${api===false?`<p class="note">Automaattihaku toimii, kun sovellus ajetaan omana palvelunaan (ohje Opas-välilehdellä). Tässä näkymässä selaimen turvallisuusasetukset estävät yhteydet muihin palveluihin. Hae tiedot alla olevista linkeistä tai AI-mentorin <b>Tutki netistä</b> -ohjeella.</p>`:""}
+    ${res?`<div class="stack" style="gap:6px">${res}</div>`:""}
+    <div class="row"><span class="note">Hae käsin:</span>${searchLinks(c,(ui.lkQ||"").trim())}</div>
+  </div>`;
+}
+const lvl={good:"good",warn:"warn",bad:"bad",info:""};
+function presencePanel(c){
+  const L=c.lookup, w=L?.web;
+  const chans=[["web","Verkkosivu"],...NETS];
+  const missing=chans.filter(([k])=>!c[k]).map(([,l])=>l);
+  return `<div class="panel"><span class="eyebrow">Näkyvyys${L?" · haettu "+esc(L.date):""}</span>
+    <div class="row">${chans.map(([k,l])=>c[k]?`<a class="chip good" target="_blank" rel="noopener" href="${esc(/^https?:/.test(c[k])?c[k]:"https://"+c[k])}">✓ ${l}</a>`:`<span class="chip">– ${l}</span>`).join("")}</div>
+    ${missing.length&&missing.length<chans.length?`<p class="note">Ei löytynyt: ${missing.join(", ")}. Puuttuva kanava voi olla myyntimahdollisuus – tai merkki siitä, ettei asiakas tarvitse sitä. Tarkista ennen kuin otat puheeksi.</p>`:""}
+    ${L?.company?`<dl class="kv"><dt>Virallinen nimi</dt><dd>${esc(L.company.name)}${L.company.auxNames?.length?" (myös "+esc(L.company.auxNames.join(", "))+")":""}</dd><dt>Y-tunnus</dt><dd>${esc(L.company.businessId)}</dd><dt>Yhtiömuoto</dt><dd>${esc(L.company.form||"-")}</dd><dt>Toimiala</dt><dd>${esc(L.company.industry||"-")}</dd><dt>Rekisteröity</dt><dd>${esc(L.company.registrationDate||"-")}</dd><dt>Tila</dt><dd>${L.company.active?"Toiminnassa":`<span class="chip bad">Lopettanut</span>`}</dd></dl>`:""}
+    ${L?.candidates?.length>1?`<details><summary>Muita samannimisiä yrityksiä (${L.candidates.length-1})</summary><div class="list" style="margin-top:8px">${L.candidates.filter(x=>x.businessId!==L.company?.businessId).map(x=>`<div class="fact"><span class="t">${esc(x.name)} · ${esc(x.businessId)} ${esc(x.city||"")}</span><button class="btn sm" data-lkpick="${esc(x.businessId)}">Tämä on oikea</button></div>`).join("")}</div></details>`:""}
+    ${w?`<span class="eyebrow">Miten sivut on tehty · ${esc(w.url)}</span>
+      ${w.tech.length?`<div class="row">${w.tech.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>`:""}
+      <div>${w.observations.map(o=>`<div class="fact"><span class="chip ${lvl[o.level]}">${{good:"OK",warn:"Huom",bad:"Korjaa",info:"Info"}[o.level]}</span><span class="t">${esc(o.text)}</span></div>`).join("")}</div>
+      ${w.hooks.length?`<p class="why"><b>Keskustelun avaukset:</b> ${w.hooks.map(esc).join(" ")}</p><div><button class="btn sm" data-go='["viestit","${c.id}","havainto"]'>Tee havaintoviesti</button></div>`:""}`:""}
+    ${L?.news?.length?`<span class="eyebrow">Uutiset</span><div>${L.news.map((n,i)=>`<div class="fact"><span class="chip">${esc(n.date)}</span><a class="t" target="_blank" rel="noopener" href="${esc(n.link)}">${esc(n.title)}</a><button class="btn sm ghost" data-newsfact="${i}">+ tietopankkiin</button></div>`).join("")}</div>`:""}
+    ${!L?`<p class="note">Tee pikahaku, niin tähän tulevat yritystiedot, somekanavat, arvio verkkosivuista ja tuoreet uutiset.</p>`:""}
+  </div>`;
+}
+async function runLookup(q){
+  const c=cur(); if(!q||!c) return;
+  ui.lkQ=q; ui.lkBusy=true; ui.lkMsg=""; render();
+  try{
+    if(api===false) throw new Error("offline");
+    const r=await fetch("api/lookup?q="+encodeURIComponent(q)); const j=await r.json();
+    if(!r.ok) throw new Error(j.error||"Haku epäonnistui");
+    const filled=applyLookup(c,j);
+    const msgs=[];
+    msgs.push(filled.length?`<p class="chip good" style="white-space:normal;padding:6px 10px">Täytetty: ${filled.join(", ")}</p>`:`<p class="chip" style="white-space:normal;padding:6px 10px">Ei uusia tietoja täytettäväksi. Jo täytettyjä kenttiä ei muutettu.</p>`);
+    (j.guesses||[]).forEach(g=>msgs.push(`<p class="chip warn" style="white-space:normal;padding:6px 10px">${esc(g.note)}</p>`));
+    (j.errors||[]).forEach(e=>msgs.push(`<p class="note">${esc(e)}</p>`));
+    if(!j.company&&!j.web) msgs.push(`<p class="note">Yritystä tai sivustoa ei löytynyt. Jos haet henkilöä, kokeile hänen yrityksensä nimeä tai verkkosivua.</p>`);
+    ui.lkMsg=msgs.join("");
+  }catch(e){
+    ui.lkMsg=e.message==="offline"?"":`<p class="chip bad" style="white-space:normal;padding:6px 10px">${esc(e.message==="Failed to fetch"?"Hakupalveluun ei saatu yhteyttä.":e.message)}</p>`;
+  }
+  ui.lkBusy=false; save(); render();
+}
+function applyLookup(c,j){
+  const filled=[], set=(k,v,label)=>{ if(v&&!c[k]){ c[k]=v; filled.push(label); } };
+  const co=j.company;
+  if(co){
+    if(!c.company || c.name==="Uusi asiakas") set("company",co.name,"yritys");
+    if(c.name==="Uusi asiakas"||!c.name){ c.name=co.name.replace(/\s(Oy|Ab|Oyj|Ky|Tmi)$/i,""); c.nameAuto=true; filled.push("nimi (vaihda yhteyshenkilön nimeen)"); }
+    set("ytunnus",co.businessId,"Y-tunnus"); set("industry",co.industry,"toimiala"); set("address",co.address,"osoite");
+    const addFact=t=>{ if(!c.facts.some(f=>f.t===t)) c.facts.push({c:"yritys",t}); };
+    if(co.industry) addFact("Toimiala: "+co.industry);
+    if(co.registrationDate) addFact("Yritys rekisteröity "+co.registrationDate.slice(0,4)+" ("+(co.form||"yhtiömuoto ei tiedossa")+")");
+  }
+  const w=j.web;
+  set("web",w?.url||(co?.website?(/^https?:/.test(co.website)?co.website:"https://"+co.website):""),"verkkosivu");
+  NETS.forEach(([k,l])=>set(k,(j.socials||{})[k],l));
+  if(w){ set("email",w.emails[0],"sähköposti"); set("phone",w.phones[0],"puhelin"); }
+  c.lookup={date:today(),company:co,candidates:j.candidates,web:w,news:j.news,query:j.query};
+  return filled;
+}
+
 /* ---------- Viestit ---------- */
 function buildMessage(c){
   const v=vars(c), p=ui.purpose||STEPS[Math.min(c.stage,9)].p||"tutustu";
@@ -552,7 +643,7 @@ function buildMessage(c){
   if(disc==="D"||disc==="C"||ui.channel==="email"||ui.channel==="linkedin") body=body.replace(/\s?[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,"");
   let text=body;
   if(ui.channel==="email"){
-    const subj={tutustu:"Pieni huomio",kysy:"Kysymys sinulle",arvo:"Tästä voisi olla hyötyä",onnittelu:"Hyvää syntymäpäivää!",kehu:"Hienoa työtä",esittely:"Esittely",tarina:"Lyhyt tarina",tapaaminen:"Ajatus "+(v.tavoite?"tavoitteeseenne":"teille"),ehdotus:"Ehdotus: "+(v.tuote||c.company),seuranta:"Ehdotuksen jatko",kiitos:"Kiitos!"}[p];
+    const subj={tutustu:"Pieni huomio",kysy:"Kysymys sinulle",arvo:"Tästä voisi olla hyötyä",onnittelu:"Hyvää syntymäpäivää!",kehu:"Hienoa työtä",esittely:"Esittely",tarina:"Lyhyt tarina",tapaaminen:"Ajatus "+(v.tavoite?"tavoitteeseenne":"teille"),ehdotus:"Ehdotus: "+(v.tuote||c.company),seuranta:"Ehdotuksen jatko",havainto:"Huomasin sivuillanne yhden asian",kiitos:"Kiitos!"}[p];
     text=`Aihe: ${subj}\n\n${body}\n\nTerveisin\n${S.me.name||"[nimesi]"}${S.me.company?"\n"+S.me.company:""}`;
   }
   if(ui.channel==="sms") text=body.length>300?body.slice(0,body.lastIndexOf(".",300)+1)||body:body;
@@ -679,7 +770,10 @@ TEHTÄVÄ: ${PROMPTS[ui.prompt]}
 MINÄ: ${S.me.name||"-"}, ${S.me.company||"-"}. Myyn: ${c.product||S.me.product||"-"}.
 
 ASIAKAS: ${c.name} | ${c.role||"-"} | ${c.company||"-"} | ${c.industry||"-"} | koko ${c.size||"-"}
-Ostajatyyppi: ${seg.name}
+Y-tunnus: ${c.ytunnus||"-"} | Osoite: ${c.address||"-"}
+Verkkosivu: ${c.web||"-"}
+Some: ${NETS.filter(([k])=>c[k]).map(([k,l])=>l+" "+c[k]).join(" | ")||"-"}
+${c.lookup?.web?"Havainnot sivuista: "+c.lookup.web.hooks.join(" ")+"\nSivuston tekniikka: "+(c.lookup.web.tech.join(", ")||"-")+"\n":""}${c.lookup?.news?.length?"Uutisia: "+c.lookup.news.slice(0,3).map(n=>n.date+" "+n.title).join(" / ")+"\n":""}Ostajatyyppi: ${seg.name}
 Persoona (DISC): ${d?c.disc+" – "+d.name+". "+d.puhu:"ei tiedossa – arvioi tietojen perusteella"}
 Päähyöty hänelle: ${c.benefit||"-"}
 Suhteen vaihe: ${c.stage+1}/10 – ${STEPS[c.stage].n} (${STEPS[c.stage].goal})
@@ -724,6 +818,11 @@ VIEWS.opas = () => `<div class="stack">
       <li>Kerää vain tietoja, joita hän itse jakaa tai jotka ovat julkisia. Asiakastiedot ovat henkilötietoja (GDPR).</li>
       <li>Huippumyyjän paras myyntikanava on tyytyväinen asiakas, joka suosittelee.</li></ul></div>
   </div>
+  <div class="panel"><h3>Automaattihaku</h3>
+    <p>Pikahaku hakee Y-tunnuksen ja yritystiedot kaupparekisteristä (PRH:n avoin data), lukee yrityksen verkkosivun (somelinkit, yhteystiedot, tekniikka, puutteet) ja hakee tuoreet uutiset. Syötteeksi käy nimi, Y-tunnus, verkkosivu, @instagram tai some-linkki.</p>
+    <p class="note">Tila: ${api===null?"tarkistetaan…":api?`<span class="chip good">käytössä</span>`:`<span class="chip warn">ei käytössä tässä näkymässä</span>`}</p>
+    <p class="note">Ota käyttöön jommallakummalla tavalla. <b>Omalla koneella:</b> asenna Node.js ja aja kansiossa <code>myyntimentori</code> komento <code>node server.js</code>, ja avaa sitten http://localhost:3000. <b>Verkossa:</b> vie kansio Verceliin, jolloin sovellus toimii myös puhelimessa. Tiedot tallentuvat aina siihen selaimeen ja osoitteeseen, jota käytät. Siirrä ne tarvittaessa varmuuskopiolla.</p>
+    <p class="note">Hakupalvelu ei tallenna mitään. Hakusana lähtee kaupparekisteriin, Googlen uutishakuun ja haettavan yrityksen verkkosivulle. Henkilöistä se ei hae tietoja, eikä Instagramin tai Facebookin sisältöä lueta (ne vaativat kirjautumisen).</p></div>
   <div class="panel"><h3>Omat tiedot</h3><div class="fgrid">
     <label class="f">Oma nimi<input id="me_name2" data-me="name" value="${esc(S.me.name)}"></label>
     <label class="f">Oma yritys<input id="me_company2" data-me="company" value="${esc(S.me.company)}"></label>
@@ -742,11 +841,14 @@ document.addEventListener("click", e => {
   const c=cur(), ds=b.dataset;
   if(ds.tab) return go(ds.tab);
   if(ds.go){ const g=JSON.parse(ds.go); return go(g[0],g[1],g[2]); }
-  if(ds.pick){ S.current=ds.pick; save(); return render(); }
-  if("new" in ds){ const n={id:uid(),name:"Uusi asiakas",company:"",role:"",seg:"pienyrittaja",size:"",industry:"",phone:"",email:"",birthday:"",disc:"",stage:0,product:S.me.product||"",benefit:"",notes:"",facts:[],log:[]};
-    S.contacts.push(n); S.current=n.id; tab="asiakas"; save(); render(); setTimeout(()=>{const i=$("#c_name"); i&&(i.focus(),i.select());},0); return; }
+  if(ds.pick){ S.current=ds.pick; ui.lkMsg=""; ui.lkQ=""; save(); return render(); }
+  if("new" in ds){ ui.lkQ=""; ui.lkMsg=""; const n={id:uid(),name:"Uusi asiakas",company:"",ytunnus:"",web:"",address:"",role:"",seg:"pienyrittaja",size:"",industry:"",phone:"",email:"",birthday:"",disc:"",stage:0,product:S.me.product||"",benefit:"",notes:"",facts:[],log:[]};
+    S.contacts.push(n); S.current=n.id; tab="asiakas"; save(); render(); setTimeout(()=>{const i=$("#lk_q"); i&&i.focus();},0); return; }
   if(ds.del){ if(b.dataset.confirm!=="1"){ b.dataset.confirm="1"; b.textContent="Vahvista poisto"; b.classList.remove("ghost"); return; }
     S.contacts=S.contacts.filter(x=>x.id!==ds.del); S.current=S.contacts[0]?.id; save(); return render(); }
+  if("lookup" in ds) return runLookup($("#lk_q").value.trim());
+  if(ds.lkpick){ c.ytunnus=""; c.company=""; return runLookup(ds.lkpick); }
+  if(ds.newsfact){ const n=c.lookup.news[+ds.newsfact]; c.facts.push({c:"yritys",t:`Uutinen ${n.date}: ${n.title}`}); save(); toast("Lisätty tietopankkiin"); return render(); }
   if("addfact" in ds){ const t=$("#f_txt").value.trim(); if(!t) return; c.facts.push({c:$("#f_cat").value,t}); save(); render(); $("#f_txt").focus(); return; }
   if(ds.delfact){ c.facts.splice(+ds.delfact,1); save(); return render(); }
   if(ds.disc){ c.disc=ds.disc; save(); return render(); }
@@ -768,7 +870,7 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("input", e => {
   const el=e.target, ds=el.dataset, c=cur();
-  if(ds.c && c){ c[ds.c]=el.value; save();
+  if(ds.c && c){ c[ds.c]=el.value; if(ds.c==="name") c.nameAuto=false; save();
     if(ds.c==="name"){ const o=$(`#curSel option[value="${c.id}"]`); if(o) o.textContent=el.value; } return; }
   if(ds.me){ S.me[ds.me]=el.value; save(); return; }
   if(ds.ui==="aihe"){ ui.aihe=el.value; const m=buildMessage(c); $("#m_out").value=m.text; const w=$("#waLink"); if(w){ const ph=(c.phone||"").replace(/[^\d+]/g,"").replace(/^0/,"+358").replace(/^\+/,""); w.href=`https://wa.me/${ph}?text=${encodeURIComponent(m.text)}`; } return; }
@@ -779,7 +881,7 @@ function refreshVision(){ const o=vision(); $("#vt_out").textContent=o.text; $("
 document.addEventListener("change", e => {
   const el=e.target, ds=el.dataset, c=cur();
   if(el.id==="curSel"){ S.current=el.value; save(); return render(); }
-  if(ds.c==="seg"||ds.c==="birthday"||ds.c==="phone"){ c[ds.c]=el.value; save(); return render(); }
+  if(["seg","birthday","phone","web","instagram","facebook","linkedin","tiktok","youtube","x"].includes(ds.c)){ c[ds.c]=el.value; save(); return render(); }
   if(ds.ui==="purpose"){ ui.purpose=el.value; ui.variant=0; return render(); }
   if(ds.ui==="channel"){ ui.channel=el.value; return render(); }
   if(ds.vrow!==undefined && el.tagName==="SELECT"){ ui.vt.rows[+ds.vrow].k=el.value; return refreshVision(); }
@@ -787,8 +889,10 @@ document.addEventListener("change", e => {
 });
 document.addEventListener("keydown", e => {
   if(e.key!=="Enter") return;
+  if(e.target.id==="lk_q"){ e.preventDefault(); runLookup(e.target.value.trim()); }
   if(e.target.id==="f_txt"){ e.preventDefault(); document.querySelector("[data-addfact]").click(); }
   if(e.target.id==="l_txt"){ e.preventDefault(); document.querySelector("[data-addlog]").click(); }
 });
 render();
+checkApi();
 </script>

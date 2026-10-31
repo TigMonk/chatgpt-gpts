@@ -140,13 +140,24 @@ Repossa on mukana selaimessa toimiva sovellus: `myyntimentori/index.html`. Avaa 
 | Näkymä | Mitä tekee |
 |--------|-----------|
 | **Tänään** | Kertoo kenelle ottaa yhteyttä: syntymäpäivät, unohtuneet asiakkaat, puuttuvat tiedot, seuraava vaihe |
-| **Asiakasprofiili** | Perustiedot, tietopankki (tavoite 30), DISC-persoona, ostajatyypin pelikirja, 10 arvoportaata, historia, netti-hakunapit |
+| **Pikahaku** | Syötä nimi, Y-tunnus, verkkosivu, @instagram tai some-linkki. Sovellus hakee Y-tunnuksen ja yritystiedot kaupparekisteristä, somekanavat ja yhteystiedot verkkosivulta, arvioi miten sivut on tehty ja hakee tuoreet uutiset. |
+| **Asiakasprofiili** | Perustiedot, tietopankki (tavoite 30), DISC-persoona, ostajatyypin pelikirja, 10 arvoportaata, historia, Y-tunnus, verkkosivu, somekanavat, näkyvyysarvio, netti-hakunapit |
 | **Viestit** | Valmiit WhatsApp-, tekstiviesti-, sähköposti- ja LinkedIn-viestit asiakkaan tietojen pohjalta + perustelu miksi viesti toimii |
 | **Visiotarina** | "Myy jäätä eskimolle" rehellisesti: fakta / suunnitelma / mahdollisuus + rehellisyysvahti |
 | **Vastaväitteet** | 8 yleisintä vastaväitettä vastauksineen ja jatkokysymyksineen |
 | **AI-mentori** | Kokoaa asiakkaan koko profiilin valmiiksi ohjeeksi ChatGPT:hen, Claudeen tai tähän GPT:hen |
 
 Tiedot tallentuvat vain omaan selaimeen. Varmuuskopio löytyy Opas-välilehdeltä.
+
+### Automaattihaun käyttöönotto
+
+Pikahaku tarvitsee pienen hakupalvelun (`myyntimentori/api/lookup.js`), koska selain ei saa hakea tietoja suoraan muilta sivustoilta.
+
+- **Omalla koneella:** asenna Node.js 18+, aja `cd myyntimentori && node server.js` ja avaa http://localhost:3000
+- **Verkossa (toimii myös puhelimessa):** vie kansio `myyntimentori` Verceliin. `vercel.json` sisältää valmiit asetukset.
+- **Testit:** `cd myyntimentori && npm test`
+
+Tietolähteet: PRH:n avoin YTJ-rajapinta (Y-tunnus, toimiala, osoite, verkkosivu), yrityksen oma verkkosivu (somelinkit, yhteystiedot, tekniikka, puutteet) ja Google Newsin RSS-haku. Instagramin ja Facebookin sisältöä ei lueta, koska ne vaativat kirjautumisen. Henkilöistä hakupalvelu ei kerää tietoja.
 
 ---
 
