@@ -105,6 +105,15 @@ table{border-collapse:collapse;width:100%;font-size:15px}
 .tbl{overflow-x:auto}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 th{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media (max-width:860px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bubble{background:var(--mint);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:15px;line-height:1.35;display:flex;flex-direction:column;gap:6px;min-width:0}
+.bubble b{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pine)}
+.bubble.me{background:var(--steel);border-radius:14px 14px 4px 14px}
+.log{display:flex;flex-direction:column;gap:0}
+.log div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.log time{font:500 13px var(--mono);color:var(--muted)}
+.yr{font-variant-numeric:tabular-nums}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-weight:700}
 footer{padding-block:30px 60px;border-top:1px solid var(--line)}
 </style>
@@ -265,6 +274,74 @@ Teen tällaisia pieniä tarkistuksia paikallisille salongeille ilmaiseksi. Lähe
     </table></div>
   </section>
 
+  <section id="whatsapp">
+    <span class="eyebrow">Lisä · WhatsApp-vastaanotto</span>
+    <h2>Puhelinnumero on asiakkaan tunnus</h2>
+    <p class="col">Kukaan ei halua luoda tunnusta jokaiselle parturille, mutta lähes kaikilla on WhatsApp. Kun varaus tehdään WhatsAppissa, asiakkaan puhelinnumero on hänen tunnuksensa. Rekisteröitymistä ei tarvita, ja samalla saadaan muistutukset, joilla ohareita vähennetään.</p>
+    <div class="steps">
+      <div class="bubble me"><b>Asiakas</b>"Moi, onko huomenna aikaa parturiin?"</div>
+      <div class="bubble"><b>Varausbotti</b>Kalenterinäkymä: ke 14.00, ke 16.30, to 10.00. Napautus varaa ajan.</div>
+      <div class="bubble"><b>Päivää ennen</b>"Huomenna klo 16.30 Ogelissa. Vahvista ✓ tai peru."</div>
+      <div class="bubble"><b>Jos peruu</b>Vapautunut aika tarjotaan heti jonossa oleville: "Huomenna vapautui 16.30 – otatko?"</div>
+      <div class="bubble"><b>Käynnin jälkeen</b>Kiitos ja linkki Google-arvioon. Kanta-asiakasleima: 5/10.</div>
+      <div class="bubble"><b>5 viikon päästä</b>"Alkaako tukka kasvaa? Sama aika kuin viimeksi, ke 16.30?"</div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h3>Mitä WhatsApp osaa ja mitä ei</h3><ul class="l">
+        <li><b>Ilmaisessa WhatsApp Business -sovelluksessa ei ole kalenteria eikä varausta.</b> Siinä on luettelo, pikavastaukset, poissaoloviesti ja tunnisteet.</li>
+        <li>Varaus kalenterinäkymällä vaatii <b>WhatsApp Business Platformin</b> (API) ja sen <b>Flows</b>-lomakkeet. Niissä on päivämäärävalitsin ja Metan valmis "Book an Appointment" -pohja.</li>
+        <li>Vapaat ajat tulevat omasta taustapalvelusta, esimerkiksi Google-kalenterista. Siksi rakennetaan pieni palvelu, joka synkronoi kalenterin, WhatsAppin ja puhelut.</li>
+        <li>Sama numero voi toimia myös vastaamattomien puheluiden vastaajana: puheluun, johon ei vastata, lähtee WhatsApp-viesti varauslinkillä.</li></ul></div>
+      <div class="panel"><h3>Kulut</h3><ul class="l">
+        <li><b>Viestit:</b> Meta laskuttaa viestityypin ja vastaanottajan maan mukaan. Muistutukset ovat utility-viestejä, joiden hinta on luokkaa senttejä. Markkinointiviestit ovat kalliimpia. Suomen hinnat löytyvät Metan hinnastosta.</li>
+        <li><b>Asiakkaan aloittamat keskustelut:</b> kolmansien osapuolten mukaan 1.10.2026 alkaen 1 000 palveluviestiä kuukaudessa on ilmaisia, ja sen jälkeen ne ovat maksullisia. Tarkista Metan hinnastosta.</li>
+        <li><b>Välityspalvelu</b> (BSP, esim. 360dialog) ja palvelimet: kuukausimaksu, jonka voi jakaa monen salongin kesken.</li>
+        <li>Arvio: jos salongilla on 400 varausta kuukaudessa, muistutuksiin menee muutamia euroja kuukaudessa. Tekstiviesteinä samat muistutukset maksaisivat 0,08 € kappale.</li></ul></div>
+    </div>
+    <p class="verdict col">Rehellinen arvio: WhatsApp-varaus ratkaisee rekisteröitymisen, ohareet ja vapautuneiden aikojen täytön, eli juuri ne asiat, joita Timmassa ei ole. Uusia asiakkaita se ei kuitenkaan tuo kuten Timman markkinapaikka. Siksi se toimii parhaiten Timman rinnalla kanta-asiakkaille (polku A).</p>
+  </section>
+
+  <section id="ansainta">
+    <span class="eyebrow">Ansaintamalli</span>
+    <h2>Kumppani, ei ohjelmistotalo</h2>
+    <p class="col">Parturi-kampaamot elävät tiukalla budjetilla, ja varausohjelmistoja on jo kymmeniä, osa lähes ilmaisia. Oman varausjärjestelmän myyminen on siksi huono liiketoiminta. Parempi malli: ajanvaraus ja näkyvyysarvio avaavat oven, ja raha tulee siitä, että käyt läpi yrittäjän kiinteät kulut ja kilpailutat ne. Yrittäjä säästää eikä maksa sinulle mitään, ja palveluntarjoaja maksaa sinulle liidipalkkion ja kuukausittaisen osuuden.</p>
+    <div class="grid2">
+      <div class="panel"><h3>Mitä kilpailutetaan</h3>
+        <div class="tbl"><table><thead><tr><th>Kulu</th><th>Tyypillinen säästökohde</th></tr></thead><tbody>
+          <tr><td>Kirjanpito ja tili</td><td>100 €/kk → noin 50 €/kk uusissa palveluissa</td></tr>
+          <tr><td>Maksupääte</td><td>kuukausimaksu ja maksuprosentti</td></tr>
+          <tr><td>Puhelin- ja nettiliittymät</td><td>useita numeroita yhteen</td></tr>
+          <tr><td>Sähkö (liiketila)</td><td>sopimustyyppi</td></tr>
+          <tr><td>Ajanvaraus ja sivut</td><td>Timma, Wix, päällekkäiset palvelut</td></tr>
+        </tbody></table></div>
+        <p class="note">Vakuutusten ja lainojen välittäminen vaatii rekisteröitymisen (Finanssivalvonta). Ohjaa ne rekisteröidylle kumppanille tai jätä pois. Kerro asiakkaalle aina, että saat palkkion.</p></div>
+      <div class="panel"><h3>Laske oma ansio</h3>
+        <label class="f">Uusia yrittäjäasiakkaita / vuosi <span class="v" id="o_n"></span><input type="range" id="j_n" min="5" max="200" step="5" value="30"></label>
+        <label class="f">Vaihdettuja palveluita / asiakas <span class="v" id="o_k"></span><input type="range" id="j_k" min="1" max="5" value="2"></label>
+        <label class="f">Liidipalkkio / vaihto <span class="v" id="o_l"></span><input type="range" id="j_l" min="0" max="800" step="25" value="150"></label>
+        <label class="f">Jatkuva osuus €/kk / vaihto <span class="v" id="o_m"></span><input type="range" id="j_m" min="0" max="20" value="8"></label>
+        <label class="f">Asiakkaista lähtee vuodessa <span class="v" id="o_c"></span><input type="range" id="j_c" min="0" max="40" step="5" value="15"></label>
+        <div class="tbl"><table class="yr"><thead><tr><th>Vuosi</th><th>Aktiivisia vaihtoja</th><th>Liidipalkkiot</th><th>Jatkuva</th><th>Yhteensä</th></tr></thead><tbody id="earn"></tbody></table></div>
+        <p class="note">Esimerkkiluvut. Palkkiot sovitaan jokaisen kumppanin kanssa erikseen. Esimerkiksi Tilitoimisto X maksaa omille asiakkailleen 99 €:n suosittelupalkkion, ja ohjelmistotalot maksavat tilitoimistoille jälleenmyyntipalkkioita. 500 € + 8 €/kk on neuvottelutavoite, ei markkinahinta.</p></div>
+    </div>
+    <div class="panel"><h3>Kuka voisi maksaa sinulle salongista</h3><ul class="l">
+      <li><b>Timman kilpailijat:</b> jokainen Timmasta vaihtava salonki on niille arvokas. Kysy Aikalyltä, Vellolta ja Freshalta kumppani- tai suosittelumallia.</li>
+      <li><b>Kirjanpito ja yritystili:</b> suurin yksittäinen säästö ja pitkä asiakkuus, eli paras jatkuva tulo.</li>
+      <li><b>Maksupäätteet ja liittymät:</b> pienempiä palkkioita, mutta vaihtaminen on helppoa.</li>
+      <li><b>Verkosto:</b> 30–50 yrittäjän ryhmä, joka neuvottelee porukalla halvemmat hinnat (esim. tuotteet, tilat, kirjanpito). Sinä ylläpidät verkostoa, ja jäsenmaksu tai kumppanien palkkiot ovat MRR:ää.</li></ul></div>
+    <p class="verdict col" id="earnVerdict"></p>
+  </section>
+
+  <section id="loki">
+    <span class="eyebrow">Loki</span>
+    <h2>Casen eteneminen</h2>
+    <div class="log">
+      <div><time>31.10.2026</time><span>Case luotu: Wix + Timma -salonki, BuiltWith-profiili, kolme polkua.</span></div>
+      <div><time>31.10.2026</time><span>Rahallinen arvio: Timman korvaaminen säästää noin 600–1 200 € vuodessa. Yksinään se on liian pieni kauppa, joten fokus siirtyy kumppanimalliin.</span></div>
+      <div><time>31.10.2026</time><span><b>Innostus WhatsApp-kalenterista.</b> Varaus, muistutus, vahvistus, vapautuneen ajan tarjoaminen ja kanta-asiakasleimat yhdellä numerolla ilman rekisteröitymistä. Jatketaan tätä.</span></div>
+    </div>
+  </section>
+
   <section>
     <span class="eyebrow">Tarkista ennen tarjousta</span>
     <h2>Mikä on varmaa ja mikä ei</h2>
@@ -273,13 +350,18 @@ Teen tällaisia pieniä tarkistuksia paikallisille salongeille ilmaiseksi. Lähe
         <li>Timma Pro alkaen 20 €/käyttäjä/kk, tekstiviesti 0,08 € (<a href="https://timma.fi/pro/pricing" target="_blank" rel="noopener">Timman hinnasto</a>)</li>
         <li>Provisio uuden asiakkaan ensimmäisestä markkinapaikkavarauksesta nousi 15 %:sta 20 %:iin, eikä seuraavista varauksista peritä maksua (<a href="https://yle.fi/a/74-20158967" target="_blank" rel="noopener">Yle</a>)</li>
         <li>Google-kalenterissa yksi maksuton varaussivu henkilökohtaisella tilillä (<a href="https://support.google.com/calendar/answer/10729749" target="_blank" rel="noopener">Google-tuki</a>)</li>
-        <li>Verkkomaksut Wix Bookingsissa vaativat yrityspaketin (<a href="https://support.wix.com/en/article/upgrading-wix-bookings" target="_blank" rel="noopener">Wix-tuki</a>)</li></ul></div>
+        <li>Verkkomaksut Wix Bookingsissa vaativat yrityspaketin (<a href="https://support.wix.com/en/article/upgrading-wix-bookings" target="_blank" rel="noopener">Wix-tuki</a>)</li>
+        <li>WhatsAppin varauslomakkeet (Flows) toimivat vain Business Platformissa (<a href="https://whatsappbusiness.com/products/whatsapp-flows/" target="_blank" rel="noopener">WhatsApp Flows</a>), viestien hinnat <a href="https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing" target="_blank" rel="noopener">Metan hinnastossa</a></li>
+        <li>Suosittelupalkkioesimerkki: <a href="https://tilitoimistox.fi/suosittele/" target="_blank" rel="noopener">Tilitoimisto X</a>, jälleenmyyntipalkkio: <a href="https://fivaldi.fi/tilitoimistolle/kumppaniohjelma/" target="_blank" rel="noopener">Fivaldi</a></li></ul></div>
       <div class="panel"><h3 style="color:var(--brass)">Tarkistettava tapauskohtaisesti</h3><ul class="l">
         <li>Onko salongin Wix-paketissa varaukset mukana?</li>
         <li>Vaatiiko Wix Bookings asiakkaalta jäsentilin? Wixin omat ohjeet ovat tästä ristiriitaisia (<a href="https://support.wix.com/en/article/wix-bookings-request-requiring-login-or-registration-before-booking-a-service" target="_blank" rel="noopener">Wix-tuki</a>).</li>
         <li>Perii Timma provisiota salongin oman varauslinkin kautta tulevista uusista asiakkaista?</li>
         <li>Toimiiko Googlen "Varaa verkossa" -nappi Suomessa valitulla järjestelmällä?</li>
-        <li>Haluaako juuri tämä salonki pois Timmasta? Kysy, älä oleta.</li></ul></div>
+        <li>Haluaako juuri tämä salonki pois Timmasta? Kysy, älä oleta.</li>
+        <li>Wix vaatii asiakkaalta todennäköisesti jäsentilin varaukseen (<a href="https://www.wix.com/app-market/bookings/overview" target="_blank" rel="noopener">Wix App Market</a>). Tämä heikentää polkua B.</li>
+        <li>WhatsAppin Suomen viestihinnat ja palveluviestien ilmaiskiintiö 1.10.2026 alkaen</li>
+        <li>Saako saman numeron käyttöön sekä WhatsApp Business -sovelluksessa että Platformissa?</li></ul></div>
     </div>
   </section>
 
@@ -340,5 +422,21 @@ document.addEventListener("click",e=>{
     try{navigator.clipboard.writeText(t).then(ok,()=>{});}catch(err){} }
 });
 document.addEventListener("input",e=>{ if(e.target.id&&e.target.id.startsWith("i_")) calc(); });
-drawFlow("now"); calc();
+function earn(){
+  const g=id=>+document.getElementById("j_"+id).value;
+  const n=g("n"),k=g("k"),l=g("l"),m=g("m"),c=g("c");
+  const set=(id,t)=>document.getElementById("o_"+id).textContent=t;
+  set("n",n);set("k",k);set("l",l+" €");set("m",m+" €");set("c",c+" %");
+  let active=0, rows="", total=0;
+  for(let y=1;y<=3;y++){
+    const fresh=n*k, start=active*(1-c/100);
+    const lead=fresh*l, rec=(start*12+fresh*6)*m; // uudet keskimäärin puoli vuotta
+    active=start+fresh; total+=lead+rec;
+    rows+=`<tr><td>${y}</td><td>${Math.round(active)}</td><td>${eur(lead)}</td><td>${eur(rec)}</td><td><b>${eur(lead+rec)}</b></td></tr>`;
+  }
+  document.getElementById("earn").innerHTML=rows;
+  document.getElementById("earnVerdict").innerHTML=`Näillä luvuilla kolmessa vuodessa yhteensä <b>${eur(total)}</b>, ja jatkuvan tulon osuus kasvaa joka vuosi. Ajanvarauscase on sisäänheittäjä: se näyttää, että ymmärrät yrittäjän arjen, ja avaa keskustelun kaikista kuluista.`;
+}
+document.addEventListener("input",e=>{ if(e.target.id&&e.target.id.startsWith("j_")) earn(); });
+drawFlow("now"); calc(); earn();
 </script>
